@@ -17,7 +17,10 @@ import WeatherKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
-    let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "PlatformSensorBridge")
+    guard let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "PlatformSensorBridge") else {
+      assertionFailure("PlatformSensorBridge registrar is unavailable.")
+      return
+    }
     PlatformSensorBridge.register(with: registrar)
   }
 }
