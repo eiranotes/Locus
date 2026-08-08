@@ -1,0 +1,90 @@
+name: Flutter import failure reporter
+
+on:
+  workflow_run:
+    workflows: ["Flutter CI"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: flutter-import-failure-reporter
+  cancel-in-progress: false
+
+jobs:
+  sync-failure-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create, update, or close the import failure issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run = context.payload.workflow_run;
+            if (run.head_branch !== 'main') {
+              core.info(`Ignoring ${run.head_branch}; only main updates the import failure issue.`);
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'Flutter import requires follow-up';
+            const {data: openIssues} = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: 'open',
+              per_page: 100,
+            });
+            const existing = openIssues.find(
+              issue => !issue.pull_request && issue.title === title,
+            );
+
+            if (run.conclusion === 'success') {
+              if (existing) {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: existing.number,
+                  body: `Resolved by successful Flutter CI run ${run.html_url} at \`${run.head_sha}\`.`,
+                });
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: existing.number,
+                  state: 'closed',
+                  state_reason: 'completed',
+                });
+              }
+              core.info('The main Flutter CI run succeeded.');
+              return;
+            }
+
+            const body = [
+              'The latest `Flutter CI` run on `main` did not succeed.',
+              '',
+              `- Conclusion: \`${run.conclusion ?? 'unknown'}\``,
+              `- Event: \`${run.event}\``,
+              `- Head SHA: \`${run.head_sha}\``,
+              `- Run: ${run.html_url}`,
+              '',
+              'Review the failed job and step logs in the linked run. This issue remains open until a later successful `main` run closes it automatically.',
+            ].join('\n');
+
+            if (existing) {
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body,
+              });
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body: `Updated for run ${run.html_url}.`,
+              });
+            } else {
+              await github.rest.issues.create({owner, repo, title, body});
+            }
