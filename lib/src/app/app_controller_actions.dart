@@ -37,7 +37,7 @@ extension AppControllerActions on AppController {
       await _reloadAll();
       await refreshCapturePreparation(notify: false);
     });
-    notifyListeners();
+    notifyChanged();
     return output;
   }
 
@@ -48,12 +48,12 @@ extension AppControllerActions on AppController {
   }) async {
     if (!_unlockedRecipeIds.contains(recipe.id)) {
       _errorMessage = '아직 열리지 않은 만드는 법입니다.';
-      notifyListeners();
+      notifyChanged();
       return null;
     }
     if (construction != null) {
       _errorMessage = '진행 중인 공사를 먼저 마쳐 주세요.';
-      notifyListeners();
+      notifyChanged();
       return null;
     }
 
@@ -98,7 +98,7 @@ extension AppControllerActions on AppController {
       created = savedObject;
       await _evaluateAndPersistVisitors();
     });
-    notifyListeners();
+    notifyChanged();
     return created;
   }
 
@@ -121,7 +121,7 @@ extension AppControllerActions on AppController {
         _placements.length >= catalog.balance.activeObjectLimit) {
       _errorMessage =
           '내 공간에는 물건을 ${catalog.balance.activeObjectLimit}개까지 놓을 수 있습니다.';
-      notifyListeners();
+      notifyChanged();
       return false;
     }
     final candidate = Placement(
@@ -147,7 +147,7 @@ extension AppControllerActions on AppController {
         );
     if (!validation.valid) {
       _errorMessage = validation.message;
-      notifyListeners();
+      notifyChanged();
       return false;
     }
 
@@ -167,7 +167,7 @@ extension AppControllerActions on AppController {
       }
       await _evaluateAndPersistVisitors();
     });
-    notifyListeners();
+    notifyChanged();
     return true;
   }
 
@@ -194,7 +194,7 @@ extension AppControllerActions on AppController {
       );
       await _evaluateAndPersistVisitors();
     });
-    notifyListeners();
+    notifyChanged();
   }
 
   VisitorEvaluation? get targetVisitor {
@@ -411,7 +411,7 @@ extension AppControllerActions on AppController {
     if (_busy) return;
     _busy = true;
     _errorMessage = null;
-    notifyListeners();
+    notifyChanged();
     try {
       await action();
     } catch (error) {

@@ -146,6 +146,9 @@ class _CaptureSheetState extends State<CaptureSheet> {
     if (include) {
       include = await _requestBluetoothPermission();
     }
+    if (!mounted) {
+      return;
+    }
     setState(() => _capturing = true);
     final bundle = await AppScope.read(
       context,

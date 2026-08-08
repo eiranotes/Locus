@@ -129,6 +129,8 @@ class AppController extends ChangeNotifier {
 
   TimeBand get sceneTimeBand => timeBandFor(DateTime.now());
 
+  void notifyChanged() => notifyListeners();
+
   Future<void> initialize() async {
     if (_initialized) return;
     await _guard(() async {

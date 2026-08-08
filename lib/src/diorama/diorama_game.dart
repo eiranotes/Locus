@@ -22,6 +22,7 @@ class DioramaGame extends FlameGame {
 
   @override
   void render(Canvas canvas) {
+    super.render(canvas);
     DioramaScenePainter(_snapshot).paint(canvas, Size(size.x, size.y));
   }
 }
@@ -82,7 +83,7 @@ class DioramaScenePainter {
               Colors.transparent,
             ],
           ).createShader(
-            const Rect.fromCircle(center: Offset(180, 180), radius: 180),
+            Rect.fromCircle(center: const Offset(180, 180), radius: 180),
           );
     canvas.drawRect(const Rect.fromLTWH(0, 0, logicalSize, logicalSize), glow);
   }

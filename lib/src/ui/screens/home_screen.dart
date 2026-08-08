@@ -4,6 +4,7 @@ import 'package:reality_diorama/src/app/app_scope.dart';
 import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/diorama/diorama_view.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
+import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/domain/engines/visitor_engine.dart';
 import 'package:reality_diorama/src/ui/screens/crafting_screen.dart';
 import 'package:reality_diorama/src/ui/screens/placement_editor_screen.dart';
