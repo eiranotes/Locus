@@ -2,22 +2,38 @@ name: Flutter CI
 
 on:
   push:
-    branches: ['**']
+    branches:
+      - main
   pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: flutter-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: 3.44.9
+
 jobs:
   verify:
+    name: Analyze, test, and build Android
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.44.9
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
       - name: Generate platform wrappers
         run: ./tool/bootstrap_platforms.sh
@@ -25,6 +41,8 @@ jobs:
         run: flutter pub get
       - name: Repository contracts
         run: python3 tool/check_repo.py
+      - name: Import completion contract
+        run: python3 tool/check_import_contract.py
       - name: Check Dart formatting
         run: dart format --output=none --set-exit-if-changed lib test
       - name: Analyze
@@ -33,15 +51,28 @@ jobs:
         run: flutter test
       - name: Build Android debug APK
         run: flutter build apk --debug --dart-define=DEMO_MODE=true --no-pub
+      - name: Upload Android debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: locus-android-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
 
   ios-compile:
+    name: Build iOS simulator
     runs-on: macos-15
+    timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.44.9
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
       - name: Generate platform wrappers
         run: ./tool/bootstrap_platforms.sh
@@ -52,3 +83,21 @@ jobs:
         run: pod install --repo-update
       - name: Build iOS simulator
         run: flutter build ios --simulator --debug --dart-define=DEMO_MODE=true --no-pub
+
+  import-contract:
+    name: Import contract
+    if: always()
+    needs:
+      - verify
+      - ios-compile
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require both platform gates
+        env:
+          ANDROID_RESULT: ${{ needs.verify.result }}
+          IOS_RESULT: ${{ needs.ios-compile.result }}
+        run: |
+          set -euo pipefail
+          test "$ANDROID_RESULT" = success
+          test "$IOS_RESULT" = success
