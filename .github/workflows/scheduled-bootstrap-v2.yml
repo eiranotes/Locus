@@ -4,6 +4,8 @@ on:
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
@@ -14,6 +16,7 @@ concurrency:
 
 jobs:
   import-source:
+    if: github.event_name != 'issues' || github.event.issue.title == '[bootstrap] import Flutter source'
     runs-on: ubuntu-latest
     steps:
       - name: Check out import branch
@@ -60,8 +63,6 @@ jobs:
           bash -n tool/publish_github.sh
           bash -n tool/validate.sh
 
-          # A GITHUB_TOKEN push can be rejected when the same commit adds a workflow.
-          # Register the production CI workflow separately through the GitHub connector.
           rm -f .github/workflows/flutter-ci.yml
           rm -rf bootstrap
 
