@@ -42,7 +42,7 @@ class CellEffects {
         height: height == null
             ? this.height
             : HeightBand.values[
-                math.max(this.height.index, height.index),
+                math.max(this.height.index, height.index)
               ],
       );
 }
