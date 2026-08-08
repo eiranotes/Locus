@@ -16,6 +16,11 @@ if ! command -v flutter >/dev/null 2>&1; then
   exit 1
 fi
 
+# Flutter 3.44 enables Swift Package Manager for plugins by default. This app
+# intentionally uses CocoaPods until the iOS wrapper and all selected plugins
+# pass the migration gate together.
+flutter config --no-enable-swift-package-manager >/dev/null
+
 BRIDGE_DIR="$(mktemp -d)"
 trap 'rm -rf "$BRIDGE_DIR"' EXIT
 cp android/app/src/main/kotlin/com/eiranotes/reality_diorama/MainActivity.kt "$BRIDGE_DIR/MainActivity.kt"
@@ -37,4 +42,4 @@ cp "$BRIDGE_DIR/SceneDelegate.swift" ios/Runner/SceneDelegate.swift
 
 python3 tool/patch_platform_manifests.py
 
-echo "Platform wrappers generated and sensor bridges reapplied."
+echo "Platform wrappers generated with CocoaPods and sensor bridges reapplied."
