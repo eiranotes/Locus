@@ -1,0 +1,193 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:reality_diorama/src/domain/content_catalog.dart';
+import 'package:reality_diorama/src/domain/entities.dart';
+import 'package:reality_diorama/src/domain/enums.dart';
+import 'package:reality_diorama/src/platform/ambient_scanner.dart';
+import 'package:reality_diorama/src/services/capture_coordinator.dart';
+import 'package:reality_diorama/src/services/location_gateway.dart';
+import 'package:reality_diorama/src/services/weather_gateway.dart';
+
+import 'test_fixtures.dart';
+
+void main() {
+  final now = DateTime(2026, 8, 8, 19, 14);
+  final snapshot = WeatherSnapshot(
+    temperatureCelsius: 22,
+    apparentTemperatureCelsius: 22,
+    precipitationMillimeters: 0.7,
+    cloudCoverPercent: 90,
+    windSpeedKph: 8,
+    visibilityMeters: 12000,
+    weatherCode: 61,
+    observedAt: now,
+    basis: WeatherBasis.providerCurrentModel,
+    providerName: 'Test provider',
+  );
+
+  test('provider failure creates no fake weather and keeps surroundings usable', () async {
+    final coordinator = CaptureCoordinator(
+      locationGateway: const _FixedLocationGateway(),
+      weatherGateway: _ThrowingWeatherGateway(),
+      ambientScanner: const _FixedAmbientScanner(),
+      catalog: ContentCatalog(
+        recipes: const <RecipeDefinition>[],
+        visitors: const <VisitorDefinition>[],
+        balance: testBalance(),
+      ),
+    );
+
+    final preparation = await coordinator.prepare(now: now);
+    expect(preparation.weatherSnapshot, isNull);
+    expect(preparation.weatherKind, isNull);
+    expect(preparation.weatherReadiness.status, ReadinessStatus.unavailable);
+    expect(preparation.surroundingReadiness.isReady, isTrue);
+
+    final result = await coordinator.capture(
+      preparation: preparation,
+      now: now,
+      includeSurroundings: true,
+    );
+
+    expect(result.weatherMaterial, isNull);
+    expect(result.surroundingMaterial, isNotNull);
+    expect(result.record.weatherBasis, WeatherBasis.unavailable);
+    expect(result.record.weatherMaterialId, isNull);
+    expect(result.record.surroundingMaterialId, isNotNull);
+  });
+
+  test('fallback location does not call the weather provider', () async {
+    final gateway = _CountingWeatherGateway(snapshot);
+    final coordinator = CaptureCoordinator(
+      locationGateway: const _FallbackLocationGateway(),
+      weatherGateway: gateway,
+      ambientScanner: const _FixedAmbientScanner(),
+      catalog: ContentCatalog(
+        recipes: const <RecipeDefinition>[],
+        visitors: const <VisitorDefinition>[],
+        balance: testBalance(),
+      ),
+    );
+
+    final preparation = await coordinator.prepare(now: now);
+    expect(gateway.callCount, 0);
+    expect(preparation.weatherSnapshot, isNull);
+    expect(preparation.weatherKind, isNull);
+    expect(preparation.weatherReadiness.status, ReadinessStatus.unavailable);
+
+    final result = await coordinator.capture(
+      preparation: preparation,
+      now: now,
+      includeSurroundings: false,
+    );
+
+    expect(result.weatherMaterial, isNull);
+    expect(result.record.weatherBasis, WeatherBasis.unavailable);
+    expect(result.record.coarseCellId, isNull);
+    expect(result.record.userPlaceLabel, '위치 권한 필요');
+  });
+
+  test('available provider creates a weather material with its provenance', () async {
+    final coordinator = CaptureCoordinator(
+      locationGateway: const _FixedLocationGateway(),
+      weatherGateway: _CountingWeatherGateway(snapshot),
+      ambientScanner: const _FixedAmbientScanner(),
+      catalog: ContentCatalog(
+        recipes: const <RecipeDefinition>[],
+        visitors: const <VisitorDefinition>[],
+        balance: testBalance(),
+      ),
+    );
+
+    final preparation = await coordinator.prepare(now: now);
+    expect(preparation.weatherKind, WeatherMaterialKind.rain);
+    expect(preparation.weatherReadiness.isReady, isTrue);
+
+    final result = await coordinator.capture(
+      preparation: preparation,
+      now: now,
+      includeSurroundings: false,
+    );
+
+    expect(result.weatherMaterial?.providerName, 'Test provider');
+    expect(result.record.weatherBasis, WeatherBasis.providerCurrentModel);
+  });
+}
+
+class _CountingWeatherGateway implements WeatherGateway {
+  _CountingWeatherGateway(this.snapshot);
+
+  final WeatherSnapshot snapshot;
+  int callCount = 0;
+
+  @override
+  Future<WeatherAttributionInfo> attribution() async =>
+      const WeatherAttributionInfo(
+        serviceName: 'Test',
+        notice: 'Test attribution',
+      );
+
+  @override
+  Future<WeatherSnapshot> current(GeoPoint point) async {
+    callCount += 1;
+    return snapshot;
+  }
+}
+
+class _ThrowingWeatherGateway implements WeatherGateway {
+  @override
+  Future<WeatherAttributionInfo> attribution() async =>
+      const WeatherAttributionInfo(
+        serviceName: 'Unavailable',
+        notice: 'Unavailable provider',
+      );
+
+  @override
+  Future<WeatherSnapshot> current(GeoPoint point) async {
+    throw StateError('provider unavailable');
+  }
+}
+
+class _FixedAmbientScanner implements AmbientScanner {
+  const _FixedAmbientScanner();
+
+  @override
+  Future<AmbientFeatures?> scan({required Duration duration}) async =>
+      const AmbientFeatures(
+        uniqueCount: 11,
+        medianRssi: -67,
+        strongSignalRatio: 0.27,
+        persistence: 0.52,
+        churn: 0.61,
+        observationCoverage: 0.93,
+      );
+}
+
+class _FixedLocationGateway implements LocationGateway {
+  const _FixedLocationGateway();
+
+  @override
+  Future<LocationFix> current() async => const LocationFix(
+        point: GeoPoint(
+          latitude: 37.5446,
+          longitude: 127.0559,
+          accuracyMeters: 30,
+        ),
+        label: '성수동',
+        isFallback: false,
+      );
+}
+
+class _FallbackLocationGateway implements LocationGateway {
+  const _FallbackLocationGateway();
+
+  @override
+  Future<LocationFix> current() async => const LocationFix(
+        point: GeoPoint(
+          latitude: 37.5665,
+          longitude: 126.9780,
+          accuracyMeters: 5000,
+        ),
+        label: '위치 권한 필요',
+        isFallback: true,
+      );
+}

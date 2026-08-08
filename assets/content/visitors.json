@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "visitors": [
+    {
+      "id": "umbrella_walker",
+      "nameKo": "우산 산책자",
+      "descriptionKo": "젖은 길과 이어진 불빛을 따라 천천히 걷습니다.",
+      "hintsKo": ["젖은 칸을 좋아해요", "이어진 불빛이 필요해요", "저녁이나 밤에 찾아와요"],
+      "requirements": [
+        {"kind": "wetCells", "min": 3},
+        {"kind": "connectedLights", "min": 2},
+        {"kind": "timeBand", "anyOf": ["evening", "night"]}
+      ],
+      "reward": {"kind": "recipe", "value": "pond"}
+    },
+    {
+      "id": "night_moth",
+      "nameKo": "야간 나방",
+      "descriptionKo": "오래 켜진 따뜻한 불빛 곁에 머뭅니다.",
+      "hintsKo": ["밤을 좋아해요", "빛이 많은 곳을 찾아요", "오래 유지되는 연결과 관련 있어요"],
+      "requirements": [
+        {"kind": "lightCells", "min": 3},
+        {"kind": "stableConnections", "min": 1},
+        {"kind": "timeBand", "anyOf": ["night"]}
+      ],
+      "reward": {"kind": "recipe", "value": "bus_stop"}
+    },
+    {
+      "id": "roof_bird",
+      "nameKo": "지붕 위 새",
+      "descriptionKo": "높은 곳과 멀리 이어진 길을 내려다봅니다.",
+      "hintsKo": ["높은 물건이 필요해요", "먼 연결을 좋아해요", "맑거나 바람 부는 날을 기다려요"],
+      "requirements": [
+        {"kind": "highObjects", "min": 2},
+        {"kind": "farConnections", "min": 1},
+        {"kind": "weatherKind", "anyOf": ["clear", "windy"]}
+      ],
+      "reward": {"kind": "recipe", "value": "bridge"}
+    },
+    {
+      "id": "fog_cat",
+      "nameKo": "안개 고양이",
+      "descriptionKo": "서늘하고 조용한 머무름 자리를 골라 앉습니다.",
+      "hintsKo": ["서늘한 칸을 찾아요", "벤치나 정류장을 좋아해요", "연결이 적은 조용한 곳을 원해요"],
+      "requirements": [
+        {"kind": "coolCells", "min": 3},
+        {"kind": "objectTag", "anyOf": ["stay"]},
+        {"kind": "quietZones", "min": 1}
+      ],
+      "reward": {"kind": "recipe", "value": "tree"}
+    },
+    {
+      "id": "transfer_guest",
+      "nameKo": "환승 손님",
+      "descriptionKo": "움직이는 연결을 따라 정류장 사이를 오갑니다.",
+      "hintsKo": ["정류장이 필요해요", "순서대로 흐르는 연결을 따라와요", "길을 이루는 물건을 좋아해요"],
+      "requirements": [
+        {"kind": "objectKind", "anyOf": ["busStop"]},
+        {"kind": "sequentialConnections", "min": 1},
+        {"kind": "taggedObjects", "tag": "path", "min": 2}
+      ],
+      "reward": {"kind": "recipe", "value": "signpost"}
+    },
+    {
+      "id": "light_swarm",
+      "nameKo": "빛 무리",
+      "descriptionKo": "따뜻한 불빛 여러 개가 이어지면 작은 빛들이 모입니다.",
+      "hintsKo": ["따뜻한 칸을 좋아해요", "이어진 불빛이 많아야 해요", "저녁이나 밤에 잘 보여요"],
+      "requirements": [
+        {"kind": "warmCells", "min": 2},
+        {"kind": "connectedLights", "min": 3},
+        {"kind": "timeBand", "anyOf": ["evening", "night"]}
+      ],
+      "reward": {"kind": "recipe", "value": "tower"}
+    }
+  ]
+}

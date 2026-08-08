@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "recipes": [
+    {
+      "id": "alley_lamp",
+      "kind": "alleyLamp",
+      "nameKo": "골목등",
+      "descriptionKo": "작은 골목을 밝히고 날씨의 흔적을 바닥에 남깁니다.",
+      "stepCost": 1500,
+      "footprint": {"width": 1, "height": 1},
+      "height": "medium",
+      "initiallyUnlocked": true,
+      "tags": ["light", "street"],
+      "baseEffects": {"light": 1}
+    },
+    {
+      "id": "signpost",
+      "kind": "signpost",
+      "nameKo": "표지판",
+      "descriptionKo": "연결 효과가 흘러갈 방향을 정합니다.",
+      "stepCost": 1200,
+      "footprint": {"width": 1, "height": 1},
+      "height": "low",
+      "initiallyUnlocked": false,
+      "tags": ["path", "direction"],
+      "baseEffects": {}
+    },
+    {
+      "id": "planter",
+      "kind": "planter",
+      "nameKo": "화분",
+      "descriptionKo": "작은 자연 환경을 만들고 가까운 물건을 부드럽게 잇습니다.",
+      "stepCost": 1400,
+      "footprint": {"width": 1, "height": 1},
+      "height": "low",
+      "initiallyUnlocked": true,
+      "tags": ["nature", "stay"],
+      "baseEffects": {"nature": 1}
+    },
+    {
+      "id": "bench",
+      "kind": "bench",
+      "nameKo": "벤치",
+      "descriptionKo": "방문자가 머무를 수 있는 조용한 칸을 만듭니다.",
+      "stepCost": 2400,
+      "footprint": {"width": 1, "height": 1},
+      "height": "low",
+      "initiallyUnlocked": true,
+      "tags": ["stay", "path"],
+      "baseEffects": {}
+    },
+    {
+      "id": "stairs",
+      "kind": "stairs",
+      "nameKo": "계단",
+      "descriptionKo": "낮은 곳과 높은 곳을 연결합니다.",
+      "stepCost": 3000,
+      "footprint": {"width": 1, "height": 2},
+      "height": "medium",
+      "initiallyUnlocked": true,
+      "tags": ["path", "height"],
+      "baseEffects": {}
+    },
+    {
+      "id": "tree",
+      "kind": "tree",
+      "nameKo": "나무",
+      "descriptionKo": "그늘과 자연을 넓게 만듭니다.",
+      "stepCost": 3200,
+      "footprint": {"width": 1, "height": 1},
+      "height": "high",
+      "initiallyUnlocked": false,
+      "tags": ["nature", "shade"],
+      "baseEffects": {"nature": 2, "cool": 1}
+    },
+    {
+      "id": "bus_stop",
+      "kind": "busStop",
+      "nameKo": "정류장",
+      "descriptionKo": "머무름과 빛을 만들고 순서 연결의 시작점이 됩니다.",
+      "stepCost": 3500,
+      "footprint": {"width": 1, "height": 2},
+      "height": "medium",
+      "initiallyUnlocked": false,
+      "tags": ["stay", "light", "path"],
+      "baseEffects": {"light": 1}
+    },
+    {
+      "id": "pond",
+      "kind": "pond",
+      "nameKo": "작은 연못",
+      "descriptionKo": "젖은 칸을 만들고 비의 흔적을 모읍니다.",
+      "stepCost": 3400,
+      "footprint": {"width": 1, "height": 1},
+      "height": "low",
+      "initiallyUnlocked": false,
+      "tags": ["wet", "nature"],
+      "baseEffects": {"wet": 2, "nature": 1}
+    },
+    {
+      "id": "bridge",
+      "kind": "bridge",
+      "nameKo": "작은 다리",
+      "descriptionKo": "떨어진 두 구역을 하나의 길로 잇습니다.",
+      "stepCost": 5500,
+      "footprint": {"width": 1, "height": 2},
+      "height": "medium",
+      "initiallyUnlocked": false,
+      "tags": ["path", "far"],
+      "baseEffects": {}
+    },
+    {
+      "id": "tower",
+      "kind": "tower",
+      "nameKo": "작은 탑",
+      "descriptionKo": "높은 빛과 여러 연결의 중심을 만듭니다.",
+      "stepCost": 6500,
+      "footprint": {"width": 1, "height": 1},
+      "height": "high",
+      "initiallyUnlocked": false,
+      "tags": ["light", "height", "hub"],
+      "baseEffects": {"light": 2}
+    }
+  ]
+}

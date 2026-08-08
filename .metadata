@@ -1,0 +1,10 @@
+# This file tracks properties of this Flutter project.
+version:
+  revision: "6b182d2c7585eba26d4edce0f97630effd256c33"
+  channel: "stable"
+project_type: app
+migration:
+  platforms:
+    - platform: root
+      create_revision: 6b182d2c7585eba26d4edce0f97630effd256c33
+      base_revision: 6b182d2c7585eba26d4edce0f97630effd256c33

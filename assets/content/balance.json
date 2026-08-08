@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "weatherCooldownMinutes": 120,
+  "weatherMinimumMinutes": 30,
+  "surroundingCooldownMinutes": 60,
+  "surroundingMinimumMinutes": 20,
+  "surroundingDistanceTriggerMeters": 300,
+  "surroundingScanSeconds": 8,
+  "surroundingConfidenceThreshold": 0.60,
+  "fallbackDailySteps": 2000,
+  "gridColumns": 5,
+  "gridRows": 5,
+  "activeObjectLimit": 8,
+  "repeatVisitorCooldownHours": 6
+}
