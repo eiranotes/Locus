@@ -1,15 +1,20 @@
 name: Flutter CI
 
 on:
-  push:
-    branches: ['**']
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -19,6 +24,20 @@ jobs:
         run: ./tool/bootstrap_platforms.sh
       - name: Resolve packages
         run: flutter pub get
+      - name: Format Dart sources once
+        shell: bash
+        run: |
+          set -euo pipefail
+          dart format lib test
+          git add lib test
+          if git diff --cached --quiet; then
+            echo 'Dart sources already formatted.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'style: format Dart sources'
+            git push origin "HEAD:${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          fi
       - name: Repository contracts
         run: python3 tool/check_repo.py
       - name: Check Dart formatting
@@ -34,6 +53,9 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
