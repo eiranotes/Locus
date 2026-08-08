@@ -1,4 +1,5 @@
 archive=locus-bootstrap-source.tar.gz
 sha256=fc941aed2a65fef1eea06b8f8bdd51905506f304de6c3c5b2440db8b9d227d1e
-parts=8
+parts=11
 source_commit=f7a71c520ec5f87cd0df794920cf334497dc61ad
+retry=2
