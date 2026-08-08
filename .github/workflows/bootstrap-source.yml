@@ -1,8 +1,10 @@
 name: Bootstrap Flutter source
 
 on:
+  workflow_dispatch:
   push:
     branches:
+      - main
       - agent/import-flutter-mvp
     paths:
       - bootstrap/READY
