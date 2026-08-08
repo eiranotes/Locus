@@ -47,8 +47,12 @@ These are post-core-loop tasks in the v6 roadmap, not silent omissions.
 - Android: Open-Meteo prototype gateway with visible attribution; replaceable behind `WeatherGateway`.
 - Demo: deterministic weather/location/steps/BLE only when `DEMO_MODE=true`.
 
-## Validation boundary for this snapshot
+## Import and validation status
 
-The source tree includes CI that pins Flutter 3.44.9, regenerates platform wrappers, resolves packages, parses Dart sources with the formatter, runs the analyzer and tests, builds an Android debug APK, and compiles an iOS simulator build.
+The staged archive import has been replaced by the tracked Flutter source tree. `IMPORT_COMPLETE.md` defines the main-branch completion contract, and `IMPORT_STATUS.md` records `Conclusion: success` together with the validated gates and their release boundary.
 
-The current generation environment has no Flutter SDK, Android SDK, or Xcode. Local validation therefore covers repository contracts, content reachability, JSON/XML/plist parsing, Swift syntax, Kotlin syntax-level checks, Bash/Python checks, privacy-string checks, and git diff integrity. The first remote CI run remains the authoritative Flutter/Gradle/Xcode type-check gate.
+GitHub Actions pins Flutter 3.44.9, regenerates the platform wrappers, resolves packages, runs repository and import-contract checks, verifies formatting, runs `flutter analyze` and the full test suite, builds an Android debug APK, and compiles an iOS simulator build. The first complete remote proof passed in `Flutter CI` run #16 on pull request #6; the latest successful `main` run remains authoritative after merge.
+
+The normal Flutter workflow is read-only. A separate `workflow_run` reporter may write only to GitHub Issues: a non-successful `main` run creates or updates `Flutter import requires follow-up`, and a later successful `main` run closes it automatically.
+
+Distribution signing, store configuration, WeatherKit provisioning, production Android weather-provider selection, and physical-device accessibility/battery/thermal testing remain release gates rather than import gates.
