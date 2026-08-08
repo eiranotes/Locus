@@ -1,0 +1,54 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.44.9
+          cache: true
+      - name: Generate platform wrappers
+        run: ./tool/bootstrap_platforms.sh
+      - name: Resolve packages
+        run: flutter pub get
+      - name: Repository contracts
+        run: python3 tool/check_repo.py
+      - name: Check Dart formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Analyze
+        run: flutter analyze
+      - name: Test
+        run: flutter test
+      - name: Build Android debug APK
+        run: flutter build apk --debug --dart-define=DEMO_MODE=true --no-pub
+
+  ios-compile:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.44.9
+          cache: true
+      - name: Generate platform wrappers
+        run: ./tool/bootstrap_platforms.sh
+      - name: Resolve packages
+        run: flutter pub get
+      - name: Install CocoaPods dependencies
+        working-directory: ios
+        run: pod install --repo-update
+      - name: Build iOS simulator
+        run: flutter build ios --simulator --debug --dart-define=DEMO_MODE=true --no-pub
