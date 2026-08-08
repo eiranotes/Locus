@@ -1,0 +1,85 @@
+name: Scheduled import validation
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scheduled-import-validation
+  cancel-in-progress: false
+
+jobs:
+  validate-import:
+    runs-on: macos-15
+    timeout-minutes: 50
+    steps:
+      - name: Check out imported source
+        uses: actions/checkout@v4
+        with:
+          ref: agent/import-flutter-mvp
+          fetch-depth: 0
+
+      - name: Skip completed validation
+        id: state
+        shell: bash
+        run: |
+          if [[ -f .github/IMPORT_VALIDATION_PASSED ]]; then
+            echo 'needed=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'needed=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Flutter
+        if: steps.state.outputs.needed == 'true'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.9
+          channel: stable
+          cache: true
+
+      - name: Regenerate platform wrappers
+        if: steps.state.outputs.needed == 'true'
+        run: ./tool/bootstrap_platforms.sh
+
+      - name: Resolve dependencies
+        if: steps.state.outputs.needed == 'true'
+        run: flutter pub get
+
+      - name: Validate repository contracts
+        if: steps.state.outputs.needed == 'true'
+        run: python3 tool/check_repo.py
+
+      - name: Check formatting
+        if: steps.state.outputs.needed == 'true'
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Analyze
+        if: steps.state.outputs.needed == 'true'
+        run: flutter analyze
+
+      - name: Run tests
+        if: steps.state.outputs.needed == 'true'
+        run: flutter test
+
+      - name: Build Android debug APK
+        if: steps.state.outputs.needed == 'true'
+        run: flutter build apk --debug
+
+      - name: Build iOS simulator app
+        if: steps.state.outputs.needed == 'true'
+        run: flutter build ios --simulator --no-codesign
+
+      - name: Record successful validation
+        if: steps.state.outputs.needed == 'true'
+        shell: bash
+        run: |
+          printf 'Flutter 3.44.9: format, analyze, tests, Android debug APK, and iOS simulator build passed.\n' > .github/IMPORT_VALIDATION_PASSED
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/IMPORT_VALIDATION_PASSED
+          git commit -m 'ci: record imported Flutter validation'
+          git push origin HEAD:agent/import-flutter-mvp
