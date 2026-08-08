@@ -64,13 +64,13 @@ class AmbientFeatures {
   final double observationCoverage;
 
   Map<String, Object?> toMap() => <String, Object?>{
-        'uniqueCount': uniqueCount,
-        'medianRssi': medianRssi,
-        'strongSignalRatio': strongSignalRatio,
-        'persistence': persistence,
-        'churn': churn,
-        'observationCoverage': observationCoverage,
-      };
+    'uniqueCount': uniqueCount,
+    'medianRssi': medianRssi,
+    'strongSignalRatio': strongSignalRatio,
+    'persistence': persistence,
+    'churn': churn,
+    'observationCoverage': observationCoverage,
+  };
 
   factory AmbientFeatures.fromMap(Map<Object?, Object?> map) {
     double number(String key) => (map[key] as num?)?.toDouble() ?? 0;
@@ -94,17 +94,17 @@ class ResourceReadiness {
   });
 
   const ResourceReadiness.ready(String reason)
-      : this._(status: ReadinessStatus.ready, readyReason: reason);
+    : this._(status: ReadinessStatus.ready, readyReason: reason);
 
   const ResourceReadiness.waiting(DateTime until, String message)
-      : this._(
-          status: ReadinessStatus.waiting,
-          waitUntil: until,
-          message: message,
-        );
+    : this._(
+        status: ReadinessStatus.waiting,
+        waitUntil: until,
+        message: message,
+      );
 
   const ResourceReadiness.unavailable(String message)
-      : this._(status: ReadinessStatus.unavailable, message: message);
+    : this._(status: ReadinessStatus.unavailable, message: message);
 
   final ReadinessStatus status;
   final String? readyReason;
@@ -140,43 +140,38 @@ class CaptureRecord {
   final String? surroundingMaterialId;
 
   Map<String, Object?> toMap() => <String, Object?>{
-        'id': id,
-        'captured_at': capturedAt.millisecondsSinceEpoch,
-        'coarse_cell_id': coarseCellId,
-        'user_place_label': userPlaceLabel,
-        'time_band': timeBand.name,
-        'season': season.name,
-        'weather_basis': weatherBasis.name,
-        'source_version': sourceVersion,
-        'weather_material_id': weatherMaterialId,
-        'surrounding_material_id': surroundingMaterialId,
-      };
+    'id': id,
+    'captured_at': capturedAt.millisecondsSinceEpoch,
+    'coarse_cell_id': coarseCellId,
+    'user_place_label': userPlaceLabel,
+    'time_band': timeBand.name,
+    'season': season.name,
+    'weather_basis': weatherBasis.name,
+    'source_version': sourceVersion,
+    'weather_material_id': weatherMaterialId,
+    'surrounding_material_id': surroundingMaterialId,
+  };
 
   factory CaptureRecord.fromMap(Map<String, Object?> map) => CaptureRecord(
-        id: map['id']! as String,
-        capturedAt:
-            DateTime.fromMillisecondsSinceEpoch(map['captured_at']! as int),
-        coarseCellId: map['coarse_cell_id'] as String?,
-        userPlaceLabel: map['user_place_label'] as String?,
-        timeBand: enumByName(
-          TimeBand.values,
-          map['time_band']! as String,
-          TimeBand.afternoon,
-        ),
-        season: enumByName(
-          Season.values,
-          map['season']! as String,
-          Season.summer,
-        ),
-        weatherBasis: enumByName(
-          WeatherBasis.values,
-          map['weather_basis']! as String,
-          WeatherBasis.unavailable,
-        ),
-        sourceVersion: map['source_version']! as String,
-        weatherMaterialId: map['weather_material_id'] as String?,
-        surroundingMaterialId: map['surrounding_material_id'] as String?,
-      );
+    id: map['id']! as String,
+    capturedAt: DateTime.fromMillisecondsSinceEpoch(map['captured_at']! as int),
+    coarseCellId: map['coarse_cell_id'] as String?,
+    userPlaceLabel: map['user_place_label'] as String?,
+    timeBand: enumByName(
+      TimeBand.values,
+      map['time_band']! as String,
+      TimeBand.afternoon,
+    ),
+    season: enumByName(Season.values, map['season']! as String, Season.summer),
+    weatherBasis: enumByName(
+      WeatherBasis.values,
+      map['weather_basis']! as String,
+      WeatherBasis.unavailable,
+    ),
+    sourceVersion: map['source_version']! as String,
+    weatherMaterialId: map['weather_material_id'] as String?,
+    surroundingMaterialId: map['surrounding_material_id'] as String?,
+  );
 }
 
 class WeatherMaterial {
@@ -224,47 +219,42 @@ class WeatherMaterial {
       );
 
   Map<String, Object?> toMap() => <String, Object?>{
-        'id': id,
-        'kind': kind.name,
-        'time_band': timeBand.name,
-        'season': season.name,
-        'captured_at': capturedAt.millisecondsSinceEpoch,
-        'coarse_cell_id': coarseCellId,
-        'source_record_id': sourceRecordId,
-        'visual_seed': visualSeed,
-        'provider_name': providerName,
-        'consumed_at': consumedAt?.millisecondsSinceEpoch,
-        'crafted_object_id': craftedObjectId,
-      };
+    'id': id,
+    'kind': kind.name,
+    'time_band': timeBand.name,
+    'season': season.name,
+    'captured_at': capturedAt.millisecondsSinceEpoch,
+    'coarse_cell_id': coarseCellId,
+    'source_record_id': sourceRecordId,
+    'visual_seed': visualSeed,
+    'provider_name': providerName,
+    'consumed_at': consumedAt?.millisecondsSinceEpoch,
+    'crafted_object_id': craftedObjectId,
+  };
 
   factory WeatherMaterial.fromMap(Map<String, Object?> map) => WeatherMaterial(
-        id: map['id']! as String,
-        kind: enumByName(
-          WeatherMaterialKind.values,
-          map['kind']! as String,
-          WeatherMaterialKind.cloudy,
-        ),
-        timeBand: enumByName(
-          TimeBand.values,
-          map['time_band']! as String,
-          TimeBand.afternoon,
-        ),
-        season: enumByName(
-          Season.values,
-          map['season']! as String,
-          Season.summer,
-        ),
-        capturedAt:
-            DateTime.fromMillisecondsSinceEpoch(map['captured_at']! as int),
-        coarseCellId: map['coarse_cell_id'] as String?,
-        sourceRecordId: map['source_record_id']! as String,
-        visualSeed: map['visual_seed']! as int,
-        providerName: map['provider_name']! as String,
-        consumedAt: map['consumed_at'] == null
-            ? null
-            : DateTime.fromMillisecondsSinceEpoch(map['consumed_at']! as int),
-        craftedObjectId: map['crafted_object_id'] as String?,
-      );
+    id: map['id']! as String,
+    kind: enumByName(
+      WeatherMaterialKind.values,
+      map['kind']! as String,
+      WeatherMaterialKind.cloudy,
+    ),
+    timeBand: enumByName(
+      TimeBand.values,
+      map['time_band']! as String,
+      TimeBand.afternoon,
+    ),
+    season: enumByName(Season.values, map['season']! as String, Season.summer),
+    capturedAt: DateTime.fromMillisecondsSinceEpoch(map['captured_at']! as int),
+    coarseCellId: map['coarse_cell_id'] as String?,
+    sourceRecordId: map['source_record_id']! as String,
+    visualSeed: map['visual_seed']! as int,
+    providerName: map['provider_name']! as String,
+    consumedAt: map['consumed_at'] == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(map['consumed_at']! as int),
+    craftedObjectId: map['crafted_object_id'] as String?,
+  );
 }
 
 class SurroundingMaterial {
@@ -292,30 +282,32 @@ class SurroundingMaterial {
 
   bool get isAvailable => consumedAt == null;
 
-  SurroundingMaterial consume({required DateTime at, required String objectId}) =>
-      SurroundingMaterial(
-        id: id,
-        kind: kind,
-        confidence: confidence,
-        capturedAt: capturedAt,
-        coarseCellId: coarseCellId,
-        sourceRecordId: sourceRecordId,
-        featureSchemaVersion: featureSchemaVersion,
-        consumedAt: at,
-        craftedObjectId: objectId,
-      );
+  SurroundingMaterial consume({
+    required DateTime at,
+    required String objectId,
+  }) => SurroundingMaterial(
+    id: id,
+    kind: kind,
+    confidence: confidence,
+    capturedAt: capturedAt,
+    coarseCellId: coarseCellId,
+    sourceRecordId: sourceRecordId,
+    featureSchemaVersion: featureSchemaVersion,
+    consumedAt: at,
+    craftedObjectId: objectId,
+  );
 
   Map<String, Object?> toMap() => <String, Object?>{
-        'id': id,
-        'kind': kind.name,
-        'confidence': confidence,
-        'captured_at': capturedAt.millisecondsSinceEpoch,
-        'coarse_cell_id': coarseCellId,
-        'source_record_id': sourceRecordId,
-        'feature_schema_version': featureSchemaVersion,
-        'consumed_at': consumedAt?.millisecondsSinceEpoch,
-        'crafted_object_id': craftedObjectId,
-      };
+    'id': id,
+    'kind': kind.name,
+    'confidence': confidence,
+    'captured_at': capturedAt.millisecondsSinceEpoch,
+    'coarse_cell_id': coarseCellId,
+    'source_record_id': sourceRecordId,
+    'feature_schema_version': featureSchemaVersion,
+    'consumed_at': consumedAt?.millisecondsSinceEpoch,
+    'crafted_object_id': craftedObjectId,
+  };
 
   factory SurroundingMaterial.fromMap(Map<String, Object?> map) =>
       SurroundingMaterial(
@@ -326,8 +318,9 @@ class SurroundingMaterial {
           SurroundingMaterialKind.sparse,
         ),
         confidence: (map['confidence']! as num).toDouble(),
-        capturedAt:
-            DateTime.fromMillisecondsSinceEpoch(map['captured_at']! as int),
+        capturedAt: DateTime.fromMillisecondsSinceEpoch(
+          map['captured_at']! as int,
+        ),
         coarseCellId: map['coarse_cell_id'] as String?,
         sourceRecordId: map['source_record_id']! as String,
         featureSchemaVersion: map['feature_schema_version']! as String,

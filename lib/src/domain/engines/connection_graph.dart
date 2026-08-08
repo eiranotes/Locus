@@ -21,8 +21,8 @@ class ConnectionGraph {
   final List<ConnectionEdge> edges;
 
   int degree(String objectId) => edges.where((ConnectionEdge edge) {
-        return edge.fromObjectId == objectId || edge.toObjectId == objectId;
-      }).length;
+    return edge.fromObjectId == objectId || edge.toObjectId == objectId;
+  }).length;
 
   int countMode(ConnectionMode mode) =>
       edges.where((ConnectionEdge edge) => edge.mode == mode).length;
@@ -35,10 +35,12 @@ class ConnectionGraphBuilder {
     required List<Placement> placements,
     required Map<String, CraftedObject> objectsById,
   }) {
-    final candidates = placements.where((Placement placement) {
-      final object = objectsById[placement.craftedObjectId];
-      return object != null && object.isComplete;
-    }).toList(growable: false);
+    final candidates = placements
+        .where((Placement placement) {
+          final object = objectsById[placement.craftedObjectId];
+          return object != null && object.isComplete;
+        })
+        .toList(growable: false);
 
     final edges = <ConnectionEdge>[];
     final keys = <String>{};
@@ -143,12 +145,12 @@ class ConnectionGraphBuilder {
   }
 
   ConnectionMode _modeFor(SurroundingMaterialKind? kind) => switch (kind) {
-        null => ConnectionMode.adjacent,
-        SurroundingMaterialKind.dense => ConnectionMode.dense,
-        SurroundingMaterialKind.dynamic => ConnectionMode.sequential,
-        SurroundingMaterialKind.stable => ConnectionMode.stable,
-        SurroundingMaterialKind.sparse => ConnectionMode.far,
-      };
+    null => ConnectionMode.adjacent,
+    SurroundingMaterialKind.dense => ConnectionMode.dense,
+    SurroundingMaterialKind.dynamic => ConnectionMode.sequential,
+    SurroundingMaterialKind.stable => ConnectionMode.stable,
+    SurroundingMaterialKind.sparse => ConnectionMode.far,
+  };
 
   int _distance(Placement a, Placement b) =>
       (a.column - b.column).abs() + (a.row - b.row).abs();

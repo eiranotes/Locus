@@ -10,18 +10,19 @@ void main() {
 
   test('first weather and surroundings captures are ready', () {
     expect(
-      engine.weatherReadiness(
-        now: base,
-        currentKind: WeatherMaterialKind.clear,
-        currentTimeBand: TimeBand.afternoon,
-      ).isReady,
+      engine
+          .weatherReadiness(
+            now: base,
+            currentKind: WeatherMaterialKind.clear,
+            currentTimeBand: TimeBand.afternoon,
+          )
+          .isReady,
       isTrue,
     );
     expect(
-      engine.surroundingReadiness(
-        now: base,
-        distanceFromLastCaptureMeters: 0,
-      ).isReady,
+      engine
+          .surroundingReadiness(now: base, distanceFromLastCaptureMeters: 0)
+          .isReady,
       isTrue,
     );
   });
@@ -51,19 +52,23 @@ void main() {
   test('surroundings unlock early after moving 300 meters', () {
     final last = testSurrounding(capturedAt: base);
     expect(
-      engine.surroundingReadiness(
-        now: base.add(const Duration(minutes: 21)),
-        distanceFromLastCaptureMeters: 299,
-        lastMaterial: last,
-      ).isReady,
+      engine
+          .surroundingReadiness(
+            now: base.add(const Duration(minutes: 21)),
+            distanceFromLastCaptureMeters: 299,
+            lastMaterial: last,
+          )
+          .isReady,
       isFalse,
     );
     expect(
-      engine.surroundingReadiness(
-        now: base.add(const Duration(minutes: 21)),
-        distanceFromLastCaptureMeters: 301,
-        lastMaterial: last,
-      ).isReady,
+      engine
+          .surroundingReadiness(
+            now: base.add(const Duration(minutes: 21)),
+            distanceFromLastCaptureMeters: 301,
+            lastMaterial: last,
+          )
+          .isReady,
       isTrue,
     );
   });

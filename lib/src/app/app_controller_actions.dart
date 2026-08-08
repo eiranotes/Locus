@@ -1,15 +1,18 @@
 part of 'app_controller.dart';
 
 extension AppControllerActions on AppController {
-  Future<CaptureBundle?> performCapture({required bool includeSurroundings}) async {
+  Future<CaptureBundle?> performCapture({
+    required bool includeSurroundings,
+  }) async {
     CaptureBundle? output;
     await _guard(() async {
       var preparation = _capturePreparation;
       preparation ??= await captureCoordinator.prepare(
         now: DateTime.now(),
         lastWeather: _weatherMaterials.isEmpty ? null : _weatherMaterials.first,
-        lastSurrounding:
-            _surroundingMaterials.isEmpty ? null : _surroundingMaterials.first,
+        lastSurrounding: _surroundingMaterials.isEmpty
+            ? null
+            : _surroundingMaterials.first,
         lastAmbientCoordinate: await repository.lastAmbientCoordinate(),
       );
       final bundle = await captureCoordinator.capture(
@@ -22,7 +25,8 @@ extension AppControllerActions on AppController {
         weather: bundle.weatherMaterial,
         surroundings: bundle.surroundingMaterial,
       );
-      if (bundle.surroundingMaterial != null && !preparation.location.isFallback) {
+      if (bundle.surroundingMaterial != null &&
+          !preparation.location.isFallback) {
         await repository.saveLastAmbientCoordinate(
           preparation.location.point.latitude,
           preparation.location.point.longitude,
@@ -113,8 +117,10 @@ extension AppControllerActions on AppController {
     final existing = _placements
         .where((Placement item) => item.craftedObjectId == craftedObjectId)
         .firstOrNull;
-    if (existing == null && _placements.length >= catalog.balance.activeObjectLimit) {
-      _errorMessage = '내 공간에는 물건을 ${catalog.balance.activeObjectLimit}개까지 놓을 수 있습니다.';
+    if (existing == null &&
+        _placements.length >= catalog.balance.activeObjectLimit) {
+      _errorMessage =
+          '내 공간에는 물건을 ${catalog.balance.activeObjectLimit}개까지 놓을 수 있습니다.';
       notifyListeners();
       return false;
     }
@@ -126,17 +132,19 @@ extension AppControllerActions on AppController {
       rotation: rotation % 4,
     );
     final recipesByObject = <String, RecipeDefinition>{
-      for (final item in _craftedObjects) item.id: catalog.recipeById(item.recipeId),
+      for (final item in _craftedObjects)
+        item.id: catalog.recipeById(item.recipeId),
     };
-    final validation = PlacementEngine(
-      columns: catalog.balance.gridColumns,
-      rows: catalog.balance.gridRows,
-    ).validate(
-      candidate: candidate,
-      recipe: recipe,
-      existing: _placements,
-      recipeByObjectId: recipesByObject,
-    );
+    final validation =
+        PlacementEngine(
+          columns: catalog.balance.gridColumns,
+          rows: catalog.balance.gridRows,
+        ).validate(
+          candidate: candidate,
+          recipe: recipe,
+          existing: _placements,
+          recipeByObjectId: recipesByObject,
+        );
     if (!validation.valid) {
       _errorMessage = validation.message;
       notifyListeners();
@@ -191,14 +199,14 @@ extension AppControllerActions on AppController {
 
   VisitorEvaluation? get targetVisitor {
     final snapshot = dioramaSnapshot;
-    final unseen = snapshot.visitorEvaluations.where((VisitorEvaluation item) {
-      return !_visitorSightings.any(
-        (VisitorSighting sighting) => sighting.visitorId == item.visitor.id,
-      );
-    }).toList()
-      ..sort((VisitorEvaluation a, VisitorEvaluation b) {
-        return b.satisfiedCount.compareTo(a.satisfiedCount);
-      });
+    final unseen =
+        snapshot.visitorEvaluations.where((VisitorEvaluation item) {
+          return !_visitorSightings.any(
+            (VisitorSighting sighting) => sighting.visitorId == item.visitor.id,
+          );
+        }).toList()..sort((VisitorEvaluation a, VisitorEvaluation b) {
+          return b.satisfiedCount.compareTo(a.satisfiedCount);
+        });
     return unseen.firstOrNull ?? snapshot.visitorEvaluations.firstOrNull;
   }
 
@@ -209,14 +217,15 @@ extension AppControllerActions on AppController {
     final recipesById = <String, RecipeDefinition>{
       for (final recipe in catalog.recipes) recipe.id: recipe,
     };
-    final grid = EnvironmentGridBuilder(
-      columns: catalog.balance.gridColumns,
-      rows: catalog.balance.gridRows,
-    ).build(
-      placements: _placements,
-      objectsById: objectsById,
-      recipesById: recipesById,
-    );
+    final grid =
+        EnvironmentGridBuilder(
+          columns: catalog.balance.gridColumns,
+          rows: catalog.balance.gridRows,
+        ).build(
+          placements: _placements,
+          objectsById: objectsById,
+          recipesById: recipesById,
+        );
     final graph = const ConnectionGraphBuilder().build(
       placements: _placements,
       objectsById: objectsById,
@@ -232,7 +241,10 @@ extension AppControllerActions on AppController {
     );
     const visitorEngine = VisitorEngine();
     final evaluations = catalog.visitors
-        .map((VisitorDefinition visitor) => visitorEngine.evaluate(visitor, visitorContext))
+        .map(
+          (VisitorDefinition visitor) =>
+              visitorEngine.evaluate(visitor, visitorContext),
+        )
         .toList(growable: false);
     return DioramaSnapshot(
       objects: _craftedObjects,
@@ -251,10 +263,16 @@ extension AppControllerActions on AppController {
     final now = DateTime.now();
     switch (_stepTrackingMode) {
       case StepTrackingMode.real:
-        _stepBuckets = await stepSyncService.syncReal(existing: _stepBuckets, now: now);
+        _stepBuckets = await stepSyncService.syncReal(
+          existing: _stepBuckets,
+          now: now,
+        );
         break;
       case StepTrackingMode.fallback:
-        _stepBuckets = stepSyncService.syncFallback(existing: _stepBuckets, now: now);
+        _stepBuckets = stepSyncService.syncFallback(
+          existing: _stepBuckets,
+          now: now,
+        );
         break;
       case StepTrackingMode.undecided:
         return;
@@ -296,7 +314,8 @@ extension AppControllerActions on AppController {
     for (final evaluation in snapshot.visitorEvaluations) {
       if (!evaluation.satisfied) continue;
       final previous = seenById[evaluation.visitor.id];
-      final repeatReady = previous == null ||
+      final repeatReady =
+          previous == null ||
           now.difference(previous.lastSeenAt) >=
               Duration(hours: catalog.balance.repeatVisitorCooldownHours);
       if (!repeatReady) continue;
@@ -310,14 +329,17 @@ extension AppControllerActions on AppController {
         snapshotJson: VisitorSighting.encodeSnapshot(<String, Object?>{
           'weather': sceneWeatherKind.name,
           'timeBand': sceneTimeBand.name,
-          'objects': _placements.map((Placement item) => item.craftedObjectId).toList(),
+          'objects': _placements
+              .map((Placement item) => item.craftedObjectId)
+              .toList(),
         }),
       );
       final nextRecipeIds = Set<String>.from(_unlockedRecipeIds);
       final nextRewardKeys = Set<String>.from(_unlockedRewardKeys);
       final reward = evaluation.visitor.reward;
       final rewardKey = '${reward.kind.name}:${reward.value}';
-      if (nextRewardKeys.add(rewardKey) && reward.kind == VisitorRewardKind.recipe) {
+      if (nextRewardKeys.add(rewardKey) &&
+          reward.kind == VisitorRewardKind.recipe) {
         nextRecipeIds.add(reward.value);
       }
       await repository.saveVisitorResolution(
@@ -347,7 +369,8 @@ extension AppControllerActions on AppController {
       rows: catalog.balance.gridRows,
     );
     final recipesByObject = <String, RecipeDefinition>{
-      for (final item in _craftedObjects) item.id: catalog.recipeById(item.recipeId),
+      for (final item in _craftedObjects)
+        item.id: catalog.recipeById(item.recipeId),
     };
     recipesByObject[object.id] = recipe;
     for (var row = 0; row < catalog.balance.gridRows; row += 1) {
@@ -359,12 +382,14 @@ extension AppControllerActions on AppController {
           row: row,
           rotation: 0,
         );
-        if (engine.validate(
-          candidate: candidate,
-          recipe: recipe,
-          existing: _placements,
-          recipeByObjectId: recipesByObject,
-        ).valid) {
+        if (engine
+            .validate(
+              candidate: candidate,
+              recipe: recipe,
+              existing: _placements,
+              recipeByObjectId: recipesByObject,
+            )
+            .valid) {
           return candidate;
         }
       }

@@ -11,8 +11,9 @@ abstract interface class StepSource {
 class MethodChannelStepSource implements StepSource {
   const MethodChannelStepSource();
 
-  static const MethodChannel _channel =
-      MethodChannel('com.eiranotes.reality_diorama/steps');
+  static const MethodChannel _channel = MethodChannel(
+    'com.eiranotes.reality_diorama/steps',
+  );
 
   @override
   Future<Map<String, int>> dailySteps({
@@ -20,13 +21,11 @@ class MethodChannelStepSource implements StepSource {
     required DateTime to,
   }) async {
     try {
-      final result = await _channel.invokeMethod<Object?>(
-        'getDailySteps',
-        <String, Object?>{
-          'fromMillis': from.millisecondsSinceEpoch,
-          'toMillis': to.millisecondsSinceEpoch,
-        },
-      );
+      final result = await _channel
+          .invokeMethod<Object?>('getDailySteps', <String, Object?>{
+            'fromMillis': from.millisecondsSinceEpoch,
+            'toMillis': to.millisecondsSinceEpoch,
+          });
       if (result is! Map<Object?, Object?>) {
         return <String, int>{};
       }

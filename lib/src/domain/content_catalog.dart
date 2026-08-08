@@ -36,8 +36,7 @@ class BalanceDefinition {
       BalanceDefinition(
         weatherCooldownMinutes: json['weatherCooldownMinutes']! as int,
         weatherMinimumMinutes: json['weatherMinimumMinutes']! as int,
-        surroundingCooldownMinutes:
-            json['surroundingCooldownMinutes']! as int,
+        surroundingCooldownMinutes: json['surroundingCooldownMinutes']! as int,
         surroundingMinimumMinutes: json['surroundingMinimumMinutes']! as int,
         surroundingDistanceTriggerMeters:
             json['surroundingDistanceTriggerMeters']! as int,
@@ -48,8 +47,7 @@ class BalanceDefinition {
         gridColumns: json['gridColumns']! as int,
         gridRows: json['gridRows']! as int,
         activeObjectLimit: json['activeObjectLimit']! as int,
-        repeatVisitorCooldownHours:
-            json['repeatVisitorCooldownHours']! as int,
+        repeatVisitorCooldownHours: json['repeatVisitorCooldownHours']! as int,
       );
 }
 
@@ -71,15 +69,15 @@ class ContentCatalog {
       visitors.firstWhere((VisitorDefinition visitor) => visitor.id == id);
 
   static Future<ContentCatalog> load(AssetBundle bundle) async {
-    final recipeDocument = jsonDecode(
-      await bundle.loadString('assets/content/recipes.json'),
-    ) as Map<String, Object?>;
-    final visitorDocument = jsonDecode(
-      await bundle.loadString('assets/content/visitors.json'),
-    ) as Map<String, Object?>;
-    final balanceDocument = jsonDecode(
-      await bundle.loadString('assets/content/balance.json'),
-    ) as Map<String, Object?>;
+    final recipeDocument =
+        jsonDecode(await bundle.loadString('assets/content/recipes.json'))
+            as Map<String, Object?>;
+    final visitorDocument =
+        jsonDecode(await bundle.loadString('assets/content/visitors.json'))
+            as Map<String, Object?>;
+    final balanceDocument =
+        jsonDecode(await bundle.loadString('assets/content/balance.json'))
+            as Map<String, Object?>;
 
     return ContentCatalog(
       recipes: (recipeDocument['recipes']! as List<Object?>)

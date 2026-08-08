@@ -11,20 +11,19 @@ WeatherSnapshot snapshot({
   double clouds = 10,
   double wind = 5,
   String? conditionKey,
-}) =>
-    WeatherSnapshot(
-      temperatureCelsius: apparent,
-      apparentTemperatureCelsius: apparent,
-      precipitationMillimeters: precipitation,
-      cloudCoverPercent: clouds,
-      windSpeedKph: wind,
-      visibilityMeters: 10000,
-      weatherCode: weatherCode,
-      conditionKey: conditionKey,
-      observedAt: DateTime.utc(2026, 8, 8),
-      basis: WeatherBasis.providerCurrentModel,
-      providerName: 'test',
-    );
+}) => WeatherSnapshot(
+  temperatureCelsius: apparent,
+  apparentTemperatureCelsius: apparent,
+  precipitationMillimeters: precipitation,
+  cloudCoverPercent: clouds,
+  windSpeedKph: wind,
+  visibilityMeters: 10000,
+  weatherCode: weatherCode,
+  conditionKey: conditionKey,
+  observedAt: DateTime.utc(2026, 8, 8),
+  basis: WeatherBasis.providerCurrentModel,
+  providerName: 'test',
+);
 
 void main() {
   const weather = WeatherClassifier();
@@ -42,18 +41,9 @@ void main() {
   });
 
   test('weather classifier maps wind, warmth, cloud, and clear', () {
-    expect(
-      weather.classify(snapshot(wind: 30)),
-      WeatherMaterialKind.windy,
-    );
-    expect(
-      weather.classify(snapshot(apparent: 30)),
-      WeatherMaterialKind.warm,
-    );
-    expect(
-      weather.classify(snapshot(clouds: 90)),
-      WeatherMaterialKind.cloudy,
-    );
+    expect(weather.classify(snapshot(wind: 30)), WeatherMaterialKind.windy);
+    expect(weather.classify(snapshot(apparent: 30)), WeatherMaterialKind.warm);
+    expect(weather.classify(snapshot(clouds: 90)), WeatherMaterialKind.cloudy);
     expect(weather.classify(snapshot()), WeatherMaterialKind.clear);
   });
 

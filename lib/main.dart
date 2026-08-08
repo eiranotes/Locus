@@ -31,8 +31,9 @@ Future<void> main() async {
   final AmbientScanner ambientScanner = demoMode
       ? const DemoAmbientScanner()
       : const MethodChannelAmbientScanner();
-  final StepSource stepSource =
-      demoMode ? const DemoStepSource() : const MethodChannelStepSource();
+  final StepSource stepSource = demoMode
+      ? const DemoStepSource()
+      : const MethodChannelStepSource();
 
   final controller = AppController(
     repository: repository,

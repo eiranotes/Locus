@@ -43,7 +43,8 @@ class AppController extends ChangeNotifier {
 
   List<CaptureRecord> _captures = const <CaptureRecord>[];
   List<WeatherMaterial> _weatherMaterials = const <WeatherMaterial>[];
-  List<SurroundingMaterial> _surroundingMaterials = const <SurroundingMaterial>[];
+  List<SurroundingMaterial> _surroundingMaterials =
+      const <SurroundingMaterial>[];
   List<StepBucket> _stepBuckets = const <StepBucket>[];
   List<CraftedObject> _craftedObjects = const <CraftedObject>[];
   List<Placement> _placements = const <Placement>[];
@@ -59,19 +60,27 @@ class AppController extends ChangeNotifier {
   bool get busy => _busy;
   String? get errorMessage => _errorMessage;
   int get navigationIndex => _navigationIndex;
-  List<CaptureRecord> get captures => List<CaptureRecord>.unmodifiable(_captures);
-  List<WeatherMaterial> get weatherMaterials => List<WeatherMaterial>.unmodifiable(_weatherMaterials);
-  List<SurroundingMaterial> get surroundingMaterials => List<SurroundingMaterial>.unmodifiable(_surroundingMaterials);
-  List<StepBucket> get stepBuckets => List<StepBucket>.unmodifiable(_stepBuckets);
-  List<CraftedObject> get craftedObjects => List<CraftedObject>.unmodifiable(_craftedObjects);
+  List<CaptureRecord> get captures =>
+      List<CaptureRecord>.unmodifiable(_captures);
+  List<WeatherMaterial> get weatherMaterials =>
+      List<WeatherMaterial>.unmodifiable(_weatherMaterials);
+  List<SurroundingMaterial> get surroundingMaterials =>
+      List<SurroundingMaterial>.unmodifiable(_surroundingMaterials);
+  List<StepBucket> get stepBuckets =>
+      List<StepBucket>.unmodifiable(_stepBuckets);
+  List<CraftedObject> get craftedObjects =>
+      List<CraftedObject>.unmodifiable(_craftedObjects);
   List<Placement> get placements => List<Placement>.unmodifiable(_placements);
-  List<VisitorSighting> get visitorSightings => List<VisitorSighting>.unmodifiable(_visitorSightings);
-  Set<String> get unlockedRecipeIds => Set<String>.unmodifiable(_unlockedRecipeIds);
+  List<VisitorSighting> get visitorSightings =>
+      List<VisitorSighting>.unmodifiable(_visitorSightings);
+  Set<String> get unlockedRecipeIds =>
+      Set<String>.unmodifiable(_unlockedRecipeIds);
   CapturePreparation? get capturePreparation => _capturePreparation;
   CaptureBundle? get lastCaptureBundle => _lastCaptureBundle;
   String? get newVisitorId => _newVisitorId;
   StepTrackingMode get stepTrackingMode => _stepTrackingMode;
-  bool get stepTrackingConfigured => _stepTrackingMode != StepTrackingMode.undecided;
+  bool get stepTrackingConfigured =>
+      _stepTrackingMode != StepTrackingMode.undecided;
   bool get usesRealSteps => _stepTrackingMode == StepTrackingMode.real;
   int get fallbackDailySteps => stepSyncService.fallbackDailySteps;
 
@@ -79,12 +88,15 @@ class AppController extends ChangeNotifier {
       .where((WeatherMaterial material) => material.isAvailable)
       .toList(growable: false);
 
-  List<SurroundingMaterial> get availableSurroundingMaterials => _surroundingMaterials
-      .where((SurroundingMaterial material) => material.isAvailable)
-      .toList(growable: false);
+  List<SurroundingMaterial> get availableSurroundingMaterials =>
+      _surroundingMaterials
+          .where((SurroundingMaterial material) => material.isAvailable)
+          .toList(growable: false);
 
   List<RecipeDefinition> get unlockedRecipes => catalog.recipes
-      .where((RecipeDefinition recipe) => _unlockedRecipeIds.contains(recipe.id))
+      .where(
+        (RecipeDefinition recipe) => _unlockedRecipeIds.contains(recipe.id),
+      )
       .toList(growable: false);
 
   int get availableSteps => const StepLedger().available(_stepBuckets);
@@ -105,7 +117,8 @@ class AppController extends ChangeNotifier {
     ].where((ResourceReadiness value) => value.isReady).length;
   }
 
-  WeatherMaterialKind? get currentWeatherKind => _capturePreparation?.weatherKind;
+  WeatherMaterialKind? get currentWeatherKind =>
+      _capturePreparation?.weatherKind;
 
   WeatherMaterialKind get sceneWeatherKind {
     final current = currentWeatherKind;
@@ -125,18 +138,22 @@ class AppController extends ChangeNotifier {
           .map((RecipeDefinition recipe) => recipe.id)
           .toSet();
       final persisted = await repository.unlockedRecipeIds();
-      _unlockedRecipeIds = persisted.isEmpty ? initialIds : persisted..addAll(initialIds);
+      _unlockedRecipeIds = persisted.isEmpty ? initialIds : persisted
+        ..addAll(initialIds);
       await repository.saveUnlockedRecipeIds(_unlockedRecipeIds);
       final rewardRaw = await repository.metadata('unlocked_reward_keys');
       if (rewardRaw != null) {
-        _unlockedRewardKeys = (jsonDecode(rewardRaw) as List<Object?>).cast<String>().toSet();
+        _unlockedRewardKeys = (jsonDecode(rewardRaw) as List<Object?>)
+            .cast<String>()
+            .toSet();
       }
       _stepTrackingMode = enumByName(
         StepTrackingMode.values,
         await repository.metadata('step_tracking_mode') ?? '',
         StepTrackingMode.undecided,
       );
-      if (_stepTrackingMode == StepTrackingMode.undecided && _stepBuckets.isNotEmpty) {
+      if (_stepTrackingMode == StepTrackingMode.undecided &&
+          _stepBuckets.isNotEmpty) {
         _stepBuckets = const <StepBucket>[];
         await repository.replaceStepBuckets(_stepBuckets);
       }
@@ -164,8 +181,12 @@ class AppController extends ChangeNotifier {
   }
 
   Future<void> refreshCapturePreparation({bool notify = true}) async {
-    final lastWeather = _weatherMaterials.isEmpty ? null : _weatherMaterials.first;
-    final lastSurrounding = _surroundingMaterials.isEmpty ? null : _surroundingMaterials.first;
+    final lastWeather = _weatherMaterials.isEmpty
+        ? null
+        : _weatherMaterials.first;
+    final lastSurrounding = _surroundingMaterials.isEmpty
+        ? null
+        : _surroundingMaterials.first;
     final lastCoordinate = await repository.lastAmbientCoordinate();
     _capturePreparation = await captureCoordinator.prepare(
       now: DateTime.now(),
@@ -176,7 +197,8 @@ class AppController extends ChangeNotifier {
     if (notify) notifyListeners();
   }
 
-  Future<WeatherAttributionInfo> weatherAttribution() => captureCoordinator.weatherGateway.attribution();
+  Future<WeatherAttributionInfo> weatherAttribution() =>
+      captureCoordinator.weatherGateway.attribution();
 
   Future<void> refreshSteps() async {
     await _guard(_syncStepsAndConstruction);
@@ -186,9 +208,13 @@ class AppController extends ChangeNotifier {
   Future<void> configureStepTracking({required bool useRealSteps}) async {
     await _guard(() async {
       final now = DateTime.now();
-      var mode = useRealSteps ? StepTrackingMode.real : StepTrackingMode.fallback;
+      var mode = useRealSteps
+          ? StepTrackingMode.real
+          : StepTrackingMode.fallback;
       final sourceChanged = mode != _stepTrackingMode;
-      final baseline = sourceChanged ? stepSyncService.sourceChangeBaseline(_stepBuckets) : _stepBuckets;
+      final baseline = sourceChanged
+          ? stepSyncService.sourceChangeBaseline(_stepBuckets)
+          : _stepBuckets;
       var buckets = useRealSteps
           ? await stepSyncService.syncReal(existing: baseline, now: now)
           : stepSyncService.syncFallback(existing: baseline, now: now);

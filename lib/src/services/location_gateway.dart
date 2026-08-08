@@ -62,14 +62,14 @@ class GeolocatorLocationGateway implements LocationGateway {
   }
 
   LocationFix _fallback() => LocationFix(
-        point: GeoPoint(
-          latitude: fallbackLatitude,
-          longitude: fallbackLongitude,
-          accuracyMeters: 5000,
-        ),
-        label: '위치 권한 필요',
-        isFallback: true,
-      );
+    point: GeoPoint(
+      latitude: fallbackLatitude,
+      longitude: fallbackLongitude,
+      accuracyMeters: 5000,
+    ),
+    label: '위치 권한 필요',
+    isFallback: true,
+  );
 }
 
 class DemoLocationGateway implements LocationGateway {
@@ -77,12 +77,8 @@ class DemoLocationGateway implements LocationGateway {
 
   @override
   Future<LocationFix> current() async => const LocationFix(
-        point: GeoPoint(
-          latitude: 37.5446,
-          longitude: 127.0559,
-          accuracyMeters: 30,
-        ),
-        label: '성수동',
-        isFallback: false,
-      );
+    point: GeoPoint(latitude: 37.5446, longitude: 127.0559, accuracyMeters: 30),
+    label: '성수동',
+    isFallback: false,
+  );
 }

@@ -29,13 +29,14 @@ class PlatformWeatherGateway implements WeatherGateway {
   PlatformWeatherGateway({
     WeatherGateway? appleWeather,
     WeatherGateway? otherPlatforms,
-  })  : _appleWeather = appleWeather ?? const MethodChannelWeatherGateway(),
-        _otherPlatforms = otherPlatforms ?? OpenMeteoWeatherGateway();
+  }) : _appleWeather = appleWeather ?? const MethodChannelWeatherGateway(),
+       _otherPlatforms = otherPlatforms ?? OpenMeteoWeatherGateway();
 
   final WeatherGateway _appleWeather;
   final WeatherGateway _otherPlatforms;
 
-  WeatherGateway get _delegate => Platform.isIOS ? _appleWeather : _otherPlatforms;
+  WeatherGateway get _delegate =>
+      Platform.isIOS ? _appleWeather : _otherPlatforms;
 
   @override
   Future<WeatherAttributionInfo> attribution() => _delegate.attribution();
@@ -47,8 +48,9 @@ class PlatformWeatherGateway implements WeatherGateway {
 class MethodChannelWeatherGateway implements WeatherGateway {
   const MethodChannelWeatherGateway();
 
-  static const MethodChannel _channel =
-      MethodChannel('com.eiranotes.reality_diorama/weather');
+  static const MethodChannel _channel = MethodChannel(
+    'com.eiranotes.reality_diorama/weather',
+  );
 
   @override
   Future<WeatherAttributionInfo> attribution() async {
@@ -72,10 +74,13 @@ class MethodChannelWeatherGateway implements WeatherGateway {
 
   @override
   Future<WeatherSnapshot> current(GeoPoint point) async {
-    final result = await _channel.invokeMethod<Object?>('current', <String, Object?>{
-      'latitude': point.latitude,
-      'longitude': point.longitude,
-    });
+    final result = await _channel.invokeMethod<Object?>(
+      'current',
+      <String, Object?>{
+        'latitude': point.latitude,
+        'longitude': point.longitude,
+      },
+    );
     if (result is! Map<Object?, Object?>) {
       throw const FormatException('WeatherKit returned an invalid payload.');
     }
@@ -100,39 +105,44 @@ class MethodChannelWeatherGateway implements WeatherGateway {
 
   static const WeatherAttributionInfo _fallbackAttribution =
       WeatherAttributionInfo(
-    serviceName: 'Weather',
-    notice: 'Apple Weather 데이터를 게임용 재료로 변환했습니다.',
-  );
+        serviceName: 'Weather',
+        notice: 'Apple Weather 데이터를 게임용 재료로 변환했습니다.',
+      );
 }
 
 class OpenMeteoWeatherGateway implements WeatherGateway {
-  OpenMeteoWeatherGateway({http.Client? client}) : _client = client ?? http.Client();
+  OpenMeteoWeatherGateway({http.Client? client})
+    : _client = client ?? http.Client();
 
   final http.Client _client;
 
   @override
   Future<WeatherAttributionInfo> attribution() async => WeatherAttributionInfo(
-        serviceName: 'Open-Meteo',
-        notice: 'Open-Meteo 날씨 데이터를 게임용 재료로 변환했습니다.',
-        legalPageUri: Uri.parse('https://open-meteo.com/'),
-      );
+    serviceName: 'Open-Meteo',
+    notice: 'Open-Meteo 날씨 데이터를 게임용 재료로 변환했습니다.',
+    legalPageUri: Uri.parse('https://open-meteo.com/'),
+  );
 
   @override
   Future<WeatherSnapshot> current(GeoPoint point) async {
-    final uri = Uri.https('api.open-meteo.com', '/v1/forecast', <String, String>{
-      'latitude': point.latitude.toStringAsFixed(5),
-      'longitude': point.longitude.toStringAsFixed(5),
-      'current': <String>[
-        'temperature_2m',
-        'apparent_temperature',
-        'precipitation',
-        'cloud_cover',
-        'wind_speed_10m',
-        'visibility',
-        'weather_code',
-      ].join(','),
-      'timezone': 'auto',
-    });
+    final uri = Uri.https(
+      'api.open-meteo.com',
+      '/v1/forecast',
+      <String, String>{
+        'latitude': point.latitude.toStringAsFixed(5),
+        'longitude': point.longitude.toStringAsFixed(5),
+        'current': <String>[
+          'temperature_2m',
+          'apparent_temperature',
+          'precipitation',
+          'cloud_cover',
+          'wind_speed_10m',
+          'visibility',
+          'weather_code',
+        ].join(','),
+        'timezone': 'auto',
+      },
+    );
     final response = await _client.get(uri).timeout(const Duration(seconds: 6));
     if (response.statusCode != 200) {
       throw StateError('Weather provider returned ${response.statusCode}.');
@@ -147,7 +157,8 @@ class OpenMeteoWeatherGateway implements WeatherGateway {
       windSpeedKph: _number(current, 'wind_speed_10m'),
       visibilityMeters: _number(current, 'visibility'),
       weatherCode: (current['weather_code']! as num).toInt(),
-      observedAt: DateTime.tryParse(current['time']! as String)?.toLocal() ??
+      observedAt:
+          DateTime.tryParse(current['time']! as String)?.toLocal() ??
           DateTime.now(),
       basis: WeatherBasis.providerCurrentModel,
       providerName: 'Open-Meteo',

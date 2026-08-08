@@ -30,13 +30,13 @@ class VisitorReward {
   final String value;
 
   factory VisitorReward.fromJson(Map<String, Object?> json) => VisitorReward(
-        kind: enumByName(
-          VisitorRewardKind.values,
-          json['kind']! as String,
-          VisitorRewardKind.effect,
-        ),
-        value: json['value']! as String,
-      );
+    kind: enumByName(
+      VisitorRewardKind.values,
+      json['kind']! as String,
+      VisitorRewardKind.effect,
+    ),
+    value: json['value']! as String,
+  );
 }
 
 class VisitorDefinition {
@@ -66,9 +66,7 @@ class VisitorDefinition {
             .cast<Map<String, Object?>>()
             .map(VisitorRequirement.fromJson)
             .toList(growable: false),
-        reward: VisitorReward.fromJson(
-          json['reward']! as Map<String, Object?>,
-        ),
+        reward: VisitorReward.fromJson(json['reward']! as Map<String, Object?>),
       );
 }
 
@@ -90,24 +88,26 @@ class VisitorSighting {
   final String? snapshotJson;
 
   Map<String, Object?> toMap() => <String, Object?>{
-        'id': id,
-        'visitor_id': visitorId,
-        'first_seen_at': firstSeenAt.millisecondsSinceEpoch,
-        'last_seen_at': lastSeenAt.millisecondsSinceEpoch,
-        'variant_key': variantKey,
-        'snapshot_json': snapshotJson,
-      };
+    'id': id,
+    'visitor_id': visitorId,
+    'first_seen_at': firstSeenAt.millisecondsSinceEpoch,
+    'last_seen_at': lastSeenAt.millisecondsSinceEpoch,
+    'variant_key': variantKey,
+    'snapshot_json': snapshotJson,
+  };
 
   factory VisitorSighting.fromMap(Map<String, Object?> map) => VisitorSighting(
-        id: map['id']! as String,
-        visitorId: map['visitor_id']! as String,
-        firstSeenAt:
-            DateTime.fromMillisecondsSinceEpoch(map['first_seen_at']! as int),
-        lastSeenAt:
-            DateTime.fromMillisecondsSinceEpoch(map['last_seen_at']! as int),
-        variantKey: map['variant_key']! as String,
-        snapshotJson: map['snapshot_json'] as String?,
-      );
+    id: map['id']! as String,
+    visitorId: map['visitor_id']! as String,
+    firstSeenAt: DateTime.fromMillisecondsSinceEpoch(
+      map['first_seen_at']! as int,
+    ),
+    lastSeenAt: DateTime.fromMillisecondsSinceEpoch(
+      map['last_seen_at']! as int,
+    ),
+    variantKey: map['variant_key']! as String,
+    snapshotJson: map['snapshot_json'] as String?,
+  );
 
   static String encodeSnapshot(Map<String, Object?> value) => jsonEncode(value);
 }

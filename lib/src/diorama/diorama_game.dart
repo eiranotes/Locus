@@ -22,10 +22,7 @@ class DioramaGame extends FlameGame {
 
   @override
   void render(Canvas canvas) {
-    DioramaScenePainter(_snapshot).paint(
-      canvas,
-      Size(size.x, size.y),
-    );
+    DioramaScenePainter(_snapshot).paint(canvas, Size(size.x, size.y));
   }
 }
 
@@ -78,12 +75,15 @@ class DioramaScenePainter {
     );
 
     final glow = Paint()
-      ..shader = RadialGradient(
-        colors: <Color>[
-          PixelPalette.amber.withValues(alpha: 0.10),
-          Colors.transparent,
-        ],
-      ).createShader(const Rect.fromCircle(center: Offset(180, 180), radius: 180));
+      ..shader =
+          RadialGradient(
+            colors: <Color>[
+              PixelPalette.amber.withValues(alpha: 0.10),
+              Colors.transparent,
+            ],
+          ).createShader(
+            const Rect.fromCircle(center: Offset(180, 180), radius: 180),
+          );
     canvas.drawRect(const Rect.fromLTWH(0, 0, logicalSize, logicalSize), glow);
   }
 
@@ -154,11 +154,7 @@ class DioramaScenePainter {
     );
     if (effects.wet > 0 && (column + row).isEven) {
       canvas.drawRect(
-        Rect.fromCenter(
-          center: center.translate(0, 2),
-          width: 14,
-          height: 2,
-        ),
+        Rect.fromCenter(center: center.translate(0, 2), width: 14, height: 2),
         Paint()
           ..isAntiAlias = false
           ..color = const Color(0xFF75A7BD).withValues(alpha: 0.42),
@@ -225,10 +221,14 @@ class DioramaScenePainter {
       if (from == null || to == null) {
         continue;
       }
-      final a = _tileTop(from.column.toDouble(), from.row.toDouble())
-          .translate(0, -16);
-      final b = _tileTop(to.column.toDouble(), to.row.toDouble())
-          .translate(0, -16);
+      final a = _tileTop(
+        from.column.toDouble(),
+        from.row.toDouble(),
+      ).translate(0, -16);
+      final b = _tileTop(
+        to.column.toDouble(),
+        to.row.toDouble(),
+      ).translate(0, -16);
       final color = switch (edge.mode) {
         ConnectionMode.adjacent => PixelPalette.muted,
         ConnectionMode.dense => PixelPalette.mint,
@@ -327,18 +327,9 @@ class DioramaScenePainter {
     final wood = Paint()
       ..isAntiAlias = false
       ..color = const Color(0xFF8A603B);
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 17, anchor.dy - 17, 34, 7),
-      wood,
-    );
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 13, anchor.dy - 29, 4, 20),
-      wood,
-    );
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx + 9, anchor.dy - 29, 4, 20),
-      wood,
-    );
+    canvas.drawRect(Rect.fromLTWH(anchor.dx - 17, anchor.dy - 17, 34, 7), wood);
+    canvas.drawRect(Rect.fromLTWH(anchor.dx - 13, anchor.dy - 29, 4, 20), wood);
+    canvas.drawRect(Rect.fromLTWH(anchor.dx + 9, anchor.dy - 29, 4, 20), wood);
     canvas.drawRect(
       Rect.fromLTWH(anchor.dx - 15, anchor.dy - 34, 30 * progress, 3),
       Paint()..color = PixelPalette.mint,
@@ -368,9 +359,15 @@ class DioramaScenePainter {
       anchor.translate(0, -53),
       15,
       Paint()
-        ..shader = RadialGradient(
-          colors: <Color>[accent.withValues(alpha: 0.28), Colors.transparent],
-        ).createShader(Rect.fromCircle(center: anchor.translate(0, -53), radius: 15)),
+        ..shader =
+            RadialGradient(
+              colors: <Color>[
+                accent.withValues(alpha: 0.28),
+                Colors.transparent,
+              ],
+            ).createShader(
+              Rect.fromCircle(center: anchor.translate(0, -53), radius: 15),
+            ),
     );
   }
 
@@ -385,7 +382,12 @@ class DioramaScenePainter {
     canvas.drawRect(Rect.fromLTWH(anchor.dx + 14, anchor.dy - 12, 4, 12), wood);
   }
 
-  void _drawTreeShape(Canvas canvas, Offset anchor, Color accent, {bool fixed = false}) {
+  void _drawTreeShape(
+    Canvas canvas,
+    Offset anchor,
+    Color accent, {
+    bool fixed = false,
+  }) {
     _drawShadow(canvas, anchor, 33, 12);
     canvas.drawRect(
       Rect.fromLTWH(anchor.dx - 5, anchor.dy - 45, 10, 38),
@@ -393,7 +395,11 @@ class DioramaScenePainter {
         ..isAntiAlias = false
         ..color = const Color(0xFF5B3B26),
     );
-    final leaves = Color.lerp(const Color(0xFF4E7148), accent, fixed ? 0.05 : 0.24)!;
+    final leaves = Color.lerp(
+      const Color(0xFF4E7148),
+      accent,
+      fixed ? 0.05 : 0.24,
+    )!;
     final paint = Paint()
       ..isAntiAlias = false
       ..color = leaves;
@@ -423,7 +429,12 @@ class DioramaScenePainter {
     }
   }
 
-  void _drawStairsShape(Canvas canvas, Offset anchor, Color accent, int rotation) {
+  void _drawStairsShape(
+    Canvas canvas,
+    Offset anchor,
+    Color accent,
+    int rotation,
+  ) {
     _drawShadow(canvas, anchor, 28, 10);
     final direction = rotation == 1 || rotation == 2 ? -1.0 : 1.0;
     for (var index = 0; index < 4; index += 1) {
@@ -437,7 +448,11 @@ class DioramaScenePainter {
         ),
         Paint()
           ..isAntiAlias = false
-          ..color = Color.lerp(const Color(0xFF515A5C), accent, 0.10 + index * 0.04)!,
+          ..color = Color.lerp(
+            const Color(0xFF515A5C),
+            accent,
+            0.10 + index * 0.04,
+          )!,
       );
     }
   }
@@ -445,9 +460,18 @@ class DioramaScenePainter {
   void _drawBusStopShape(Canvas canvas, Offset anchor, Color accent) {
     _drawShadow(canvas, anchor, 33, 11);
     final frame = Paint()..color = const Color(0xFF29373B);
-    canvas.drawRect(Rect.fromLTWH(anchor.dx - 24, anchor.dy - 48, 5, 42), frame);
-    canvas.drawRect(Rect.fromLTWH(anchor.dx + 19, anchor.dy - 48, 5, 42), frame);
-    canvas.drawRect(Rect.fromLTWH(anchor.dx - 27, anchor.dy - 51, 54, 6), frame);
+    canvas.drawRect(
+      Rect.fromLTWH(anchor.dx - 24, anchor.dy - 48, 5, 42),
+      frame,
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(anchor.dx + 19, anchor.dy - 48, 5, 42),
+      frame,
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(anchor.dx - 27, anchor.dy - 51, 54, 6),
+      frame,
+    );
     canvas.drawRect(
       Rect.fromLTWH(anchor.dx - 18, anchor.dy - 43, 36, 25),
       Paint()..color = accent.withValues(alpha: 0.45),
@@ -475,7 +499,12 @@ class DioramaScenePainter {
     );
   }
 
-  void _drawSignShape(Canvas canvas, Offset anchor, Color accent, int rotation) {
+  void _drawSignShape(
+    Canvas canvas,
+    Offset anchor,
+    Color accent,
+    int rotation,
+  ) {
     _drawShadow(canvas, anchor, 18, 7);
     canvas.drawRect(
       Rect.fromLTWH(anchor.dx - 2, anchor.dy - 35, 4, 30),
@@ -493,7 +522,12 @@ class DioramaScenePainter {
     );
   }
 
-  void _drawBridgeShape(Canvas canvas, Offset anchor, Color accent, int rotation) {
+  void _drawBridgeShape(
+    Canvas canvas,
+    Offset anchor,
+    Color accent,
+    int rotation,
+  ) {
     _drawShadow(canvas, anchor, 44, 12);
     final vertical = rotation.isOdd;
     final rect = vertical
@@ -517,8 +551,14 @@ class DioramaScenePainter {
   void _drawTowerShape(Canvas canvas, Offset anchor, Color accent) {
     _drawShadow(canvas, anchor, 30, 10);
     final stone = Paint()..color = const Color(0xFF4A5558);
-    canvas.drawRect(Rect.fromLTWH(anchor.dx - 15, anchor.dy - 65, 30, 58), stone);
-    canvas.drawRect(Rect.fromLTWH(anchor.dx - 20, anchor.dy - 70, 40, 8), stone);
+    canvas.drawRect(
+      Rect.fromLTWH(anchor.dx - 15, anchor.dy - 65, 30, 58),
+      stone,
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(anchor.dx - 20, anchor.dy - 70, 40, 8),
+      stone,
+    );
     canvas.drawRect(
       Rect.fromLTWH(anchor.dx - 5, anchor.dy - 55, 10, 13),
       Paint()..color = accent,
@@ -576,7 +616,12 @@ class DioramaScenePainter {
     if (snapshot.activeVisitorId == 'umbrella_walker') {
       final umbrella = Path()
         ..moveTo(anchor.dx - 18, anchor.dy - 39)
-        ..quadraticBezierTo(anchor.dx, anchor.dy - 57, anchor.dx + 18, anchor.dy - 39)
+        ..quadraticBezierTo(
+          anchor.dx,
+          anchor.dy - 57,
+          anchor.dx + 18,
+          anchor.dy - 39,
+        )
         ..close();
       canvas.drawPath(umbrella, Paint()..color = PixelPalette.blue);
       canvas.drawRect(
@@ -594,7 +639,8 @@ class DioramaScenePainter {
           ..color = PixelPalette.blue.withValues(alpha: 0.42)
           ..strokeWidth = 1;
         for (var index = 0; index < 28; index += 1) {
-          final x = ((index * 47 + snapshot.objects.length * 19) % 360).toDouble();
+          final x = ((index * 47 + snapshot.objects.length * 19) % 360)
+              .toDouble();
           final y = ((index * 83 + 11) % 300).toDouble();
           canvas.drawLine(Offset(x, y), Offset(x - 3, y + 9), paint);
         }
@@ -636,23 +682,27 @@ class DioramaScenePainter {
   }
 
   Offset _tileTop(double column, double row) => Offset(
-        origin.dx + (column - row) * tileWidth / 2,
-        origin.dy + (column + row) * tileHeight / 2,
-      );
+    origin.dx + (column - row) * tileWidth / 2,
+    origin.dy + (column + row) * tileHeight / 2,
+  );
 
   void _drawShadow(Canvas canvas, Offset anchor, double width, double height) {
     canvas.drawOval(
-      Rect.fromCenter(center: anchor.translate(0, -4), width: width, height: height),
+      Rect.fromCenter(
+        center: anchor.translate(0, -4),
+        width: width,
+        height: height,
+      ),
       Paint()..color = Colors.black.withValues(alpha: 0.27),
     );
   }
 
   Color _weatherAccent(WeatherMaterialKind kind) => switch (kind) {
-        WeatherMaterialKind.clear => const Color(0xFFE2B85F),
-        WeatherMaterialKind.rain => const Color(0xFF6FA9C8),
-        WeatherMaterialKind.cloudy => const Color(0xFF9EADB0),
-        WeatherMaterialKind.windy => const Color(0xFF82B8A0),
-        WeatherMaterialKind.cold => const Color(0xFFB8D8E8),
-        WeatherMaterialKind.warm => const Color(0xFFD98855),
-      };
+    WeatherMaterialKind.clear => const Color(0xFFE2B85F),
+    WeatherMaterialKind.rain => const Color(0xFF6FA9C8),
+    WeatherMaterialKind.cloudy => const Color(0xFF9EADB0),
+    WeatherMaterialKind.windy => const Color(0xFF82B8A0),
+    WeatherMaterialKind.cold => const Color(0xFFB8D8E8),
+    WeatherMaterialKind.warm => const Color(0xFFD98855),
+  };
 }

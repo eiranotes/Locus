@@ -16,10 +16,7 @@ void main() {
     );
     final first = testObject(id: 'first', recipeId: recipe.id);
     final second = testObject(id: 'second', recipeId: recipe.id);
-    final objects = <String, CraftedObject>{
-      first.id: first,
-      second.id: second,
-    };
+    final objects = <String, CraftedObject>{first.id: first, second.id: second};
     final placements = <Placement>[
       const Placement(
         id: 'p1',
@@ -75,7 +72,10 @@ void main() {
         weatherKind: WeatherMaterialKind.rain,
       ),
     );
-    expect(grid.countWhere((CellEffects cell) => cell.wet > 0), greaterThanOrEqualTo(3));
+    expect(
+      grid.countWhere((CellEffects cell) => cell.wet > 0),
+      greaterThanOrEqualTo(3),
+    );
     expect(graph.degree(first.id), greaterThan(0));
     expect(result.satisfied, isTrue);
   });
@@ -83,17 +83,35 @@ void main() {
   test('undirected connection keys do not collapse unrelated object ids', () {
     final recipe = testRecipe();
     CraftedObject object(String id) => testObject(
-          id: id,
-          recipeId: recipe.id,
-          surroundingKind: SurroundingMaterialKind.dense,
-        );
+      id: id,
+      recipeId: recipe.id,
+      surroundingKind: SurroundingMaterialKind.dense,
+    );
     final objects = <String, CraftedObject>{
       for (final id in <String>['a', 'b', 'c']) id: object(id),
     };
     final placements = <Placement>[
-      const Placement(id: 'pa', craftedObjectId: 'a', column: 0, row: 0, rotation: 0),
-      const Placement(id: 'pb', craftedObjectId: 'b', column: 1, row: 0, rotation: 0),
-      const Placement(id: 'pc', craftedObjectId: 'c', column: 0, row: 1, rotation: 0),
+      const Placement(
+        id: 'pa',
+        craftedObjectId: 'a',
+        column: 0,
+        row: 0,
+        rotation: 0,
+      ),
+      const Placement(
+        id: 'pb',
+        craftedObjectId: 'b',
+        column: 1,
+        row: 0,
+        rotation: 0,
+      ),
+      const Placement(
+        id: 'pc',
+        craftedObjectId: 'c',
+        column: 0,
+        row: 1,
+        rotation: 0,
+      ),
     ];
     final graph = const ConnectionGraphBuilder().build(
       placements: placements,
@@ -101,47 +119,46 @@ void main() {
     );
     expect(graph.edges.length, 3);
   });
-  test('weather requirements fail closed when current weather is unavailable', () {
-    final recipe = testRecipe();
-    final object = testObject(id: 'weather-object', recipeId: recipe.id);
-    final placement = const Placement(
-      id: 'weather-placement',
-      craftedObjectId: 'weather-object',
-      column: 1,
-      row: 1,
-      rotation: 0,
-    );
-    final visitor = VisitorDefinition(
-      id: 'weather-visitor',
-      nameKo: '날씨 방문자',
-      descriptionKo: '테스트',
-      hintsKo: const <String>[],
-      requirements: const <VisitorRequirement>[
-        VisitorRequirement(
-          kind: 'weatherKind',
-          anyOf: <String>['clear'],
+  test(
+    'weather requirements fail closed when current weather is unavailable',
+    () {
+      final recipe = testRecipe();
+      final object = testObject(id: 'weather-object', recipeId: recipe.id);
+      final placement = const Placement(
+        id: 'weather-placement',
+        craftedObjectId: 'weather-object',
+        column: 1,
+        row: 1,
+        rotation: 0,
+      );
+      final visitor = VisitorDefinition(
+        id: 'weather-visitor',
+        nameKo: '날씨 방문자',
+        descriptionKo: '테스트',
+        hintsKo: const <String>[],
+        requirements: const <VisitorRequirement>[
+          VisitorRequirement(kind: 'weatherKind', anyOf: <String>['clear']),
+        ],
+        reward: const VisitorReward(
+          kind: VisitorRewardKind.effect,
+          value: 'test',
         ),
-      ],
-      reward: const VisitorReward(
-        kind: VisitorRewardKind.effect,
-        value: 'test',
-      ),
-    );
-    final result = const VisitorEngine().evaluate(
-      visitor,
-      VisitorContext(
-        grid: EnvironmentGrid(columns: 5, rows: 5),
-        graph: ConnectionGraph(edges: <ConnectionEdge>[]),
-        placements: <Placement>[placement],
-        objectsById: <String, CraftedObject>{'weather-object': object},
-        recipesById: <String, RecipeDefinition>{'alley-lamp': recipe},
-        timeBand: TimeBand.afternoon,
-        weatherKind: null,
-      ),
-    );
+      );
+      final result = const VisitorEngine().evaluate(
+        visitor,
+        VisitorContext(
+          grid: EnvironmentGrid(columns: 5, rows: 5),
+          graph: ConnectionGraph(edges: <ConnectionEdge>[]),
+          placements: <Placement>[placement],
+          objectsById: <String, CraftedObject>{'weather-object': object},
+          recipesById: <String, RecipeDefinition>{'alley-lamp': recipe},
+          timeBand: TimeBand.afternoon,
+          weatherKind: null,
+        ),
+      );
 
-    expect(result.satisfied, isFalse);
-    expect(result.progress.single.current, '확인할 수 없음');
-  });
-
+      expect(result.satisfied, isFalse);
+      expect(result.progress.single.current, '확인할 수 없음');
+    },
+  );
 }

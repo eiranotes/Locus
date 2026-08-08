@@ -15,9 +15,8 @@ class StepSyncService {
   List<StepBucket> sourceChangeBaseline(List<StepBucket> existing) {
     return existing
         .map(
-          (StepBucket bucket) => bucket.copyWith(
-            observedSteps: bucket.spentSteps,
-          ),
+          (StepBucket bucket) =>
+              bucket.copyWith(observedSteps: bucket.spentSteps),
         )
         .toList(growable: false);
   }

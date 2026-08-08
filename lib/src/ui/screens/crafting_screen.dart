@@ -61,7 +61,10 @@ class RecipeListScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(recipe.nameKo, style: Theme.of(context).textTheme.titleMedium),
+                            Text(
+                              recipe.nameKo,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
                             const SizedBox(height: 4),
                             Text(
                               recipe.descriptionKo,
@@ -84,7 +87,10 @@ class RecipeListScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const Icon(Icons.chevron_right, color: PixelPalette.muted),
+                      const Icon(
+                        Icons.chevron_right,
+                        color: PixelPalette.muted,
+                      ),
                     ],
                   ),
                 );
@@ -120,12 +126,15 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
     super.didChangeDependencies();
     final controller = AppScope.of(context);
     _weatherId ??= _findPreferred(
-      controller.availableWeatherMaterials.map((WeatherMaterial value) => value.id),
+      controller.availableWeatherMaterials.map(
+        (WeatherMaterial value) => value.id,
+      ),
       widget.preselectedWeatherId,
     );
     _surroundingId ??= _findPreferred(
-      controller.availableSurroundingMaterials
-          .map((SurroundingMaterial value) => value.id),
+      controller.availableSurroundingMaterials.map(
+        (SurroundingMaterial value) => value.id,
+      ),
       widget.preselectedSurroundingId,
     );
   }
@@ -139,7 +148,8 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
     final surroundings = controller.availableSurroundingMaterials
         .where((SurroundingMaterial item) => item.id == _surroundingId)
         .firstOrNull;
-    final canSubmit = weather != null && !_submitting && controller.construction == null;
+    final canSubmit =
+        weather != null && !_submitting && controller.construction == null;
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.recipe.nameKo)),
@@ -155,9 +165,7 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
           Text('날씨 재료', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           if (controller.availableWeatherMaterials.isEmpty)
-            const PixelCard(
-              child: Text('사용 가능한 날씨 재료가 없습니다. 먼저 수집해 주세요.'),
-            )
+            const PixelCard(child: Text('사용 가능한 날씨 재료가 없습니다. 먼저 수집해 주세요.'))
           else
             _WeatherPicker(
               materials: controller.availableWeatherMaterials,
@@ -168,7 +176,10 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
           Row(
             children: <Widget>[
               Expanded(
-                child: Text('주변 재료 · 선택', style: Theme.of(context).textTheme.titleMedium),
+                child: Text(
+                  '주변 재료 · 선택',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
               TextButton(
                 onPressed: _surroundingId == null
@@ -180,9 +191,7 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
           ),
           const SizedBox(height: 8),
           if (controller.availableSurroundingMaterials.isEmpty)
-            const PixelCard(
-              child: Text('주변 재료 없이 기본 인접 기능으로 만들 수 있습니다.'),
-            )
+            const PixelCard(child: Text('주변 재료 없이 기본 인접 기능으로 만들 수 있습니다.'))
           else
             _SurroundingPicker(
               materials: controller.availableSurroundingMaterials,
@@ -199,7 +208,10 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('필요한 걸음', style: Theme.of(context).textTheme.bodyMedium),
+                      Text(
+                        '필요한 걸음',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                       Text(
                         '${widget.recipe.stepCost}걸음',
                         style: Theme.of(context).textTheme.titleMedium,
@@ -228,7 +240,9 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
           ],
           const SizedBox(height: 22),
           FilledButton.icon(
-            onPressed: canSubmit ? () => _craft(controller, weather, surroundings) : null,
+            onPressed: canSubmit
+                ? () => _craft(controller, weather, surroundings)
+                : null,
             icon: const Icon(Icons.handyman_outlined),
             label: Text(
               controller.availableSteps >= widget.recipe.stepCost
@@ -311,7 +325,9 @@ class _ObjectPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = weather == null ? PixelPalette.muted : weatherColor(weather!);
+    final accent = weather == null
+        ? PixelPalette.muted
+        : weatherColor(weather!);
     return PixelCard(
       child: Column(
         children: <Widget>[

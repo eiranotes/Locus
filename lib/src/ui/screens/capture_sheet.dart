@@ -71,7 +71,9 @@ class _CaptureSheetState extends State<CaptureSheet> {
                   ),
                 ),
                 IconButton(
-                  onPressed: _capturing ? null : () => Navigator.of(context).pop(),
+                  onPressed: _capturing
+                      ? null
+                      : () => Navigator.of(context).pop(),
                   icon: const Icon(Icons.close),
                   tooltip: '닫기',
                 ),
@@ -82,25 +84,27 @@ class _CaptureSheetState extends State<CaptureSheet> {
               child: _loadingPreparation
                   ? const Center(child: CircularProgressIndicator())
                   : _capturing
-                      ? _CaptureProgress(
-                          scansSurroundings: _includeSurroundings &&
-                              preparation?.surroundingReadiness.isReady == true,
-                        )
-                      : _result == null
-                          ? _PreparationView(
-                              preparation: preparation,
-                              availableSteps: controller.availableSteps,
-                              includeSurroundings: _includeSurroundings,
-                              onSurroundingsChanged: (bool value) {
-                                setState(() => _includeSurroundings = value);
-                              },
-                            )
-                          : _ResultView(bundle: _result!),
+                  ? _CaptureProgress(
+                      scansSurroundings:
+                          _includeSurroundings &&
+                          preparation?.surroundingReadiness.isReady == true,
+                    )
+                  : _result == null
+                  ? _PreparationView(
+                      preparation: preparation,
+                      availableSteps: controller.availableSteps,
+                      includeSurroundings: _includeSurroundings,
+                      onSurroundingsChanged: (bool value) {
+                        setState(() => _includeSurroundings = value);
+                      },
+                    )
+                  : _ResultView(bundle: _result!),
             ),
             const SizedBox(height: 14),
             if (!_capturing && _result == null)
               FilledButton.icon(
-                onPressed: preparation == null ||
+                onPressed:
+                    preparation == null ||
                         (!preparation.weatherReadiness.isReady &&
                             !preparation.surroundingReadiness.isReady)
                     ? null
@@ -113,14 +117,14 @@ class _CaptureSheetState extends State<CaptureSheet> {
                 onPressed: _result!.weatherMaterial == null
                     ? null
                     : () => Navigator.of(context).push<void>(
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) => RecipeListScreen(
-                              preselectedWeatherId: _result!.weatherMaterial?.id,
-                              preselectedSurroundingId:
-                                  _result!.surroundingMaterial?.id,
-                            ),
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) => RecipeListScreen(
+                            preselectedWeatherId: _result!.weatherMaterial?.id,
+                            preselectedSurroundingId:
+                                _result!.surroundingMaterial?.id,
                           ),
                         ),
+                      ),
                 icon: const Icon(Icons.handyman_outlined),
                 label: const Text('이 재료로 만들기'),
               ),
@@ -137,14 +141,15 @@ class _CaptureSheetState extends State<CaptureSheet> {
   }
 
   Future<void> _capture(CapturePreparation preparation) async {
-    var include = _includeSurroundings && preparation.surroundingReadiness.isReady;
+    var include =
+        _includeSurroundings && preparation.surroundingReadiness.isReady;
     if (include) {
       include = await _requestBluetoothPermission();
     }
     setState(() => _capturing = true);
-    final bundle = await AppScope.read(context).performCapture(
-      includeSurroundings: include,
-    );
+    final bundle = await AppScope.read(
+      context,
+    ).performCapture(includeSurroundings: include);
     if (!mounted) {
       return;
     }
@@ -224,9 +229,7 @@ class _PreparationView extends StatelessWidget {
                   value: includeSurroundings,
                   onChanged: onSurroundingsChanged,
                   title: const Text('주변까지 함께 수집'),
-                  subtitle: const Text(
-                    '사람 수나 특정 기기를 기록하지 않습니다.',
-                  ),
+                  subtitle: const Text('사람 수나 특정 기기를 기록하지 않습니다.'),
                 ),
               ],
             ],
@@ -242,7 +245,10 @@ class _PreparationView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text('제작에 쓸 수 있는 걸음', style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      '제작에 쓸 수 있는 걸음',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 3),
                     Text(
                       '$availableSteps걸음',
@@ -300,9 +306,7 @@ class _ReadinessRow extends StatelessWidget {
               Text(value),
               const SizedBox(height: 5),
               Text(
-                readiness.isReady
-                    ? '준비됨'
-                    : readiness.message ?? '아직 준비 중',
+                readiness.isReady ? '준비됨' : readiness.message ?? '아직 준비 중',
                 style: TextStyle(
                   color: readiness.isReady
                       ? PixelPalette.success
@@ -334,7 +338,9 @@ class _CaptureProgress extends StatelessWidget {
             height: 112,
             child: CircularProgressIndicator(
               strokeWidth: 7,
-              color: scansSurroundings ? PixelPalette.violet : PixelPalette.mint,
+              color: scansSurroundings
+                  ? PixelPalette.violet
+                  : PixelPalette.mint,
               backgroundColor: PixelPalette.line,
             ),
           ),
@@ -345,9 +351,7 @@ class _CaptureProgress extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            scansSurroundings
-                ? '화면을 켠 상태로 잠시 기다려 주세요.'
-                : '준비된 날씨 재료를 저장합니다.',
+            scansSurroundings ? '화면을 켠 상태로 잠시 기다려 주세요.' : '준비된 날씨 재료를 저장합니다.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ],
@@ -376,7 +380,10 @@ class _ResultView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('날씨 재료', style: Theme.of(context).textTheme.bodyMedium),
+                      Text(
+                        '날씨 재료',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                       const SizedBox(height: 3),
                       Text(
                         '${bundle.weatherMaterial!.kind.labelKo} · '
@@ -389,7 +396,8 @@ class _ResultView extends StatelessWidget {
               ],
             ),
           ),
-        if (bundle.weatherMaterial != null && bundle.surroundingMaterial != null)
+        if (bundle.weatherMaterial != null &&
+            bundle.surroundingMaterial != null)
           const SizedBox(height: 10),
         if (bundle.surroundingMaterial != null)
           PixelCard(
@@ -402,7 +410,10 @@ class _ResultView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('주변 재료', style: Theme.of(context).textTheme.bodyMedium),
+                      Text(
+                        '주변 재료',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                       const SizedBox(height: 3),
                       Text(
                         bundle.surroundingMaterial!.kind.labelKo,
@@ -419,10 +430,9 @@ class _ResultView extends StatelessWidget {
               ],
             ),
           ),
-        if (bundle.weatherMaterial == null && bundle.surroundingMaterial == null)
-          const PixelCard(
-            child: Text('새로 준비된 재료가 없어 기록만 확인했습니다.'),
-          ),
+        if (bundle.weatherMaterial == null &&
+            bundle.surroundingMaterial == null)
+          const PixelCard(child: Text('새로 준비된 재료가 없어 기록만 확인했습니다.')),
         const SizedBox(height: 14),
         Text(
           '${bundle.record.userPlaceLabel ?? '현재 지역'} · '

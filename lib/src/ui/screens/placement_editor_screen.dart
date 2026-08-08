@@ -23,7 +23,8 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final controller = AppScope.of(context);
-    _selectedObjectId ??= widget.initialObjectId ??
+    _selectedObjectId ??=
+        widget.initialObjectId ??
         controller.placements.firstOrNull?.craftedObjectId;
   }
 
@@ -79,7 +80,8 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
                   itemBuilder: (BuildContext context, int index) {
                     final placement = controller.placements[index];
                     final object = controller.craftedObjects.firstWhere(
-                      (CraftedObject value) => value.id == placement.craftedObjectId,
+                      (CraftedObject value) =>
+                          value.id == placement.craftedObjectId,
                     );
                     final selected = object.id == _selectedObjectId;
                     return SizedBox(
@@ -87,7 +89,8 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
                       child: PixelCard(
                         highlighted: selected,
                         padding: const EdgeInsets.all(9),
-                        onTap: () => setState(() => _selectedObjectId = object.id),
+                        onTap: () =>
+                            setState(() => _selectedObjectId = object.id),
                         child: Row(
                           children: <Widget>[
                             Icon(
@@ -114,12 +117,8 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
                 _PlacementControls(
                   object: selectedObject,
                   placement: selectedPlacement,
-                  onMove: (int dx, int dy) => _move(
-                    controller,
-                    selectedPlacement,
-                    dx,
-                    dy,
-                  ),
+                  onMove: (int dx, int dy) =>
+                      _move(controller, selectedPlacement, dx, dy),
                   onRotate: () => _rotate(controller, selectedPlacement),
                   onRemove: () => _remove(controller, selectedPlacement),
                 ),
@@ -156,7 +155,10 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
   Future<void> _remove(AppController controller, Placement placement) async {
     await controller.removePlacement(placement.craftedObjectId);
     if (mounted) {
-      setState(() => _selectedObjectId = controller.placements.firstOrNull?.craftedObjectId);
+      setState(
+        () => _selectedObjectId =
+            controller.placements.firstOrNull?.craftedObjectId,
+      );
     }
   }
 }
@@ -186,7 +188,10 @@ class _PlacementControls extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(object.kind.labelKo, style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  object.kind.labelKo,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 Text(
                   '칸 ${placement.column + 1}, ${placement.row + 1} · 방향 ${placement.rotation + 1}',
                   style: Theme.of(context).textTheme.bodyMedium,
@@ -194,10 +199,22 @@ class _PlacementControls extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: <Widget>[
-                    _MoveButton(icon: Icons.arrow_left, onTap: () => onMove(-1, 0)),
-                    _MoveButton(icon: Icons.arrow_upward, onTap: () => onMove(0, -1)),
-                    _MoveButton(icon: Icons.arrow_downward, onTap: () => onMove(0, 1)),
-                    _MoveButton(icon: Icons.arrow_right, onTap: () => onMove(1, 0)),
+                    _MoveButton(
+                      icon: Icons.arrow_left,
+                      onTap: () => onMove(-1, 0),
+                    ),
+                    _MoveButton(
+                      icon: Icons.arrow_upward,
+                      onTap: () => onMove(0, -1),
+                    ),
+                    _MoveButton(
+                      icon: Icons.arrow_downward,
+                      onTap: () => onMove(0, 1),
+                    ),
+                    _MoveButton(
+                      icon: Icons.arrow_right,
+                      onTap: () => onMove(1, 0),
+                    ),
                   ],
                 ),
               ],

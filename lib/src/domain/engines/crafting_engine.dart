@@ -34,7 +34,9 @@ class CraftingEngine {
       throw StateError('The selected weather material is already consumed.');
     }
     if (surrounding != null && !surrounding.isAvailable) {
-      throw StateError('The selected surrounding material is already consumed.');
+      throw StateError(
+        'The selected surrounding material is already consumed.',
+      );
     }
 
     const ledger = StepLedger();

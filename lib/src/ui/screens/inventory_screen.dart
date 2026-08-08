@@ -24,7 +24,10 @@ class InventoryScreen extends StatelessWidget {
             child: Row(
               children: <Widget>[
                 Expanded(
-                  child: Text('보관함', style: Theme.of(context).textTheme.headlineLarge),
+                  child: Text(
+                    '보관함',
+                    style: Theme.of(context).textTheme.headlineLarge,
+                  ),
                 ),
                 Text(
                   '${controller.captures.length}개 기록',
@@ -73,7 +76,8 @@ class _RecordsTab extends StatelessWidget {
       for (final material in controller.weatherMaterials) material.id: material,
     };
     final surroundingById = <String, SurroundingMaterial>{
-      for (final material in controller.surroundingMaterials) material.id: material,
+      for (final material in controller.surroundingMaterials)
+        material.id: material,
     };
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 110),
@@ -139,11 +143,7 @@ class _RecordCard extends StatelessWidget {
                     ),
                   ),
                   Center(
-                    child: Icon(
-                      weatherIcon(kind),
-                      color: accent,
-                      size: 42,
-                    ),
+                    child: Icon(weatherIcon(kind), color: accent, size: 42),
                   ),
                   if (surroundings != null)
                     Positioned(
@@ -258,9 +258,8 @@ class _WeatherMaterialRow extends StatelessWidget {
             IconButton(
               onPressed: () => Navigator.of(context).push<void>(
                 MaterialPageRoute<void>(
-                  builder: (BuildContext context) => RecipeListScreen(
-                    preselectedWeatherId: material.id,
-                  ),
+                  builder: (BuildContext context) =>
+                      RecipeListScreen(preselectedWeatherId: material.id),
                 ),
               ),
               tooltip: '이 재료로 만들기',
@@ -340,7 +339,9 @@ class _ObjectsTab extends StatelessWidget {
                 width: 58,
                 height: 58,
                 decoration: BoxDecoration(
-                  color: weatherColor(object.weatherKind).withValues(alpha: 0.12),
+                  color: weatherColor(
+                    object.weatherKind,
+                  ).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Icon(
@@ -354,13 +355,16 @@ class _ObjectsTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(recipe.nameKo, style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      recipe.nameKo,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 3),
                     Text(
                       object.isComplete
                           ? object.lifecycle == ObjectLifecycle.placed
-                              ? '내 공간에 배치됨'
-                              : '보관 중'
+                                ? '내 공간에 배치됨'
+                                : '보관 중'
                           : '${object.remainingSteps}걸음 남음',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),

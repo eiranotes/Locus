@@ -12,10 +12,7 @@ import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 import 'package:reality_diorama/src/ui/widgets/resource_badge.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({
-    required this.demoMode,
-    super.key,
-  });
+  const HomeScreen({required this.demoMode, super.key});
   final bool demoMode;
 
   @override
@@ -84,7 +81,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     const PlacementEditorScreen(),
                               ),
                             ),
-                            icon: const Icon(Icons.grid_view_outlined, size: 18),
+                            icon: const Icon(
+                              Icons.grid_view_outlined,
+                              size: 18,
+                            ),
                             label: const Text('배치 편집'),
                           ),
                         ),
@@ -130,10 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
       final visitor = controller.catalog.visitorById(visitorId);
       await showDialog<void>(
         context: context,
-        builder: (BuildContext context) => _VisitorArrivalDialog(
-          visitor: visitor,
-          controller: controller,
-        ),
+        builder: (BuildContext context) =>
+            _VisitorArrivalDialog(visitor: visitor, controller: controller),
       );
       controller.clearNewVisitor();
     });
@@ -361,7 +359,8 @@ class _SceneSummary extends StatelessWidget {
           child: PixelCard(
             child: _SummaryValue(
               label: '놓인 물건',
-              value: '$placed / ${controller.catalog.balance.activeObjectLimit}',
+              value:
+                  '$placed / ${controller.catalog.balance.activeObjectLimit}',
               icon: Icons.account_tree_outlined,
             ),
           ),
@@ -408,7 +407,10 @@ class _SummaryValue extends StatelessWidget {
 }
 
 class _VisitorArrivalDialog extends StatelessWidget {
-  const _VisitorArrivalDialog({required this.visitor, required this.controller});
+  const _VisitorArrivalDialog({
+    required this.visitor,
+    required this.controller,
+  });
 
   final VisitorDefinition visitor;
   final AppController controller;
@@ -426,7 +428,10 @@ class _VisitorArrivalDialog extends StatelessWidget {
           children: <Widget>[
             Text('새 방문자', style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 4),
-            Text(visitor.nameKo, style: Theme.of(context).textTheme.headlineSmall),
+            Text(
+              visitor.nameKo,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
             const SizedBox(height: 12),
             AspectRatio(
               aspectRatio: 1.4,

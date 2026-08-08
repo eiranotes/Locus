@@ -36,44 +36,48 @@ void main() {
     expect(buckets.single.available, 2000);
   });
 
-  test('source change discards unspent allowance from the previous source', () async {
-    final service = StepSyncService(
-      source: const _FixedStepSource(<String, int>{'2026-08-08': 725}),
-      fallbackDailySteps: 2000,
-    );
-    final fallback = service.syncFallback(
-      existing: const <StepBucket>[],
-      now: now,
-    );
-    final baseline = service.sourceChangeBaseline(fallback);
+  test(
+    'source change discards unspent allowance from the previous source',
+    () async {
+      final service = StepSyncService(
+        source: const _FixedStepSource(<String, int>{'2026-08-08': 725}),
+        fallbackDailySteps: 2000,
+      );
+      final fallback = service.syncFallback(
+        existing: const <StepBucket>[],
+        now: now,
+      );
+      final baseline = service.sourceChangeBaseline(fallback);
 
-    final real = await service.syncReal(existing: baseline, now: now);
+      final real = await service.syncReal(existing: baseline, now: now);
 
-    expect(real.single.observedSteps, 725);
-    expect(real.single.spentSteps, 0);
-    expect(real.single.available, 725);
-  });
+      expect(real.single.observedSteps, 725);
+      expect(real.single.spentSteps, 0);
+      expect(real.single.available, 725);
+    },
+  );
 
-  test('source change keeps spent work but never creates a negative balance', () async {
-    final service = StepSyncService(
-      source: const _FixedStepSource(<String, int>{'2026-08-08': 725}),
-      fallbackDailySteps: 2000,
-    );
-    final fallback = service.syncFallback(
-      existing: const <StepBucket>[],
-      now: now,
-    );
-    final spent = <StepBucket>[
-      fallback.single.copyWith(spentSteps: 1500),
-    ];
-    final baseline = service.sourceChangeBaseline(spent);
+  test(
+    'source change keeps spent work but never creates a negative balance',
+    () async {
+      final service = StepSyncService(
+        source: const _FixedStepSource(<String, int>{'2026-08-08': 725}),
+        fallbackDailySteps: 2000,
+      );
+      final fallback = service.syncFallback(
+        existing: const <StepBucket>[],
+        now: now,
+      );
+      final spent = <StepBucket>[fallback.single.copyWith(spentSteps: 1500)];
+      final baseline = service.sourceChangeBaseline(spent);
 
-    final real = await service.syncReal(existing: baseline, now: now);
+      final real = await service.syncReal(existing: baseline, now: now);
 
-    expect(real.single.observedSteps, 1500);
-    expect(real.single.spentSteps, 1500);
-    expect(real.single.available, 0);
-  });
+      expect(real.single.observedSteps, 1500);
+      expect(real.single.spentSteps, 1500);
+      expect(real.single.available, 0);
+    },
+  );
 
   test('switching sources preserves previously spent work', () async {
     final service = StepSyncService(
@@ -84,9 +88,7 @@ void main() {
       existing: const <StepBucket>[],
       now: now,
     );
-    final spent = <StepBucket>[
-      fallback.single.copyWith(spentSteps: 1500),
-    ];
+    final spent = <StepBucket>[fallback.single.copyWith(spentSteps: 1500)];
 
     final real = await service.syncReal(existing: spent, now: now);
 

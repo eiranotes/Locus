@@ -26,13 +26,13 @@ class SurroundingClassifier {
     }
 
     final signalEvidence = math.min(1.0, features.uniqueCount / 10.0);
-    final confidence = (features.observationCoverage * 0.55 +
-            signalEvidence * 0.20 +
-            features.persistence.clamp(0.0, 1.0) * 0.15 +
-            (1 - (features.churn - 0.5).abs() * 0.5).clamp(0.0, 1.0) *
-                0.10)
-        .clamp(0.0, 1.0)
-        .toDouble();
+    final confidence =
+        (features.observationCoverage * 0.55 +
+                signalEvidence * 0.20 +
+                features.persistence.clamp(0.0, 1.0) * 0.15 +
+                (1 - (features.churn - 0.5).abs() * 0.5).clamp(0.0, 1.0) * 0.10)
+            .clamp(0.0, 1.0)
+            .toDouble();
 
     if (confidence < minimumConfidence) {
       return null;
@@ -41,8 +41,7 @@ class SurroundingClassifier {
     final kind = switch ((features.churn, features.persistence)) {
       (>= 0.45, _) => SurroundingMaterialKind.dynamic,
       (_, >= 0.65) => SurroundingMaterialKind.stable,
-      _ when features.uniqueCount >= 8 ||
-              features.strongSignalRatio >= 0.35 =>
+      _ when features.uniqueCount >= 8 || features.strongSignalRatio >= 0.35 =>
         SurroundingMaterialKind.dense,
       _ => SurroundingMaterialKind.sparse,
     };

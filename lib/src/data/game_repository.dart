@@ -44,10 +44,7 @@ class GameRepository {
   }
 
   Future<List<CraftedObject>> loadCraftedObjects() async {
-    final rows = await _db.query(
-      'crafted_objects',
-      orderBy: 'created_at DESC',
-    );
+    final rows = await _db.query('crafted_objects', orderBy: 'created_at DESC');
     return rows.map(CraftedObject.fromMap).toList(growable: false);
   }
 
@@ -219,22 +216,14 @@ class GameRepository {
         sighting.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      await transaction.insert(
-        'metadata',
-        <String, Object?>{
-          'key': 'unlocked_recipe_ids',
-          'value': jsonEncode(unlockedRecipeIds.toList()..sort()),
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-      await transaction.insert(
-        'metadata',
-        <String, Object?>{
-          'key': 'unlocked_reward_keys',
-          'value': jsonEncode(unlockedRewardKeys.toList()..sort()),
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      await transaction.insert('metadata', <String, Object?>{
+        'key': 'unlocked_recipe_ids',
+        'value': jsonEncode(unlockedRecipeIds.toList()..sort()),
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
+      await transaction.insert('metadata', <String, Object?>{
+        'key': 'unlocked_reward_keys',
+        'value': jsonEncode(unlockedRewardKeys.toList()..sort()),
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
     });
   }
 
@@ -250,11 +239,10 @@ class GameRepository {
   }
 
   Future<void> setMetadata(String key, String value) async {
-    await _db.insert(
-      'metadata',
-      <String, Object?>{'key': key, 'value': value},
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _db.insert('metadata', <String, Object?>{
+      'key': key,
+      'value': value,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<Set<String>> unlockedRecipeIds() async {

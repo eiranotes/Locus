@@ -31,29 +31,26 @@ class CellEffects {
     int wind = 0,
     int nature = 0,
     HeightBand? height,
-  }) =>
-      CellEffects(
-        wet: this.wet + wet,
-        light: this.light + light,
-        warm: this.warm + warm,
-        cool: this.cool + cool,
-        wind: this.wind + wind,
-        nature: this.nature + nature,
-        height: height == null
-            ? this.height
-            : HeightBand.values[
-                math.max(this.height.index, height.index)
-              ],
-      );
+  }) => CellEffects(
+    wet: this.wet + wet,
+    light: this.light + light,
+    warm: this.warm + warm,
+    cool: this.cool + cool,
+    wind: this.wind + wind,
+    nature: this.nature + nature,
+    height: height == null
+        ? this.height
+        : HeightBand.values[math.max(this.height.index, height.index)],
+  );
 }
 
 class EnvironmentGrid {
   EnvironmentGrid({required this.columns, required this.rows})
-      : _cells = List<CellEffects>.filled(
-          columns * rows,
-          const CellEffects(),
-          growable: false,
-        );
+    : _cells = List<CellEffects>.filled(
+        columns * rows,
+        const CellEffects(),
+        growable: false,
+      );
 
   final int columns;
   final int rows;
@@ -135,30 +132,30 @@ class EnvironmentGridBuilder {
   }
 
   CellEffects _baseEffects(RecipeDefinition recipe) => CellEffects(
-        wet: recipe.baseEffects['wet'] ?? 0,
-        light: recipe.baseEffects['light'] ?? 0,
-        warm: recipe.baseEffects['warm'] ?? 0,
-        cool: recipe.baseEffects['cool'] ?? 0,
-        wind: recipe.baseEffects['wind'] ?? 0,
-        nature: recipe.baseEffects['nature'] ?? 0,
-        height: recipe.height,
-      );
+    wet: recipe.baseEffects['wet'] ?? 0,
+    light: recipe.baseEffects['light'] ?? 0,
+    warm: recipe.baseEffects['warm'] ?? 0,
+    cool: recipe.baseEffects['cool'] ?? 0,
+    wind: recipe.baseEffects['wind'] ?? 0,
+    nature: recipe.baseEffects['nature'] ?? 0,
+    height: recipe.height,
+  );
 
   CellEffects _weatherEffects(WeatherMaterialKind kind) => switch (kind) {
-        WeatherMaterialKind.clear => const CellEffects(light: 1, warm: 1),
-        WeatherMaterialKind.rain => const CellEffects(wet: 1, cool: 1),
-        WeatherMaterialKind.cloudy => const CellEffects(cool: 1),
-        WeatherMaterialKind.windy => const CellEffects(wind: 1),
-        WeatherMaterialKind.cold => const CellEffects(cool: 2),
-        WeatherMaterialKind.warm => const CellEffects(warm: 2),
-      };
+    WeatherMaterialKind.clear => const CellEffects(light: 1, warm: 1),
+    WeatherMaterialKind.rain => const CellEffects(wet: 1, cool: 1),
+    WeatherMaterialKind.cloudy => const CellEffects(cool: 1),
+    WeatherMaterialKind.windy => const CellEffects(wind: 1),
+    WeatherMaterialKind.cold => const CellEffects(cool: 2),
+    WeatherMaterialKind.warm => const CellEffects(warm: 2),
+  };
 
   CellEffects _attenuate(CellEffects value) => CellEffects(
-        wet: value.wet > 0 ? 1 : 0,
-        light: value.light > 0 ? 1 : 0,
-        warm: value.warm > 0 ? 1 : 0,
-        cool: value.cool > 0 ? 1 : 0,
-        wind: value.wind > 0 ? 1 : 0,
-        nature: value.nature > 0 ? 1 : 0,
-      );
+    wet: value.wet > 0 ? 1 : 0,
+    light: value.light > 0 ? 1 : 0,
+    warm: value.warm > 0 ? 1 : 0,
+    cool: value.cool > 0 ? 1 : 0,
+    wind: value.wind > 0 ? 1 : 0,
+    nature: value.nature > 0 ? 1 : 0,
+  );
 }

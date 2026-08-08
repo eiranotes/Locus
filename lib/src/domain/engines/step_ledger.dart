@@ -30,8 +30,8 @@ class StepLedger {
       final safeObserved = old == null
           ? reported
           : reported < old.observedSteps
-              ? old.observedSteps
-              : reported;
+          ? old.observedSteps
+          : reported;
       byKey[entry.key] = StepBucket(
         dayKey: entry.key,
         observedSteps: safeObserved,
@@ -48,18 +48,19 @@ class StepLedger {
       syncedAt.day,
     ).subtract(const Duration(days: 6));
 
-    final retained = byKey.values.where((StepBucket bucket) {
-      final parsed = DateTime.tryParse(bucket.dayKey);
-      return parsed != null && !parsed.isBefore(cutoff);
-    }).toList()
-      ..sort((StepBucket a, StepBucket b) => a.dayKey.compareTo(b.dayKey));
+    final retained =
+        byKey.values.where((StepBucket bucket) {
+            final parsed = DateTime.tryParse(bucket.dayKey);
+            return parsed != null && !parsed.isBefore(cutoff);
+          }).toList()
+          ..sort((StepBucket a, StepBucket b) => a.dayKey.compareTo(b.dayKey));
     return retained;
   }
 
   int available(List<StepBucket> buckets) => buckets.fold<int>(
-        0,
-        (int sum, StepBucket bucket) => sum + bucket.available,
-      );
+    0,
+    (int sum, StepBucket bucket) => sum + bucket.available,
+  );
 
   StepSpendResult spend(List<StepBucket> buckets, int requested) {
     if (requested <= 0) {

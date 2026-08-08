@@ -15,7 +15,8 @@ class WeatherClassifier {
       'thunderstorm',
       'hail',
     ].any(condition.contains);
-    final isRainCode = (code >= 51 && code <= 67) ||
+    final isRainCode =
+        (code >= 51 && code <= 67) ||
         (code >= 80 && code <= 82) ||
         (code >= 95 && code <= 99);
     if (snapshot.precipitationMillimeters >= 0.1 ||
@@ -31,8 +32,7 @@ class WeatherClassifier {
       'blizzard',
       'wintry',
     ].any(condition.contains);
-    final isSnowCode = (code >= 71 && code <= 77) ||
-        (code >= 85 && code <= 86);
+    final isSnowCode = (code >= 71 && code <= 77) || (code >= 85 && code <= 86);
     if (isSnowCondition ||
         isSnowCode ||
         snapshot.apparentTemperatureCelsius <= 0) {

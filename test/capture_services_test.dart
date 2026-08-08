@@ -24,36 +24,39 @@ void main() {
     providerName: 'Test provider',
   );
 
-  test('provider failure creates no fake weather and keeps surroundings usable', () async {
-    final coordinator = CaptureCoordinator(
-      locationGateway: const _FixedLocationGateway(),
-      weatherGateway: _ThrowingWeatherGateway(),
-      ambientScanner: const _FixedAmbientScanner(),
-      catalog: ContentCatalog(
-        recipes: const <RecipeDefinition>[],
-        visitors: const <VisitorDefinition>[],
-        balance: testBalance(),
-      ),
-    );
+  test(
+    'provider failure creates no fake weather and keeps surroundings usable',
+    () async {
+      final coordinator = CaptureCoordinator(
+        locationGateway: const _FixedLocationGateway(),
+        weatherGateway: _ThrowingWeatherGateway(),
+        ambientScanner: const _FixedAmbientScanner(),
+        catalog: ContentCatalog(
+          recipes: const <RecipeDefinition>[],
+          visitors: const <VisitorDefinition>[],
+          balance: testBalance(),
+        ),
+      );
 
-    final preparation = await coordinator.prepare(now: now);
-    expect(preparation.weatherSnapshot, isNull);
-    expect(preparation.weatherKind, isNull);
-    expect(preparation.weatherReadiness.status, ReadinessStatus.unavailable);
-    expect(preparation.surroundingReadiness.isReady, isTrue);
+      final preparation = await coordinator.prepare(now: now);
+      expect(preparation.weatherSnapshot, isNull);
+      expect(preparation.weatherKind, isNull);
+      expect(preparation.weatherReadiness.status, ReadinessStatus.unavailable);
+      expect(preparation.surroundingReadiness.isReady, isTrue);
 
-    final result = await coordinator.capture(
-      preparation: preparation,
-      now: now,
-      includeSurroundings: true,
-    );
+      final result = await coordinator.capture(
+        preparation: preparation,
+        now: now,
+        includeSurroundings: true,
+      );
 
-    expect(result.weatherMaterial, isNull);
-    expect(result.surroundingMaterial, isNotNull);
-    expect(result.record.weatherBasis, WeatherBasis.unavailable);
-    expect(result.record.weatherMaterialId, isNull);
-    expect(result.record.surroundingMaterialId, isNotNull);
-  });
+      expect(result.weatherMaterial, isNull);
+      expect(result.surroundingMaterial, isNotNull);
+      expect(result.record.weatherBasis, WeatherBasis.unavailable);
+      expect(result.record.weatherMaterialId, isNull);
+      expect(result.record.surroundingMaterialId, isNotNull);
+    },
+  );
 
   test('fallback location does not call the weather provider', () async {
     final gateway = _CountingWeatherGateway(snapshot);
@@ -86,31 +89,34 @@ void main() {
     expect(result.record.userPlaceLabel, '위치 권한 필요');
   });
 
-  test('available provider creates a weather material with its provenance', () async {
-    final coordinator = CaptureCoordinator(
-      locationGateway: const _FixedLocationGateway(),
-      weatherGateway: _CountingWeatherGateway(snapshot),
-      ambientScanner: const _FixedAmbientScanner(),
-      catalog: ContentCatalog(
-        recipes: const <RecipeDefinition>[],
-        visitors: const <VisitorDefinition>[],
-        balance: testBalance(),
-      ),
-    );
+  test(
+    'available provider creates a weather material with its provenance',
+    () async {
+      final coordinator = CaptureCoordinator(
+        locationGateway: const _FixedLocationGateway(),
+        weatherGateway: _CountingWeatherGateway(snapshot),
+        ambientScanner: const _FixedAmbientScanner(),
+        catalog: ContentCatalog(
+          recipes: const <RecipeDefinition>[],
+          visitors: const <VisitorDefinition>[],
+          balance: testBalance(),
+        ),
+      );
 
-    final preparation = await coordinator.prepare(now: now);
-    expect(preparation.weatherKind, WeatherMaterialKind.rain);
-    expect(preparation.weatherReadiness.isReady, isTrue);
+      final preparation = await coordinator.prepare(now: now);
+      expect(preparation.weatherKind, WeatherMaterialKind.rain);
+      expect(preparation.weatherReadiness.isReady, isTrue);
 
-    final result = await coordinator.capture(
-      preparation: preparation,
-      now: now,
-      includeSurroundings: false,
-    );
+      final result = await coordinator.capture(
+        preparation: preparation,
+        now: now,
+        includeSurroundings: false,
+      );
 
-    expect(result.weatherMaterial?.providerName, 'Test provider');
-    expect(result.record.weatherBasis, WeatherBasis.providerCurrentModel);
-  });
+      expect(result.weatherMaterial?.providerName, 'Test provider');
+      expect(result.record.weatherBasis, WeatherBasis.providerCurrentModel);
+    },
+  );
 }
 
 class _CountingWeatherGateway implements WeatherGateway {
@@ -167,14 +173,10 @@ class _FixedLocationGateway implements LocationGateway {
 
   @override
   Future<LocationFix> current() async => const LocationFix(
-        point: GeoPoint(
-          latitude: 37.5446,
-          longitude: 127.0559,
-          accuracyMeters: 30,
-        ),
-        label: '성수동',
-        isFallback: false,
-      );
+    point: GeoPoint(latitude: 37.5446, longitude: 127.0559, accuracyMeters: 30),
+    label: '성수동',
+    isFallback: false,
+  );
 }
 
 class _FallbackLocationGateway implements LocationGateway {
@@ -182,12 +184,12 @@ class _FallbackLocationGateway implements LocationGateway {
 
   @override
   Future<LocationFix> current() async => const LocationFix(
-        point: GeoPoint(
-          latitude: 37.5665,
-          longitude: 126.9780,
-          accuracyMeters: 5000,
-        ),
-        label: '위치 권한 필요',
-        isFallback: true,
-      );
+    point: GeoPoint(
+      latitude: 37.5665,
+      longitude: 126.9780,
+      accuracyMeters: 5000,
+    ),
+    label: '위치 권한 필요',
+    isFallback: true,
+  );
 }

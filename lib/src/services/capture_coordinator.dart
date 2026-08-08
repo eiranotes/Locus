@@ -169,8 +169,8 @@ class CaptureCoordinator {
             confidence: classification.confidence,
             capturedAt: now,
             coarseCellId: preparation.location.isFallback
-            ? null
-            : preparation.location.point.coarseCellId,
+                ? null
+                : preparation.location.point.coarseCellId,
             sourceRecordId: recordId,
             featureSchemaVersion: SurroundingClassifier.version,
           );

@@ -16,16 +16,17 @@ abstract final class PixelPalette {
 }
 
 ThemeData buildAppTheme() {
-  final scheme = ColorScheme.fromSeed(
-    seedColor: PixelPalette.mint,
-    brightness: Brightness.dark,
-    surface: PixelPalette.surface,
-  ).copyWith(
-    primary: PixelPalette.mint,
-    secondary: PixelPalette.amber,
-    error: PixelPalette.danger,
-    onSurface: PixelPalette.cream,
-  );
+  final scheme =
+      ColorScheme.fromSeed(
+        seedColor: PixelPalette.mint,
+        brightness: Brightness.dark,
+        surface: PixelPalette.surface,
+      ).copyWith(
+        primary: PixelPalette.mint,
+        secondary: PixelPalette.amber,
+        error: PixelPalette.danger,
+        onSurface: PixelPalette.cream,
+      );
 
   return ThemeData(
     useMaterial3: true,
@@ -83,7 +84,9 @@ ThemeData buildAppTheme() {
       height: 74,
       backgroundColor: PixelPalette.surface,
       indicatorColor: PixelPalette.mint.withValues(alpha: 0.16),
-      labelTextStyle: WidgetStateProperty.resolveWith((Set<WidgetState> states) {
+      labelTextStyle: WidgetStateProperty.resolveWith((
+        Set<WidgetState> states,
+      ) {
         return TextStyle(
           color: states.contains(WidgetState.selected)
               ? PixelPalette.mint

@@ -30,9 +30,7 @@ class _DioramaViewState extends State<DioramaView> {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: widget.borderRadius,
-      child: RepaintBoundary(
-        child: GameWidget<DioramaGame>(game: _game),
-      ),
+      child: RepaintBoundary(child: GameWidget<DioramaGame>(game: _game)),
     );
   }
 }

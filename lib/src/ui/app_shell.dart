@@ -10,10 +10,7 @@ import 'package:reality_diorama/src/ui/screens/home_screen.dart';
 import 'package:reality_diorama/src/ui/screens/inventory_screen.dart';
 
 class AppShell extends StatefulWidget {
-  const AppShell({
-    required this.demoMode,
-    super.key,
-  });
+  const AppShell({required this.demoMode, super.key});
   final bool demoMode;
 
   @override
@@ -63,9 +60,9 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
         if (!mounted) {
           return;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error)));
       });
     }
 

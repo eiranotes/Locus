@@ -21,7 +21,10 @@ class CodexScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text('도감', style: Theme.of(context).textTheme.headlineLarge),
+              child: Text(
+                '도감',
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
             ),
           ),
           const TabBar(
@@ -84,8 +87,12 @@ class _VisitorsTab extends StatelessWidget {
                   ),
                   child: Center(
                     child: Icon(
-                      discovered ? _visitorIcon(visitor.id) : Icons.help_outline,
-                      color: discovered ? PixelPalette.blue : PixelPalette.muted,
+                      discovered
+                          ? _visitorIcon(visitor.id)
+                          : Icons.help_outline,
+                      color: discovered
+                          ? PixelPalette.blue
+                          : PixelPalette.muted,
                       size: 54,
                     ),
                   ),
@@ -118,7 +125,9 @@ class _ObjectKindsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final madeKinds = controller.craftedObjects.map((CraftedObject value) => value.kind).toSet();
+    final madeKinds = controller.craftedObjects
+        .map((CraftedObject value) => value.kind)
+        .toSet();
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 110),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -220,11 +229,11 @@ class _RecipesTab extends StatelessWidget {
 }
 
 IconData _visitorIcon(String id) => switch (id) {
-      'umbrella_walker' => Icons.umbrella_outlined,
-      'night_moth' => Icons.flutter_dash,
-      'roof_bird' => Icons.flight,
-      'fog_cat' => Icons.pets_outlined,
-      'transfer_guest' => Icons.directions_bus_outlined,
-      'light_swarm' => Icons.auto_awesome,
-      _ => Icons.person_outline,
-    };
+  'umbrella_walker' => Icons.umbrella_outlined,
+  'night_moth' => Icons.flutter_dash,
+  'roof_bird' => Icons.flight,
+  'fog_cat' => Icons.pets_outlined,
+  'transfer_guest' => Icons.directions_bus_outlined,
+  'light_swarm' => Icons.auto_awesome,
+  _ => Icons.person_outline,
+};

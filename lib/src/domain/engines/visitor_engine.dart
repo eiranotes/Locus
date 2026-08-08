@@ -18,16 +18,14 @@ class RequirementProgress {
 }
 
 class VisitorEvaluation {
-  const VisitorEvaluation({
-    required this.visitor,
-    required this.progress,
-  });
+  const VisitorEvaluation({required this.visitor, required this.progress});
 
   final VisitorDefinition visitor;
   final List<RequirementProgress> progress;
 
   bool get satisfied =>
-      progress.isNotEmpty && progress.every((RequirementProgress item) => item.satisfied);
+      progress.isNotEmpty &&
+      progress.every((RequirementProgress item) => item.satisfied);
 
   int get satisfiedCount =>
       progress.where((RequirementProgress item) => item.satisfied).length;
@@ -137,23 +135,28 @@ class VisitorEngine {
         );
       case 'highObjects':
         final count = context.placedObjects.where((CraftedObject object) {
-          return context.recipesById[object.recipeId]?.height == HeightBand.high;
+          return context.recipesById[object.recipeId]?.height ==
+              HeightBand.high;
         }).length;
         return _numeric('높은 물건', count, minimum);
       case 'quietZones':
         final count = context.placedObjects
-            .where((CraftedObject object) => context.graph.degree(object.id) == 0)
+            .where(
+              (CraftedObject object) => context.graph.degree(object.id) == 0,
+            )
             .length;
         return _numeric('조용한 구역', count, minimum);
       case 'taggedObjects':
         final tag = requirement.tag ?? '';
         final count = context.placedObjects.where((CraftedObject object) {
-          return context.recipesById[object.recipeId]?.tags.contains(tag) == true;
+          return context.recipesById[object.recipeId]?.tags.contains(tag) ==
+              true;
         }).length;
         return _numeric('$tag 물건', count, minimum);
       case 'objectTag':
         final match = context.placedObjects.any((CraftedObject object) {
-          final tags = context.recipesById[object.recipeId]?.tags ?? const <String>{};
+          final tags =
+              context.recipesById[object.recipeId]?.tags ?? const <String>{};
           return requirement.anyOf.any(tags.contains);
         });
         return RequirementProgress(
@@ -164,7 +167,8 @@ class VisitorEngine {
         );
       case 'objectKind':
         final match = context.placedObjects.any(
-          (CraftedObject object) => requirement.anyOf.contains(object.kind.name),
+          (CraftedObject object) =>
+              requirement.anyOf.contains(object.kind.name),
         );
         return RequirementProgress(
           label: '필요한 물건',

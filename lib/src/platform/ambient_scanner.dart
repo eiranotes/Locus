@@ -8,8 +8,9 @@ abstract interface class AmbientScanner {
 class MethodChannelAmbientScanner implements AmbientScanner {
   const MethodChannelAmbientScanner();
 
-  static const MethodChannel _channel =
-      MethodChannel('com.eiranotes.reality_diorama/ambient');
+  static const MethodChannel _channel = MethodChannel(
+    'com.eiranotes.reality_diorama/ambient',
+  );
 
   @override
   Future<AmbientFeatures?> scan({required Duration duration}) async {

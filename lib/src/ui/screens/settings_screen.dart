@@ -66,63 +66,73 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 12),
           FutureBuilder<WeatherAttributionInfo>(
             future: _weatherAttribution,
-            builder: (
-              BuildContext context,
-              AsyncSnapshot<WeatherAttributionInfo> snapshot,
-            ) {
-              final attribution = snapshot.data;
-              final markUri = attribution?.combinedMarkDarkUri;
-              final legalUri = attribution?.legalPageUri;
-              return PixelCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text('날씨 정보', style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 10),
-                    if (markUri != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Image.network(
-                          markUri.toString(),
-                          height: 24,
-                          errorBuilder: (_, __, ___) => Text(
-                            attribution?.serviceName ?? '날씨 제공자',
+            builder:
+                (
+                  BuildContext context,
+                  AsyncSnapshot<WeatherAttributionInfo> snapshot,
+                ) {
+                  final attribution = snapshot.data;
+                  final markUri = attribution?.combinedMarkDarkUri;
+                  final legalUri = attribution?.legalPageUri;
+                  return PixelCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          '날씨 정보',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 10),
+                        if (markUri != null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Image.network(
+                              markUri.toString(),
+                              height: 24,
+                              errorBuilder: (_, __, ___) => Text(
+                                attribution?.serviceName ?? '날씨 제공자',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ),
+                          )
+                        else
+                          Text(
+                            attribution?.serviceName ??
+                                (snapshot.hasError
+                                    ? '날씨 제공자 정보를 불러오지 못함'
+                                    : '날씨 제공자 확인 중'),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
+                        const SizedBox(height: 6),
+                        Text(
+                          attribution?.notice ??
+                              '날씨 데이터를 게임용 재료로 변환한 값이며 정확한 지점의 직접 측정이라고 표현하지 않습니다.',
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
-                      )
-                    else
-                      Text(
-                        attribution?.serviceName ??
-                            (snapshot.hasError ? '날씨 제공자 정보를 불러오지 못함' : '날씨 제공자 확인 중'),
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    const SizedBox(height: 6),
-                    Text(
-                      attribution?.notice ??
-                          '날씨 데이터를 게임용 재료로 변환한 값이며 정확한 지점의 직접 측정이라고 표현하지 않습니다.',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                        if (legalUri != null) ...<Widget>[
+                          const SizedBox(height: 4),
+                          TextButton.icon(
+                            onPressed: () => _openExternal(legalUri),
+                            icon: const Icon(Icons.open_in_new, size: 18),
+                            label: const Text('날씨 데이터 출처와 법적 고지'),
+                          ),
+                        ],
+                      ],
                     ),
-                    if (legalUri != null) ...<Widget>[
-                      const SizedBox(height: 4),
-                      TextButton.icon(
-                        onPressed: () => _openExternal(legalUri),
-                        icon: const Icon(Icons.open_in_new, size: 18),
-                        label: const Text('날씨 데이터 출처와 법적 고지'),
-                      ),
-                    ],
-                  ],
-                ),
-              );
-            },
+                  );
+                },
           ),
           const SizedBox(height: 12),
           PixelCard(
             child: Row(
               children: <Widget>[
                 Icon(
-                  widget.demoMode ? Icons.science_outlined : Icons.verified_outlined,
-                  color: widget.demoMode ? PixelPalette.amber : PixelPalette.success,
+                  widget.demoMode
+                      ? Icons.science_outlined
+                      : Icons.verified_outlined,
+                  color: widget.demoMode
+                      ? PixelPalette.amber
+                      : PixelPalette.success,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -188,9 +198,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _openExternal(Uri uri) async {
     final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!opened && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('링크를 열 수 없습니다.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('링크를 열 수 없습니다.')));
     }
   }
 }
@@ -213,20 +223,20 @@ class _StepSourceCard extends StatelessWidget {
     final mode = controller.stepTrackingMode;
     final (title, description, icon) = switch (mode) {
       StepTrackingMode.real => (
-          '기기 걸음 사용 중',
-          '최근 걸음을 물건 제작에 사용합니다. 현재 ${controller.availableSteps}걸음을 쓸 수 있습니다.',
-          Icons.directions_walk,
-        ),
+        '기기 걸음 사용 중',
+        '최근 걸음을 물건 제작에 사용합니다. 현재 ${controller.availableSteps}걸음을 쓸 수 있습니다.',
+        Icons.directions_walk,
+      ),
       StepTrackingMode.fallback => (
-          '기본 작업량 사용 중',
-          '걸음 권한 없이 하루 ${controller.fallbackDailySteps}의 작업량을 사용합니다.',
-          Icons.construction_outlined,
-        ),
+        '기본 작업량 사용 중',
+        '걸음 권한 없이 하루 ${controller.fallbackDailySteps}의 작업량을 사용합니다.',
+        Icons.construction_outlined,
+      ),
       StepTrackingMode.undecided => (
-          '제작 걸음 선택 전',
-          '첫 제작 전에 실제 걸음 또는 기본 작업량을 선택합니다.',
-          Icons.directions_walk_outlined,
-        ),
+        '제작 걸음 선택 전',
+        '첫 제작 전에 실제 걸음 또는 기본 작업량을 선택합니다.',
+        Icons.directions_walk_outlined,
+      ),
     };
 
     return PixelCard(
@@ -244,7 +254,10 @@ class _StepSourceCard extends StatelessWidget {
                   children: <Widget>[
                     Text(title, style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 4),
-                    Text(description, style: Theme.of(context).textTheme.bodyMedium),
+                    Text(
+                      description,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ],
                 ),
               ),
@@ -298,7 +311,9 @@ class _InfoLine extends StatelessWidget {
         children: <Widget>[
           Icon(icon, size: 20, color: PixelPalette.mint),
           const SizedBox(width: 10),
-          Expanded(child: Text(text, style: Theme.of(context).textTheme.bodyMedium)),
+          Expanded(
+            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+          ),
         ],
       ),
     );
