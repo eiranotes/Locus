@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reality_diorama/src/domain/content_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
+import 'package:reality_diorama/src/domain/placement_catalog.dart';
 import 'package:reality_diorama/src/platform/ambient_scanner.dart';
 import 'package:reality_diorama/src/services/capture_coordinator.dart';
 import 'package:reality_diorama/src/services/location_gateway.dart';
@@ -35,6 +36,7 @@ void main() {
           recipes: const <RecipeDefinition>[],
           visitors: const <VisitorDefinition>[],
           balance: testBalance(),
+          placement: PlacementCatalog.empty,
         ),
       );
 
@@ -68,6 +70,7 @@ void main() {
         recipes: const <RecipeDefinition>[],
         visitors: const <VisitorDefinition>[],
         balance: testBalance(),
+        placement: PlacementCatalog.empty,
       ),
     );
 
@@ -100,6 +103,7 @@ void main() {
           recipes: const <RecipeDefinition>[],
           visitors: const <VisitorDefinition>[],
           balance: testBalance(),
+          placement: PlacementCatalog.empty,
         ),
       );
 

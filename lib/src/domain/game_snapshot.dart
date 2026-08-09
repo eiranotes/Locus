@@ -3,6 +3,8 @@ import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/domain/engines/connection_graph.dart';
 import 'package:reality_diorama/src/domain/engines/environment_grid.dart';
 import 'package:reality_diorama/src/domain/engines/visitor_engine.dart';
+import 'package:reality_diorama/src/domain/engines/placement_engine.dart';
+import 'package:reality_diorama/src/domain/placement_catalog.dart';
 
 class DioramaSnapshot {
   const DioramaSnapshot({
@@ -15,7 +17,9 @@ class DioramaSnapshot {
     required this.timeBand,
     required this.weatherKind,
     required this.visitorEvaluations,
+    required this.placementCatalog,
     this.activeVisitorId,
+    this.editorOverlay,
   });
 
   final List<CraftedObject> objects;
@@ -27,7 +31,25 @@ class DioramaSnapshot {
   final TimeBand timeBand;
   final WeatherMaterialKind weatherKind;
   final List<VisitorEvaluation> visitorEvaluations;
+  final PlacementCatalog placementCatalog;
   final String? activeVisitorId;
+  final DioramaEditorOverlay? editorOverlay;
+
+  DioramaSnapshot withEditorOverlay(DioramaEditorOverlay overlay) =>
+      DioramaSnapshot(
+        objects: objects,
+        placements: placements,
+        recipesById: recipesById,
+        weatherMaterialsById: weatherMaterialsById,
+        environmentGrid: environmentGrid,
+        connectionGraph: connectionGraph,
+        timeBand: timeBand,
+        weatherKind: weatherKind,
+        visitorEvaluations: visitorEvaluations,
+        placementCatalog: placementCatalog,
+        activeVisitorId: activeVisitorId,
+        editorOverlay: overlay,
+      );
 
   factory DioramaSnapshot.empty() {
     return DioramaSnapshot(
@@ -40,6 +62,19 @@ class DioramaSnapshot {
       timeBand: TimeBand.evening,
       weatherKind: WeatherMaterialKind.cloudy,
       visitorEvaluations: const <VisitorEvaluation>[],
+      placementCatalog: PlacementCatalog.empty,
     );
   }
+}
+
+final class DioramaEditorOverlay {
+  const DioramaEditorOverlay({
+    required this.selectedObjectId,
+    required this.selectedCells,
+    required this.validAnchorCells,
+  });
+
+  final String selectedObjectId;
+  final Set<GridCell> selectedCells;
+  final Set<GridCell> validAnchorCells;
 }

@@ -4,10 +4,11 @@ Last updated: 2026-08-09
 
 ## Current state
 
-`main` at `41c8b79` contains the iOS simulator launch fixes, Locus identity
-cleanup, deterministic demo isolation, and shared deterministic object-rendering
-contract. The current slice replaces the visibly provisional runtime art with a
-production-bound generated pixel-art package while retaining Canvas fallbacks.
+`main` at `e17d579` contains the iOS simulator fixes, deterministic demo
+isolation, shared renderer, and 42-asset pixel-art package. The current working
+slice makes placement authoring catalog-driven, hardens movement, direction,
+collision, edge, and editor feedback, and adds true directional art for future
+recipe expansion.
 
 ## Completed in the current slice
 
@@ -35,6 +36,18 @@ production-bound generated pixel-art package while retaining Canvas fallbacks.
   construction-state and asset-load fallback.
 - Added reproducible prompt/source provenance, an exact manifest with SHA-256
   hashes, and a standard-library validation gate for the generated package.
+- Added `placement_catalog.json` as the editor-facing source of truth for four
+  directions and independent per-direction asset paths for every recipe.
+- Generated two tone-matched source atlases and installed 40 transparent
+  quarter-turn sprites: all ten placeable objects × four directions. The tracked
+  processor records reviewed crop bounds, exact inventory, RGBA dimensions,
+  distinct hashes, and a contact sheet.
+- Added selected-footprint highlighting, valid-anchor markers, relevant-edge
+  emphasis, catalog previews, direction labels, rotated footprint dimensions,
+  and disabled invalid movement/rotation controls to the placement editor.
+- Added exhaustive coverage for every recipe across all four rotations, board
+  edges, collisions, unsupported rotations, asset existence, and minimum touch
+  targets.
 
 ## Simulator evidence
 
@@ -50,8 +63,9 @@ Verified on `AppAudit iPhone 16 Pro`, iOS 26.5, UDID
 6. force termination and relaunch restore 2,775 steps, the object, and its
    placement.
 
-The simulator run also confirmed that placement currently lacks valid-cell
-highlighting and target-visitor condition deltas.
+That baseline simulator run identified missing valid-cell highlighting and
+target-visitor condition deltas. The current slice resolves the former in code;
+the latter remains planned.
 
 After the shared-renderer and review fixes, the final local gate used Flutter
 3.44.9: repository/content/manifest/Swift checks passed, `flutter analyze`
@@ -75,7 +89,10 @@ first visual pass.
   renderer slice.
 - Visitor scene persistence still depends on transient arrival state rather
   than persisted sightings.
-- Placement feedback and rotation/footprint validation need a dedicated slice.
+- Direct drag placement and visitor-condition deltas remain future editor
+  enhancements; the current catalog-driven button editor validates each commit.
+- Directional art is authoring-complete for the current ten recipes, but a later
+  populated-neighborhood visual pass may still tune individual scale/occlusion.
 - The AppIcon candidate requires owner review at actual icon sizes before use.
 - Wrapper bootstrap remains mutating and must use exactly Flutter 3.44.9; the
   audit machine's global SDK was 3.44.1.

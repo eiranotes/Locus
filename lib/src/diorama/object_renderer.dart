@@ -22,6 +22,7 @@ final class DeterministicObjectRenderer {
     required ObjectVisualDescriptor visual,
     int rotation = 0,
     Image? sprite,
+    bool spriteMirrorX = false,
   }) {
     if (visual.completion < 1) {
       _drawConstruction(canvas, anchor, visual.completion);
@@ -29,7 +30,7 @@ final class DeterministicObjectRenderer {
     }
 
     if (sprite != null) {
-      _drawObjectSprite(canvas, anchor, visual, sprite);
+      _drawObjectSprite(canvas, anchor, visual, sprite, mirrorX: spriteMirrorX);
       _drawConnectorMark(canvas, anchor, visual.surroundingKind);
       return;
     }
@@ -86,6 +87,8 @@ final class DeterministicObjectRenderer {
     Size outputSize, {
     required ObjectVisualDescriptor visual,
     int rotation = 0,
+    Image? sprite,
+    bool spriteMirrorX = false,
   }) {
     if (outputSize.isEmpty) {
       return;
@@ -102,7 +105,14 @@ final class DeterministicObjectRenderer {
     canvas.translate(offset.dx, offset.dy);
     canvas.scale(scale);
     canvas.clipRect(Offset.zero & previewLogicalSize);
-    paintAt(canvas, anchor: previewAnchor, visual: visual, rotation: rotation);
+    paintAt(
+      canvas,
+      anchor: previewAnchor,
+      visual: visual,
+      rotation: rotation,
+      sprite: sprite,
+      spriteMirrorX: spriteMirrorX,
+    );
     canvas.restore();
   }
 
@@ -133,8 +143,9 @@ final class DeterministicObjectRenderer {
     Canvas canvas,
     Offset anchor,
     ObjectVisualDescriptor visual,
-    Image sprite,
-  ) {
+    Image sprite, {
+    required bool mirrorX,
+  }) {
     final size = switch (visual.kind) {
       ObjectKind.alleyLamp => const Size(76, 98),
       ObjectKind.signpost => const Size(78, 78),
@@ -148,15 +159,15 @@ final class DeterministicObjectRenderer {
       ObjectKind.tower => const Size(84, 104),
     };
     _drawShadow(canvas, anchor.translate(0, 2), size.width * 0.52, 9);
+    canvas.save();
+    canvas.translate(anchor.dx, anchor.dy);
+    if (mirrorX) {
+      canvas.scale(-1, 1);
+    }
     canvas.drawImageRect(
       sprite,
       Rect.fromLTWH(0, 0, sprite.width.toDouble(), sprite.height.toDouble()),
-      Rect.fromLTWH(
-        anchor.dx - size.width / 2,
-        anchor.dy - size.height,
-        size.width,
-        size.height,
-      ),
+      Rect.fromLTWH(-size.width / 2, -size.height, size.width, size.height),
       Paint()
         ..filterQuality = FilterQuality.none
         ..colorFilter = ColorFilter.mode(
@@ -164,6 +175,7 @@ final class DeterministicObjectRenderer {
           BlendMode.modulate,
         ),
     );
+    canvas.restore();
   }
 
   void _drawLampShape(

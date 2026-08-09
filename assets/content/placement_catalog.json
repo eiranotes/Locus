@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "directions": [
+    {"rotation": 0, "labelKo": "북동 방향", "shortLabelKo": "북동"},
+    {"rotation": 1, "labelKo": "남동 방향", "shortLabelKo": "남동"},
+    {"rotation": 2, "labelKo": "남서 방향", "shortLabelKo": "남서"},
+    {"rotation": 3, "labelKo": "북서 방향", "shortLabelKo": "북서"}
+  ],
+  "entries": [
+    {
+      "recipeId": "alley_lamp",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_alley_lamp_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_alley_lamp_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_alley_lamp_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_alley_lamp_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "signpost",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_signpost_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_signpost_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_signpost_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_signpost_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "planter",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_planter_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_planter_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_planter_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_planter_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "bench",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_bench_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_bench_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_bench_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_bench_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "stairs",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_stairs_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_stairs_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_stairs_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_stairs_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "tree",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_tree_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_tree_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_tree_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_tree_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "bus_stop",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_bus_stop_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_bus_stop_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_bus_stop_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_bus_stop_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "pond",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_pond_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_pond_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_pond_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_pond_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "bridge",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_bridge_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_bridge_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_bridge_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_bridge_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "tower",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_tower_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_tower_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_tower_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_tower_r3.png"}
+      ]
+    }
+  ]
+}

@@ -21,8 +21,12 @@
 
 ## Next
 
-- [ ] Add valid/invalid footprint highlighting and target-visitor condition
-      deltas to placement editing.
+- [x] Add selected-footprint highlighting, valid anchor markers, relevant
+      connection emphasis, and disabled invalid move/rotation actions.
+- [x] Move placement directions and artwork variants into an exact recipe
+      catalog with exhaustive four-direction and boundary tests.
+- [x] Generate, process, and catalog true four-direction sprites for all ten
+      placeable objects with source/hash/contact-sheet provenance.
 - [ ] Derive the scene visitor from persisted sightings while keeping the
       one-time arrival dialog transient.
 - [ ] Add an integration test for the deterministic demo core loop.
@@ -33,6 +37,9 @@
 - [ ] Count unique visitors rather than sightings in the home visitor target.
 - [ ] Tune sprite scale and occlusion against neighborhoods containing the full
       eight-object limit and validate large-text card layouts.
+- [ ] Add direct drag-to-cell manipulation after Flame/Flutter coordinate and
+      accessibility behavior has a tested contract.
+- [ ] Add target-visitor condition deltas for proposed placements.
 
 ## Deferred release work
 

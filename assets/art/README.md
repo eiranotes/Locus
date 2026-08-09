@@ -13,7 +13,15 @@ live in `artifacts/imagegen/locus-art-v1`. Run:
 
 ```bash
 python3 tool/process_generated_art.py --validate-only
+python3 tool/process_directional_art.py --validate-only
 ```
 
 Do not hand-edit installed PNGs. Update the source sheet or processing contract,
 rebuild the package, and review the contact sheet and simulator composition.
+
+Directional placement paths live in `assets/content/placement_catalog.json`.
+The `locus-directional-art-v1` authoring package provides 10 objects × 4 true
+quarter-turn sprites under `assets/art/generated/v1/directional`. Each recipe
+direction has an independent PNG and hash; no production direction depends on
+runtime mirroring. Selection tiles, valid-anchor markers, and direction controls
+remain code-rendered because they must scale and respond to interaction state.

@@ -11,12 +11,16 @@ class ObjectVisualPreview extends StatelessWidget {
     required this.visual,
     this.rotation = 0,
     this.semanticLabel,
+    this.assetPath,
+    this.mirrorX,
     super.key,
   });
 
   final ObjectVisualDescriptor visual;
   final int rotation;
   final String? semanticLabel;
+  final String? assetPath;
+  final bool? mirrorX;
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +40,14 @@ class ObjectVisualPreview extends StatelessWidget {
                     ObjectVisualPainter.renderer.spriteTint(visual),
                     BlendMode.modulate,
                   ),
-                  child: Image.asset(
-                    GeneratedArtPaths.object(visual.kind),
-                    fit: BoxFit.contain,
-                    filterQuality: FilterQuality.none,
-                    errorBuilder: (_, __, ___) => fallback,
+                  child: Transform.flip(
+                    flipX: mirrorX ?? rotation.isOdd,
+                    child: Image.asset(
+                      assetPath ?? GeneratedArtPaths.object(visual.kind),
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.none,
+                      errorBuilder: (_, __, ___) => fallback,
+                    ),
                   ),
                 ),
               ),

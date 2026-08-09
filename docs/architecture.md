@@ -44,4 +44,16 @@ The domain engines are deterministic and independently testable:
 
 ## Diorama renderer
 
-The renderer uses a fixed logical 360×360 scene and 5×5 2:1 isometric tiles. The current prototype draws coherent primitives. Production atlases can replace individual drawing functions without altering placement, visitor, or crafting rules.
+The renderer uses a fixed logical 360×360 scene and 5×5 2:1 isometric tiles.
+Production sprites are resolved through `placement_catalog.json`; each recipe
+declares four independent directional PNGs. The directional package is built
+from tracked source atlases and validated for exact recipe/rotation coverage,
+distinct hashes, RGBA dimensions, and installed paths, so a later asset pack can
+replace one direction without editor code changes. Deterministic Canvas geometry
+remains the construction and load-failure fallback.
+
+`PlacementEngine` is the single source for rotated footprints, bounds,
+collisions, and valid anchors. The editor queries that engine before enabling a
+move or rotation, then `AppController.placeOrMoveObject` repeats the same
+validation before the repository transaction. The scene snapshot carries a
+transient editor overlay only; selection and valid-cell hints are never stored.

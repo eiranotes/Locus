@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reality_diorama/src/diorama/object_renderer.dart';
@@ -77,6 +78,36 @@ void main() {
       expect(bytes.any((int value) => value != 0), isTrue, reason: kind.name);
     }
   });
+
+  test('catalog directions render distinct production sprites', () async {
+    final northeast = await _decodeSprite(
+      'assets/art/generated/v1/directional/object_bus_stop_r0.png',
+    );
+    final southeast = await _decodeSprite(
+      'assets/art/generated/v1/directional/object_bus_stop_r1.png',
+    );
+    final firstDirection = await _render(
+      renderer,
+      _visual(kind: ObjectKind.busStop),
+      sprite: northeast,
+    );
+    final secondDirection = await _render(
+      renderer,
+      _visual(kind: ObjectKind.busStop),
+      sprite: southeast,
+    );
+    northeast.dispose();
+    southeast.dispose();
+
+    expect(secondDirection, isNot(orderedEquals(firstDirection)));
+  });
+}
+
+Future<Image> _decodeSprite(String path) async {
+  final codec = await instantiateImageCodec(await File(path).readAsBytes());
+  final frame = await codec.getNextFrame();
+  codec.dispose();
+  return frame.image;
 }
 
 ObjectVisualDescriptor _visual({
@@ -101,6 +132,8 @@ Future<Uint8List> _render(
   DeterministicObjectRenderer renderer,
   ObjectVisualDescriptor visual, {
   int rotation = 0,
+  Image? sprite,
+  bool spriteMirrorX = false,
 }) async {
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
@@ -109,6 +142,8 @@ Future<Uint8List> _render(
     const Size(96, 104),
     visual: visual,
     rotation: rotation,
+    sprite: sprite,
+    spriteMirrorX: spriteMirrorX,
   );
   final image = await recorder.endRecording().toImage(96, 104);
   final data = await image.toByteData(format: ImageByteFormat.rawRgba);

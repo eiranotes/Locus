@@ -51,3 +51,24 @@ art.
 Locus is an application rather than a reusable Dart package, so the generated
 `pubspec.lock` is retained to keep local and CI package resolution reproducible
 with Flutter 3.44.9.
+
+### Placement presentation is catalog-driven
+
+`assets/content/placement_catalog.json` is the editor-facing contract for every
+recipe's four directions and directional art. Gameplay dimensions and effects
+remain in `recipes.json`; the placement catalog must cover the recipe set
+exactly once. Each direction points to an independent production PNG from the
+40-asset directional package. The four views are authored quarter-turn redraws,
+not runtime mirrors, so asymmetric openings, backs, signs, and approaches remain
+spatially truthful. Source atlases, reviewed row bounds, contact sheet, alpha
+processing, and hashes are retained as a reproducible authoring contract.
+
+Board selection fills, valid-anchor markers, connection emphasis, and direction
+controls remain code-rendered. They are stateful interaction feedback rather
+than collectible art and must scale cleanly with layout and accessibility.
+
+All editor actions query the same `PlacementEngine` validation used by commits.
+Invalid moves and rotations are disabled before mutation, selected footprints
+and valid anchors are visible on the board, and only connections involving the
+selected object remain emphasized. Direct drag is deferred until coordinate,
+gesture-cancellation, and accessibility behavior can be tested together.

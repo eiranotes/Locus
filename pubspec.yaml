@@ -34,3 +34,4 @@ flutter:
     - assets/content/
     - assets/art/
     - assets/art/generated/v1/
+    - assets/art/generated/v1/directional/

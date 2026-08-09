@@ -1,6 +1,83 @@
 part of 'app_controller.dart';
 
 extension AppControllerActions on AppController {
+  PlacementValidation validatePlacementCandidate({
+    required String craftedObjectId,
+    required int column,
+    required int row,
+    required int rotation,
+  }) {
+    final object = _craftedObjects
+        .where((CraftedObject candidate) => candidate.id == craftedObjectId)
+        .firstOrNull;
+    if (object == null) {
+      return const PlacementValidation(
+        valid: false,
+        message: '배치할 물건을 찾을 수 없습니다.',
+      );
+    }
+    final recipe = catalog.recipeById(object.recipeId);
+    final placementEntry = catalog.placement.entryForRecipe(recipe.id);
+    final existing = _placements
+        .where((Placement item) => item.craftedObjectId == craftedObjectId)
+        .firstOrNull;
+    final candidate = Placement(
+      id: existing?.id ?? 'preview-$craftedObjectId',
+      craftedObjectId: craftedObjectId,
+      column: column,
+      row: row,
+      rotation: normalizeQuarterTurns(rotation),
+    );
+    return PlacementEngine(
+      columns: catalog.balance.gridColumns,
+      rows: catalog.balance.gridRows,
+    ).validate(
+      candidate: candidate,
+      recipe: recipe,
+      existing: _placements,
+      recipeByObjectId: <String, RecipeDefinition>{
+        for (final item in _craftedObjects)
+          item.id: catalog.recipeById(item.recipeId),
+      },
+      allowedRotations: placementEntry.allowedRotations,
+    );
+  }
+
+  Set<GridCell> validPlacementAnchors({
+    required String craftedObjectId,
+    required int rotation,
+  }) {
+    final object = _craftedObjects
+        .where((CraftedObject candidate) => candidate.id == craftedObjectId)
+        .firstOrNull;
+    if (object == null) return const <GridCell>{};
+    final recipe = catalog.recipeById(object.recipeId);
+    final placementEntry = catalog.placement.entryForRecipe(recipe.id);
+    final current = _placements
+        .where((Placement item) => item.craftedObjectId == craftedObjectId)
+        .firstOrNull;
+    final candidate = Placement(
+      id: current?.id ?? 'preview-$craftedObjectId',
+      craftedObjectId: craftedObjectId,
+      column: current?.column ?? 0,
+      row: current?.row ?? 0,
+      rotation: normalizeQuarterTurns(rotation),
+    );
+    return PlacementEngine(
+      columns: catalog.balance.gridColumns,
+      rows: catalog.balance.gridRows,
+    ).validAnchors(
+      candidate: candidate,
+      recipe: recipe,
+      existing: _placements,
+      recipeByObjectId: <String, RecipeDefinition>{
+        for (final item in _craftedObjects)
+          item.id: catalog.recipeById(item.recipeId),
+      },
+      allowedRotations: placementEntry.allowedRotations,
+    );
+  }
+
   Future<CaptureBundle?> performCapture({
     required bool includeSurroundings,
   }) async {
@@ -113,7 +190,6 @@ extension AppControllerActions on AppController {
         .where((CraftedObject candidate) => candidate.id == craftedObjectId)
         .firstOrNull;
     if (object == null) return false;
-    final recipe = catalog.recipeById(object.recipeId);
     final existing = _placements
         .where((Placement item) => item.craftedObjectId == craftedObjectId)
         .firstOrNull;
@@ -124,27 +200,20 @@ extension AppControllerActions on AppController {
       notifyChanged();
       return false;
     }
+    final normalizedRotation = normalizeQuarterTurns(rotation);
     final candidate = Placement(
       id: existing?.id ?? uuid.v4(),
       craftedObjectId: craftedObjectId,
       column: column,
       row: row,
-      rotation: rotation % 4,
+      rotation: normalizedRotation,
     );
-    final recipesByObject = <String, RecipeDefinition>{
-      for (final item in _craftedObjects)
-        item.id: catalog.recipeById(item.recipeId),
-    };
-    final validation =
-        PlacementEngine(
-          columns: catalog.balance.gridColumns,
-          rows: catalog.balance.gridRows,
-        ).validate(
-          candidate: candidate,
-          recipe: recipe,
-          existing: _placements,
-          recipeByObjectId: recipesByObject,
-        );
+    final validation = validatePlacementCandidate(
+      craftedObjectId: craftedObjectId,
+      column: column,
+      row: row,
+      rotation: normalizedRotation,
+    );
     if (!validation.valid) {
       _errorMessage = validation.message;
       notifyChanged();
@@ -259,6 +328,7 @@ extension AppControllerActions on AppController {
       timeBand: sceneTimeBand,
       weatherKind: sceneWeatherKind,
       visitorEvaluations: evaluations,
+      placementCatalog: catalog.placement,
       activeVisitorId: _newVisitorId,
     );
   }

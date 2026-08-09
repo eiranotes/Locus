@@ -11,15 +11,20 @@
 - Android and iOS foreground BLE aggregation bridges;
 - crafting/construction flow;
 - 5×5 placement and visitor rules;
+- catalog-driven four-direction placement editor with selected footprints,
+  valid anchors, collision-aware disabled actions, and directional art;
 - production-bound static pixel-art package shared by the home scene, crafting,
   inventory, and codex, with persisted `visualSeed` tint details and Canvas
   fallbacks;
+- 40 cataloged true-direction object sprites with reproducible source, crop,
+  alpha, contact-sheet, and hash validation;
 - inventory, settings, and codex;
 - tests, repository contracts, Android/iOS compile CI, and reproducible publish/archive helpers.
 
 ## Deliberately not represented as complete
 
 - frame animation and additional scenery variants beyond the static v1 atlas;
+- direct drag placement and proposed visitor-condition deltas;
 - Apple Developer portal App ID/profile activation for WeatherKit;
 - Play Billing/App Store product identifiers;
 - home-screen widgets and Android Quick Settings tile;

@@ -105,13 +105,19 @@ name for archive publishing. See `docs/repository-publishing.md`.
 
 ## Art status
 
-The app ships a 42-asset static pixel-art package for objects, visitors, fixed
-scenery, materials, weather, and time effects. It uses a fixed 2:1 isometric
-grid, one pixel scale, one light direction, and nearest-neighbor scaling. Exact
-prompts, source sheets, crop rules, and hashes live under
-`artifacts/imagegen/locus-art-v1`; deterministic Canvas geometry remains the
-fallback. Images under `docs/references` remain mood references only. The
-AppIcon under `assets/branding` is still an owner-review candidate.
+The app ships the original 42-asset static pixel-art package plus 40 true
+directional object sprites. It uses a fixed 2:1 isometric grid, one pixel scale,
+one light direction, and nearest-neighbor scaling. Exact prompts, source sheets,
+crop rules, contact sheets, and hashes live under `artifacts/imagegen`; the
+deterministic Canvas renderer remains the construction/load fallback. Images
+under `docs/references` remain mood references only. The AppIcon under
+`assets/branding` is still an owner-review candidate.
+
+Placement direction and art variants are cataloged in
+`assets/content/placement_catalog.json`. Every recipe must provide four entries;
+the repository gate rejects missing recipes, directions, or asset files.
+Each recipe direction points to its own PNG; runtime mirroring is not used by
+the production catalog.
 
 ## License
 

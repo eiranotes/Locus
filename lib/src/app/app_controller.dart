@@ -14,6 +14,7 @@ import 'package:reality_diorama/src/domain/engines/step_ledger.dart';
 import 'package:reality_diorama/src/domain/engines/time_context.dart';
 import 'package:reality_diorama/src/domain/engines/visitor_engine.dart';
 import 'package:reality_diorama/src/domain/game_snapshot.dart';
+import 'package:reality_diorama/src/domain/placement_catalog.dart';
 import 'package:reality_diorama/src/services/capture_coordinator.dart';
 import 'package:reality_diorama/src/services/step_sync_service.dart';
 import 'package:reality_diorama/src/services/weather_gateway.dart';

@@ -1,4 +1,5 @@
 import 'package:reality_diorama/src/domain/entities.dart';
+import 'package:reality_diorama/src/domain/placement_catalog.dart';
 
 class GridCell {
   const GridCell(this.column, this.row);
@@ -27,16 +28,28 @@ class PlacementEngine {
   final int columns;
   final int rows;
 
+  Footprint rotatedFootprint({
+    required Footprint footprint,
+    required int rotation,
+  }) {
+    final rotated = normalizeQuarterTurns(rotation).isOdd;
+    return Footprint(
+      width: rotated ? footprint.height : footprint.width,
+      height: rotated ? footprint.width : footprint.height,
+    );
+  }
+
   Set<GridCell> occupiedCells({
     required Placement placement,
     required Footprint footprint,
   }) {
-    final rotated = placement.rotation.isOdd;
-    final width = rotated ? footprint.height : footprint.width;
-    final height = rotated ? footprint.width : footprint.height;
+    final rotated = rotatedFootprint(
+      footprint: footprint,
+      rotation: placement.rotation,
+    );
     return <GridCell>{
-      for (var dx = 0; dx < width; dx += 1)
-        for (var dy = 0; dy < height; dy += 1)
+      for (var dx = 0; dx < rotated.width; dx += 1)
+        for (var dy = 0; dy < rotated.height; dy += 1)
           GridCell(placement.column + dx, placement.row + dy),
     };
   }
@@ -46,7 +59,14 @@ class PlacementEngine {
     required RecipeDefinition recipe,
     required List<Placement> existing,
     required Map<String, RecipeDefinition> recipeByObjectId,
+    Set<int> allowedRotations = const <int>{0, 1, 2, 3},
   }) {
+    if (!allowedRotations.contains(normalizeQuarterTurns(candidate.rotation))) {
+      return const PlacementValidation(
+        valid: false,
+        message: '이 물건이 지원하지 않는 방향입니다.',
+      );
+    }
     final cells = occupiedCells(
       placement: candidate,
       footprint: recipe.footprint,
@@ -79,5 +99,26 @@ class PlacementEngine {
       return const PlacementValidation(valid: false, message: '다른 물건과 겹칩니다.');
     }
     return const PlacementValidation(valid: true);
+  }
+
+  Set<GridCell> validAnchors({
+    required Placement candidate,
+    required RecipeDefinition recipe,
+    required List<Placement> existing,
+    required Map<String, RecipeDefinition> recipeByObjectId,
+    Set<int> allowedRotations = const <int>{0, 1, 2, 3},
+  }) {
+    return <GridCell>{
+      for (var column = 0; column < columns; column += 1)
+        for (var row = 0; row < rows; row += 1)
+          if (validate(
+            candidate: candidate.copyWith(column: column, row: row),
+            recipe: recipe,
+            existing: existing,
+            recipeByObjectId: recipeByObjectId,
+            allowedRotations: allowedRotations,
+          ).valid)
+            GridCell(column, row),
+    };
   }
 }

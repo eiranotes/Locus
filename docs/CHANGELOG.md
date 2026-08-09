@@ -25,6 +25,14 @@
   collectibles retain their previous geometry.
 - Native launch background generation uses Locus navy `#071522`.
 - Added `pubspec.lock` so application dependency resolution is reproducible.
+- Placement editing now presents placed objects as an artwork catalog with
+  direction, rotated footprint, and available-anchor information.
+- The board highlights the selected footprint and valid anchors while dimming
+  unrelated connections; invalid direction-pad and rotation actions are
+  disabled before persistence.
+- Directional artwork and allowed rotations now come from
+  `assets/content/placement_catalog.json`; every direction resolves to a unique
+  production sprite rather than an interim mirror transform.
 
 ### Assets
 
@@ -34,8 +42,18 @@
   visitor plus fixed scenery, materials, weather, and time-of-day effects.
 - Added the five original ImageGen sheets, exact prompts, a labeled contact
   sheet, crop/install tooling, and a manifest recording dimensions and hashes.
+- Added two tone-matched directional source atlases and 40 transparent runtime
+  sprites covering all ten placeable objects in four true quarter-turn views.
+- Added a directional contact sheet, exact inventory/hash manifest, reviewed
+  crop bounds, and a standalone reproducible processing/validation tool.
 - Generated art is now used by the home scene, object previews, inventory,
   codex, visitor goal, and material indicators; Canvas rendering remains the
   deterministic fallback.
 - Tuned weather/time overlay opacity after simulator review so atmospheric
   pixels do not obscure the daytime neighborhood grid.
+
+### Tests
+
+- Added exhaustive placement-catalog tests across every recipe, four rotations,
+  all board edges, collision rejection, unsupported directions, art files, and
+  iOS-sized movement targets.

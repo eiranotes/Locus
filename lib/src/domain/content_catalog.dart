@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
+import 'package:reality_diorama/src/domain/placement_catalog.dart';
 
 class BalanceDefinition {
   const BalanceDefinition({
@@ -56,11 +57,13 @@ class ContentCatalog {
     required this.recipes,
     required this.visitors,
     required this.balance,
+    required this.placement,
   });
 
   final List<RecipeDefinition> recipes;
   final List<VisitorDefinition> visitors;
   final BalanceDefinition balance;
+  final PlacementCatalog placement;
 
   RecipeDefinition recipeById(String id) =>
       recipes.firstWhere((RecipeDefinition recipe) => recipe.id == id);
@@ -78,17 +81,27 @@ class ContentCatalog {
     final balanceDocument =
         jsonDecode(await bundle.loadString('assets/content/balance.json'))
             as Map<String, Object?>;
+    final placementDocument =
+        jsonDecode(
+              await bundle.loadString('assets/content/placement_catalog.json'),
+            )
+            as Map<String, Object?>;
+
+    final recipes = (recipeDocument['recipes']! as List<Object?>)
+        .cast<Map<String, Object?>>()
+        .map(RecipeDefinition.fromJson)
+        .toList(growable: false);
+    final placement = PlacementCatalog.fromJson(placementDocument)
+      ..validateRecipes(recipes);
 
     return ContentCatalog(
-      recipes: (recipeDocument['recipes']! as List<Object?>)
-          .cast<Map<String, Object?>>()
-          .map(RecipeDefinition.fromJson)
-          .toList(growable: false),
+      recipes: recipes,
       visitors: (visitorDocument['visitors']! as List<Object?>)
           .cast<Map<String, Object?>>()
           .map(VisitorDefinition.fromJson)
           .toList(growable: false),
       balance: BalanceDefinition.fromJson(balanceDocument),
+      placement: placement,
     );
   }
 }

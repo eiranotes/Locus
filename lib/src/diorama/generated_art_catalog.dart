@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/services.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
+import 'package:reality_diorama/src/domain/placement_catalog.dart';
 
 abstract final class GeneratedArtPaths {
   static const String root = 'assets/art/generated/v1';
@@ -52,23 +53,35 @@ abstract final class GeneratedArtPaths {
 
 final class DioramaArtImages {
   const DioramaArtImages({
-    required this.objects,
+    required this.objectAssets,
     required this.visitors,
     required this.scenery,
     required this.weatherOverlays,
     required this.timeOverlays,
   });
 
-  final Map<ObjectKind, ui.Image> objects;
+  final Map<String, ui.Image> objectAssets;
   final Map<String, ui.Image> visitors;
   final Map<String, ui.Image> scenery;
   final Map<WeatherMaterialKind, ui.Image> weatherOverlays;
   final Map<TimeBand, ui.Image> timeOverlays;
 
-  static Future<DioramaArtImages> load() async {
-    final objectPaths = <ObjectKind, String>{
-      for (final kind in ObjectKind.values)
-        kind: GeneratedArtPaths.object(kind),
+  static Future<DioramaArtImages> load(
+    PlacementCatalog placementCatalog,
+  ) async {
+    final catalogPaths = <String>{
+      for (final entry in placementCatalog.entries)
+        for (final visual in entry.visuals) visual.assetPath,
+    };
+    final objectPaths = <String, String>{
+      for (final path
+          in catalogPaths.isEmpty
+              ? <String>{
+                  for (final kind in ObjectKind.values)
+                    GeneratedArtPaths.object(kind),
+                }
+              : catalogPaths)
+        path: path,
     };
     final visitorPaths = <String, String>{
       for (final id in const <String>[
@@ -104,7 +117,7 @@ final class DioramaArtImages {
     };
 
     return DioramaArtImages(
-      objects: await _loadMap(objectPaths),
+      objectAssets: await _loadMap(objectPaths),
       visitors: await _loadMap(visitorPaths),
       scenery: await _loadMap(sceneryPaths),
       weatherOverlays: await _loadMap(weatherPaths),

@@ -28,6 +28,7 @@ def check_content() -> None:
     recipes_doc = load_json("assets/content/recipes.json")
     visitors_doc = load_json("assets/content/visitors.json")
     balance = load_json("assets/content/balance.json")
+    placement_doc = load_json("assets/content/placement_catalog.json")
     recipes = recipes_doc.get("recipes", [])
     visitors = visitors_doc.get("visitors", [])
     recipe_ids = [item["id"] for item in recipes]
@@ -36,6 +37,21 @@ def check_content() -> None:
         fail("duplicate recipe id")
     if len(visitor_ids) != len(set(visitor_ids)):
         fail("duplicate visitor id")
+    directions = placement_doc.get("directions", [])
+    if {item.get("rotation") for item in directions} != {0, 1, 2, 3}:
+        fail("placement catalog must define rotations 0 through 3")
+    placement_entries = placement_doc.get("entries", [])
+    placement_ids = [item.get("recipeId") for item in placement_entries]
+    if set(placement_ids) != set(recipe_ids) or len(placement_ids) != len(recipe_ids):
+        fail("placement catalog must cover recipes exactly once")
+    for entry in placement_entries:
+        visuals = entry.get("visuals", [])
+        if {item.get("rotation") for item in visuals} != {0, 1, 2, 3}:
+            fail(f"placement entry {entry['recipeId']} must cover four directions")
+        for visual in visuals:
+            asset = ROOT / visual["assetPath"]
+            if not asset.is_file():
+                fail(f"placement entry {entry['recipeId']} has missing art {asset}")
     known_requirements = {
         "wetCells", "lightCells", "warmCells", "coolCells",
         "connectedLights", "stableConnections", "farConnections",
@@ -326,22 +342,25 @@ def check_tools_and_ci() -> None:
 
 
 def check_generated_art() -> None:
-    result = subprocess.run(
-        [sys.executable, str(ROOT / "tool/process_generated_art.py"), "--validate-only"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        fail(f"generated art validation failed: {result.stderr or result.stdout}")
+    for script in ("process_generated_art.py", "process_directional_art.py"):
+        result = subprocess.run(
+            [sys.executable, str(ROOT / f"tool/{script}"), "--validate-only"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            fail(f"generated art validation failed: {result.stderr or result.stdout}")
     pubspec = (ROOT / "pubspec.yaml").read_text(encoding="utf-8")
     if "assets/art/generated/v1/" not in pubspec:
         fail("pubspec.yaml must bundle the generated art directory")
+    if "assets/art/generated/v1/directional/" not in pubspec:
+        fail("pubspec.yaml must bundle the directional art directory")
     catalog = (ROOT / "lib/src/diorama/generated_art_catalog.dart").read_text(
         encoding="utf-8"
     )
-    if "static Future<DioramaArtImages> load()" not in catalog or "static String object(" not in catalog:
+    if "static Future<DioramaArtImages> load(" not in catalog or "static String object(" not in catalog:
         fail("generated art catalog must expose runtime paths and preload images")
 
 
@@ -356,7 +375,10 @@ def check_required_files() -> None:
         "test/capture_services_test.dart", "test/step_sync_service_test.dart",
         "tool/bootstrap_platforms.sh", "tool/publish_github.sh",
         "tool/process_generated_art.py",
+        "tool/process_directional_art.py",
         "artifacts/imagegen/locus-art-v1/manifest.json",
+        "artifacts/imagegen/locus-directional-art-v1/manifest.json",
+        "assets/content/placement_catalog.json",
     ]
     missing = [item for item in required if not (ROOT / item).exists()]
     if missing:

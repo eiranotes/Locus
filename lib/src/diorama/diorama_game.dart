@@ -8,6 +8,7 @@ import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/diorama/object_renderer.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
+import 'package:reality_diorama/src/domain/engines/placement_engine.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/domain/game_snapshot.dart';
@@ -26,7 +27,7 @@ class DioramaGame extends FlameGame {
   Future<void> onLoad() async {
     await super.onLoad();
     try {
-      _art = await DioramaArtImages.load();
+      _art = await DioramaArtImages.load(_snapshot.placementCatalog);
     } catch (error, stackTrace) {
       debugPrint('Generated diorama art failed to load: $error\n$stackTrace');
       _art = null;
@@ -161,6 +162,15 @@ class DioramaScenePainter {
     if (effects.nature > 0) {
       color = Color.lerp(color, const Color(0xFF3D5546), 0.45)!;
     }
+    final editorOverlay = snapshot.editorOverlay;
+    final cell = GridCell(column, row);
+    final selected = editorOverlay?.selectedCells.contains(cell) ?? false;
+    final validAnchor = editorOverlay?.validAnchorCells.contains(cell) ?? false;
+    if (selected) {
+      color = Color.lerp(color, PixelPalette.mint, 0.42)!;
+    } else if (validAnchor) {
+      color = Color.lerp(color, PixelPalette.mint, 0.10)!;
+    }
     canvas.drawPath(
       path,
       Paint()
@@ -172,9 +182,18 @@ class DioramaScenePainter {
       Paint()
         ..isAntiAlias = false
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1
-        ..color = const Color(0xFF17222A),
+        ..strokeWidth = selected ? 2.2 : 1
+        ..color = selected ? PixelPalette.mint : const Color(0xFF17222A),
     );
+    if (validAnchor && !selected) {
+      canvas.drawCircle(
+        center,
+        2.2,
+        Paint()
+          ..isAntiAlias = false
+          ..color = PixelPalette.mint.withValues(alpha: 0.72),
+      );
+    }
     if (effects.wet > 0 && (column + row).isEven) {
       canvas.drawRect(
         Rect.fromCenter(center: center.translate(0, 2), width: 14, height: 2),
@@ -297,11 +316,16 @@ class DioramaScenePainter {
         ConnectionMode.stable => PixelPalette.amber,
         ConnectionMode.far => PixelPalette.violet,
       };
+      final selectedObjectId = snapshot.editorOverlay?.selectedObjectId;
+      final relevant =
+          selectedObjectId == null ||
+          edge.fromObjectId == selectedObjectId ||
+          edge.toObjectId == selectedObjectId;
       final paint = Paint()
         ..isAntiAlias = false
         ..style = PaintingStyle.stroke
         ..strokeWidth = edge.mode == ConnectionMode.far ? 2 : 1.4
-        ..color = color.withValues(alpha: 0.55);
+        ..color = color.withValues(alpha: relevant ? 0.72 : 0.10);
       if (edge.mode == ConnectionMode.sequential) {
         final path = Path()
           ..moveTo(a.dx, a.dy)
@@ -336,6 +360,10 @@ class DioramaScenePainter {
       if (object == null) {
         continue;
       }
+      final placementEntry = snapshot.placementCatalog.entryForRecipe(
+        object.recipeId,
+      );
+      final placementVisual = placementEntry.visualFor(placement.rotation);
       final anchor = _tileTop(
         placement.column.toDouble(),
         placement.row.toDouble(),
@@ -349,7 +377,8 @@ class DioramaScenePainter {
               snapshot.weatherMaterialsById[object.weatherMaterialId]?.timeBand,
         ),
         rotation: placement.rotation,
-        sprite: art?.objects[object.kind],
+        sprite: art?.objectAssets[placementVisual.assetPath],
+        spriteMirrorX: placementVisual.mirrorX,
       );
     }
   }
