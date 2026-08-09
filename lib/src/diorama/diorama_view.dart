@@ -7,11 +7,13 @@ class DioramaView extends StatefulWidget {
   const DioramaView({
     required this.snapshot,
     this.borderRadius = const BorderRadius.all(Radius.circular(22)),
+    this.semanticLabel,
     super.key,
   });
 
   final DioramaSnapshot snapshot;
   final BorderRadius borderRadius;
+  final String? semanticLabel;
 
   @override
   State<DioramaView> createState() => _DioramaViewState();
@@ -28,9 +30,14 @@ class _DioramaViewState extends State<DioramaView> {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: widget.borderRadius,
-      child: RepaintBoundary(child: GameWidget<DioramaGame>(game: _game)),
+    return Semantics(
+      image: true,
+      label: widget.semanticLabel ?? '5 곱하기 5 동네 디오라마',
+      excludeSemantics: true,
+      child: ClipRRect(
+        borderRadius: widget.borderRadius,
+        child: RepaintBoundary(child: GameWidget<DioramaGame>(game: _game)),
+      ),
     );
   }
 }

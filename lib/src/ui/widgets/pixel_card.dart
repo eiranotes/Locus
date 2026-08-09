@@ -22,29 +22,35 @@ class PixelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(18);
-    final decoration = BoxDecoration(
-      color: highlighted ? PixelPalette.surfaceRaised : PixelPalette.surface,
+    final shape = RoundedRectangleBorder(
       borderRadius: borderRadius,
-      border: Border.all(
+      side: BorderSide(
         color: highlighted ? PixelPalette.mint : PixelPalette.line,
         width: highlighted ? 1.4 : 1,
       ),
     );
     if (onTap == null) {
-      return Container(padding: padding, decoration: decoration, child: child);
+      return Material(
+        color: highlighted ? PixelPalette.surfaceRaised : PixelPalette.surface,
+        shape: shape,
+        clipBehavior: Clip.antiAlias,
+        child: Padding(padding: padding, child: child),
+      );
     }
     return Semantics(
       button: true,
       selected: selected,
       label: semanticLabel,
       child: Material(
-        type: MaterialType.transparency,
+        color: highlighted ? PixelPalette.surfaceRaised : PixelPalette.surface,
+        shape: shape,
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
           borderRadius: borderRadius,
           splashColor: PixelPalette.mint.withValues(alpha: 0.14),
           highlightColor: PixelPalette.mint.withValues(alpha: 0.08),
-          child: Ink(padding: padding, decoration: decoration, child: child),
+          child: Padding(padding: padding, child: child),
         ),
       ),
     );

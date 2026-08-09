@@ -2,6 +2,28 @@
 
 ## 2026-08-09
 
+### Home is scene-first and the scene visitor is persisted
+
+The home header uses one compact resource strip and the visitor goal sits
+inside the diorama frame. The two dashboard summary cards are removed so the
+5×5 neighborhood remains the dominant first-screen surface.
+
+`newVisitorId` remains transient and controls only the one-time arrival dialog.
+The scene resolves its visible visitor from that arrival first, otherwise from
+the persisted sighting with the newest `lastSeenAt`. A deterministic visitor-ID
+tie break prevents database order from changing the result. The diorama exposes
+one semantic image label containing time, regional weather kind, placed-object
+names, and the visible visitor; individual canvas pixels are not separate
+accessibility nodes.
+
+### Screenshot QA uses the isolated deterministic demo database
+
+The integration tour deletes only `reality_diorama_demo.sqlite3`, never the
+production database. It then exercises capture, crafting, placement, inventory,
+codex, and settings in one iOS run and sends named screenshots to a host driver.
+Generated platform wrappers stay in a temporary recovery copy when the tracked
+checkout intentionally omits `Runner.xcodeproj`.
+
 ### Product identity is Locus
 
 User-visible runtime strings, iOS bundle display/name metadata, and the native

@@ -407,7 +407,10 @@ extension AppControllerActions on AppController {
       placementCatalog: catalog.placement,
       visualLayerCatalog: catalog.visualLayers,
       atmosphericTraitCatalog: catalog.atmosphericTraits,
-      activeVisitorId: _newVisitorId,
+      activeVisitorId: sceneVisitorIdFor(
+        sightings: _visitorSightings,
+        arrivingVisitorId: _newVisitorId,
+      ),
     );
   }
 

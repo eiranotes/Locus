@@ -15,6 +15,8 @@
   narrow widths and larger text sizes.
 - Objects returned to storage remain in the placement catalog and can be
   direction-adjusted and placed again on the first validated empty cell.
+- Adaptive list controls inside `PixelCard` now paint their Material selection
+  and ink response without a hidden-splash framework assertion.
 
 ### Changed
 
@@ -48,6 +50,13 @@
   environment footprint, or connection behavior.
 - Existing visitor requirements remain reachable without obtaining a rare
   atmospheric trace.
+- Home now prioritizes a taller 5×5 diorama, places the next-visitor goal inside
+  the scene, compresses resources into one strip, and removes duplicate summary
+  cards.
+- The newest persisted visitor remains visible in the scene after the one-time
+  arrival dialog closes or the app relaunches.
+- The diorama exposes one semantic summary of time, weather, objects, and the
+  visible visitor for assistive technologies.
 
 ### Assets
 
@@ -85,3 +94,7 @@
 - Added atmospheric catalog thresholds, two-trait ceiling, schema-versioned
   persistence, focus selection, anchor projection, capture propagation, and
   layered-render coverage.
+- Added persisted-visitor selection, diorama semantics, and Material list-tile
+  regression tests.
+- Added a deterministic iOS integration tour covering capture, craft, place,
+  inventory, codex, and settings with 14 named full-resolution screenshots.

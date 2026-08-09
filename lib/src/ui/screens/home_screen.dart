@@ -11,7 +11,6 @@ import 'package:reality_diorama/src/ui/screens/crafting_screen.dart';
 import 'package:reality_diorama/src/ui/screens/placement_editor_screen.dart';
 import 'package:reality_diorama/src/ui/screens/settings_screen.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
-import 'package:reality_diorama/src/ui/widgets/resource_badge.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({required this.demoMode, super.key});
@@ -55,11 +54,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 14),
-                if (target != null) _VisitorGoal(evaluation: target),
                 const SizedBox(height: 12),
                 AspectRatio(
-                  aspectRatio: 1,
+                  aspectRatio: 0.88,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: PixelPalette.surface,
@@ -71,8 +68,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         Positioned.fill(
                           child: DioramaView(
                             snapshot: controller.dioramaSnapshot,
+                            semanticLabel: _sceneSemanticLabel(controller),
                           ),
                         ),
+                        if (target != null)
+                          Positioned(
+                            left: 10,
+                            right: 10,
+                            top: 10,
+                            child: _VisitorGoal(evaluation: target),
+                          ),
                         Positioned(
                           right: 10,
                           bottom: 10,
@@ -107,10 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                const SizedBox(height: 20),
-                Text('지금의 동네', style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 10),
-                _SceneSummary(controller: controller),
               ],
             ),
           ),
@@ -153,43 +154,83 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Row(
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: Text(
-                '내 공간',
-                style: Theme.of(context).textTheme.headlineLarge,
-              ),
-            ),
-            IconButton(
-              onPressed: onSettings,
-              tooltip: '설정',
-              icon: const Icon(Icons.more_horiz),
-            ),
-          ],
+        Expanded(
+          child: Text('내 공간', style: Theme.of(context).textTheme.headlineLarge),
         ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: <Widget>[
-            ResourceBadge(
-              icon: Icons.directions_walk,
-              value: _formatNumber(availableSteps),
-              label: '걸음',
-            ),
-            ResourceBadge(
-              icon: Icons.inventory_outlined,
-              value: '$readyCount',
-              label: '준비',
-              accent: readyCount > 0 ? PixelPalette.amber : PixelPalette.muted,
-            ),
-          ],
+        _ResourceStrip(availableSteps: availableSteps, readyCount: readyCount),
+        const SizedBox(width: 4),
+        IconButton(
+          onPressed: onSettings,
+          tooltip: '설정',
+          icon: const Icon(Icons.more_horiz),
         ),
       ],
+    );
+  }
+}
+
+class _ResourceStrip extends StatelessWidget {
+  const _ResourceStrip({
+    required this.availableSteps,
+    required this.readyCount,
+  });
+
+  final int availableSteps;
+  final int readyCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: '${_formatNumber(availableSteps)}걸음, 수집 준비 $readyCount개',
+      container: true,
+      child: Container(
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: 11),
+        decoration: BoxDecoration(
+          color: PixelPalette.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: PixelPalette.line),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const Icon(
+              Icons.directions_walk,
+              color: PixelPalette.mint,
+              size: 18,
+            ),
+            const SizedBox(width: 5),
+            Text(
+              _formatNumber(availableSteps),
+              style: const TextStyle(
+                color: PixelPalette.cream,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            Container(
+              height: 20,
+              width: 1,
+              margin: const EdgeInsets.symmetric(horizontal: 9),
+              color: PixelPalette.line,
+            ),
+            Icon(
+              Icons.inventory_outlined,
+              color: readyCount > 0 ? PixelPalette.amber : PixelPalette.muted,
+              size: 18,
+            ),
+            const SizedBox(width: 5),
+            Text(
+              '$readyCount',
+              style: const TextStyle(
+                color: PixelPalette.cream,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -204,60 +245,75 @@ class _VisitorGoal extends StatelessWidget {
     final missing = evaluation.progress
         .where((RequirementProgress item) => !item.satisfied)
         .firstOrNull;
-    return PixelCard(
-      highlighted: evaluation.satisfiedCount > 0,
-      child: Row(
-        children: <Widget>[
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: PixelPalette.blue.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(4),
-              child: Image.asset(
-                GeneratedArtPaths.visitor(evaluation.visitor.id),
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.none,
+    return Material(
+      color: PixelPalette.surface.withValues(alpha: 0.94),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+        side: BorderSide(
+          color: evaluation.satisfiedCount > 0
+              ? PixelPalette.mint
+              : PixelPalette.line,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          children: <Widget>[
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: PixelPalette.blue.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Image.asset(
+                  GeneratedArtPaths.visitor(evaluation.visitor.id),
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.none,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        '다음 방문자 · ${evaluation.visitor.nameKo}',
-                        style: Theme.of(context).textTheme.titleMedium,
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          '다음 방문자 · ${evaluation.visitor.nameKo}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
                       ),
-                    ),
-                    Text(
-                      '${evaluation.satisfiedCount}/${evaluation.progress.length}',
-                      style: const TextStyle(
-                        color: PixelPalette.mint,
-                        fontWeight: FontWeight.w800,
+                      Text(
+                        '${evaluation.satisfiedCount}/${evaluation.progress.length}',
+                        style: const TextStyle(
+                          color: PixelPalette.mint,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  missing == null
-                      ? '조건을 모두 완성했습니다.'
-                      : '${missing.label} ${missing.current}/${missing.target}',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    missing == null
+                        ? '조건을 모두 완성했습니다.'
+                        : '${missing.label} ${missing.current}/${missing.target}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ),
             ),
-          ),
-          const Icon(Icons.chevron_right, color: PixelPalette.muted),
-        ],
+            const Icon(Icons.chevron_right, color: PixelPalette.muted),
+          ],
+        ),
       ),
     );
   }
@@ -350,68 +406,6 @@ class _CraftPrompt extends StatelessWidget {
   }
 }
 
-class _SceneSummary extends StatelessWidget {
-  const _SceneSummary({required this.controller});
-
-  final AppController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    final placed = controller.placements.length;
-    final visitors = controller.visitorSightings.length;
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: PixelCard(
-            child: _SummaryValue(
-              label: '놓인 물건',
-              value:
-                  '$placed / ${controller.catalog.balance.activeObjectLimit}',
-              icon: Icons.account_tree_outlined,
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: PixelCard(
-            child: _SummaryValue(
-              label: '만난 방문자',
-              value: '$visitors / ${controller.catalog.visitors.length}',
-              icon: Icons.pets_outlined,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SummaryValue extends StatelessWidget {
-  const _SummaryValue({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
-
-  final String label;
-  final String value;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Icon(icon, color: PixelPalette.mint),
-        const SizedBox(height: 12),
-        Text(value, style: Theme.of(context).textTheme.headlineSmall),
-        const SizedBox(height: 3),
-        Text(label, style: Theme.of(context).textTheme.bodyMedium),
-      ],
-    );
-  }
-}
-
 class _VisitorArrivalDialog extends StatelessWidget {
   const _VisitorArrivalDialog({
     required this.visitor,
@@ -455,6 +449,33 @@ class _VisitorArrivalDialog extends StatelessWidget {
       ),
     );
   }
+}
+
+String _sceneSemanticLabel(AppController controller) {
+  final snapshot = controller.dioramaSnapshot;
+  final placedNames = snapshot.placements
+      .map((Placement placement) {
+        final object = snapshot.objects
+            .where(
+              (CraftedObject candidate) =>
+                  candidate.id == placement.craftedObjectId,
+            )
+            .firstOrNull;
+        return object?.kind.labelKo;
+      })
+      .whereType<String>()
+      .toList(growable: false);
+  final visitorName = snapshot.activeVisitorId == null
+      ? null
+      : controller.catalog.visitorById(snapshot.activeVisitorId!).nameKo;
+  final objectSummary = placedNames.isEmpty
+      ? '놓인 물건 없음'
+      : '놓인 물건 ${placedNames.length}개, ${placedNames.join(', ')}';
+  final visitorSummary = visitorName == null
+      ? '머무는 방문자 없음'
+      : '머무는 방문자 $visitorName';
+  return '5 곱하기 5 동네 디오라마, ${snapshot.timeBand.labelKo}, '
+      '${snapshot.weatherKind.labelKo}, $objectSummary, $visitorSummary';
 }
 
 String _formatNumber(int value) {

@@ -41,16 +41,18 @@
       anchor-based environment/connection modifiers without a new permission.
 - [ ] Tune atmospheric thresholds and focus effects after a structured
       eight-object playtest; do not add more trait families first.
-- [ ] Make home scene-first, derive scene visitors from persisted sightings,
+- [x] Make home scene-first, derive scene visitors from persisted sightings,
       and add a semantic scene summary.
-- [ ] Derive the scene visitor from persisted sightings while keeping the
+- [x] Derive the scene visitor from persisted sightings while keeping the
       one-time arrival dialog transient.
-- [ ] Add an integration test for the deterministic demo core loop.
+- [x] Add an integration test for the deterministic demo core loop and export
+      a named screenshot tour for every primary UI surface.
 - [ ] Add place-plaque treatment and route future share output through the same
       object renderer.
 - [ ] Review the AppIcon candidate at 1024, 180, 60, and 29 pt; either approve
       it or request one focused revision before wiring wrapper generation.
-- [ ] Count unique visitors rather than sightings in the home visitor target.
+- [x] Remove the duplicate home sightings counter; discovery remains keyed by
+      unique visitor ID in the codex and persisted scene selection.
 - [ ] Tune sprite scale and occlusion against neighborhoods containing the full
       eight-object limit and validate large-text card layouts.
 - [ ] Add direct drag-to-cell manipulation after Flame/Flutter coordinate and

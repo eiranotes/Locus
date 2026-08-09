@@ -70,6 +70,20 @@ See `docs/platform-setup.md` for permissions, signing, provider attribution, and
 
 With Flutter installed, validation resolves packages, parses Dart sources with the formatter, runs the analyzer, and executes tests. GitHub Actions additionally regenerates the platform wrappers, builds an Android debug APK, and compiles an iOS simulator build.
 
+The deterministic iOS UI tour resets only the demo database and exports named
+screenshots through the integration-test driver. Run it from a checkout with
+generated wrappers:
+
+```bash
+LOCUS_SCREENSHOT_DIR="$PWD/artifacts/ui-screenshots/local" \
+  flutter drive \
+  --driver=test_driver/integration_test.dart \
+  --target=integration_test/demo_ui_tour_test.dart \
+  -d <ios-simulator-udid> \
+  --dart-define=DEMO_MODE=true \
+  --no-pub
+```
+
 ## Repository structure
 
 ```text

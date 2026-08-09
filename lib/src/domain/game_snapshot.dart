@@ -75,6 +75,24 @@ class DioramaSnapshot {
   }
 }
 
+String? sceneVisitorIdFor({
+  required Iterable<VisitorSighting> sightings,
+  String? arrivingVisitorId,
+}) {
+  if (arrivingVisitorId != null) return arrivingVisitorId;
+
+  VisitorSighting? latest;
+  for (final sighting in sightings) {
+    if (latest == null ||
+        sighting.lastSeenAt.isAfter(latest.lastSeenAt) ||
+        (sighting.lastSeenAt.isAtSameMomentAs(latest.lastSeenAt) &&
+            sighting.visitorId.compareTo(latest.visitorId) < 0)) {
+      latest = sighting;
+    }
+  }
+  return latest?.visitorId;
+}
+
 final class DioramaEditorOverlay {
   const DioramaEditorOverlay({
     required this.selectedObjectId,

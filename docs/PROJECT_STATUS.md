@@ -6,9 +6,10 @@ Last updated: 2026-08-09
 
 `main` contains the iOS simulator fixes, deterministic demo isolation, shared
 renderer, cataloged pixel-art packages, and a catalog-driven directional
-editor. The current working slice deepens real-world weather input with bounded
-atmospheric traces and activates the already-authored shared weather layers
-without expanding the bitmap matrix.
+editor. The current working slice makes the home surface scene-first, keeps the
+latest persisted visitor visible after its one-time arrival dialog, adds a
+semantic scene summary, and establishes a repeatable iOS screenshot tour for
+the complete deterministic demo loop.
 
 ## Completed in the current slice
 
@@ -81,6 +82,18 @@ without expanding the bitmap matrix.
 - Added recipe-specific trait affinities, a base-or-focus choice in crafting,
   anchor-based environment effects, strong-wind connection range, and a
   low-visibility quiet-zone override without changing visitor reachability.
+- Moved the visitor goal into the diorama frame, compressed steps and capture
+  readiness into one header strip, enlarged the scene, and removed the two
+  dashboard-style summary cards from home.
+- Derived the scene visitor from the newest persisted sighting while retaining
+  the new-visitor ID only for the one-time arrival dialog.
+- Added one VoiceOver image summary for the 5×5 scene with time, weather,
+  placed-object names, and the currently visible visitor.
+- Rebuilt `PixelCard` on an opaque Material surface so nested adaptive list
+  controls paint selection and ink feedback without a hidden-splash assertion.
+- Added an iOS integration tour that resets only the isolated demo database,
+  collects weather and surroundings, crafts and places one object, traverses
+  every primary tab and settings screen, and exports named PNG evidence.
 
 ## Simulator evidence
 
@@ -137,14 +150,23 @@ test run found one incorrect comparison cell in the new diagonal-spread test;
 after correcting only that assertion, the focused five-test diorama rule file
 passed. The Debug iOS simulator build, install, and launch all succeeded.
 
+The scene-first and screenshot-tour slice was verified on the same shared
+`AppAudit iPhone 16 Pro` with Flutter 3.44.1. The current checkout intentionally
+lacks generated `Runner.xcodeproj`, so the iOS build and `flutter drive` run
+used a temporary wrapper-recovery copy. The deterministic integration tour
+completed in 35 seconds with all tests passed and exported 14 full-resolution
+1206×2622 PNGs plus a labeled contact sheet under
+`artifacts/ui-screenshots/2026-08-09-final/`. The successful run logged no
+Flutter exception or overflow. Analyzer and the full local unit/widget suite
+also passed. The required Android demo debug APK built successfully from the
+same temporary wrapper-recovery copy.
+
 ## Known risks and gates
 
 - The first production-bound atlas pass is installed, but it still needs final
   composition tuning against a range of populated neighborhoods and text sizes.
 - Place plaques and a share-output renderer remain outside this first shared
   renderer slice.
-- Visitor scene persistence still depends on transient arrival state rather
-  than persisted sightings.
 - Direct drag placement and visitor-condition deltas remain future editor
   enhancements; the current catalog-driven button editor validates each move,
   rotation, removal, and replacement commit.
