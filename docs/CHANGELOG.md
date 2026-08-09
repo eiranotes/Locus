@@ -15,8 +15,9 @@
   narrow widths and larger text sizes.
 - Objects returned to storage remain in the placement catalog and can be
   direction-adjusted and placed again on the first validated empty cell.
-- Adaptive list controls inside `PixelCard` now paint their Material selection
-  and ink response without a hidden-splash framework assertion.
+- Adaptive list controls inside cards and tonal capture sections now paint
+  their Material selection and ink response without a hidden-splash framework
+  assertion.
 
 ### Changed
 

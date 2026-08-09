@@ -319,11 +319,9 @@ class _CaptureSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: tone,
-        borderRadius: BorderRadius.circular(PixelRadii.tray),
-      ),
+    return Material(
+      color: tone,
+      borderRadius: BorderRadius.circular(PixelRadii.tray),
       child: Padding(padding: const EdgeInsets.all(16), child: child),
     );
   }
