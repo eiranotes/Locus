@@ -27,6 +27,8 @@
       instead of nested outlined cards.
 - [x] Recompose inventory, codex, and settings as a drawer, field guide, and
       native-density grouped list.
+- [x] Re-run and visually audit the complete 14-screen Night Cabinet simulator
+      tour, including capture, crafting, placement, collections, and settings.
 - [x] Add selected-footprint highlighting, valid anchor markers, relevant
       connection emphasis, and disabled invalid move/rotation actions.
 - [x] Move placement directions and artwork variants into an exact recipe

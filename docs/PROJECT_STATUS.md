@@ -180,6 +180,17 @@ Flutter exception or overflow. Analyzer and the full local unit/widget suite
 also passed. The required Android demo debug APK built successfully from the
 same temporary wrapper-recovery copy.
 
+The Night Cabinet redesign was then verified from a fresh temporary
+wrapper-recovery checkout at the same committed revision. The first tour found
+one Material ancestry assertion in the capture surroundings switch; replacing
+the tonal `DecoratedBox` with `Material` preserved the design and removed the
+runtime fault. The repeated deterministic tour completed in 36 seconds with
+all tests passed and refreshed 14 full-resolution 1206×2622 PNGs plus a labeled
+contact sheet under `artifacts/ui-screenshots/2026-08-09-night-cabinet/`.
+Screen-by-screen inspection found no clipped content, overflow, hidden ink, or
+remaining floating-center action at the tested size. The Android demo debug APK
+also built successfully from that revision with Flutter 3.44.1.
+
 ## Known risks and gates
 
 - The first production-bound atlas pass is installed, but it still needs final

@@ -110,3 +110,6 @@
   regression tests.
 - Added a deterministic iOS integration tour covering capture, craft, place,
   inventory, codex, and settings with 14 named full-resolution screenshots.
+- Refreshed the complete 14-screen iOS tour after the Night Cabinet redesign;
+  the successful route logged no Flutter framework exception or overflow and
+  the visual audit found no blocking defect at the tested simulator size.
