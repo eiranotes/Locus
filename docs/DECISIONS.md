@@ -25,6 +25,16 @@ purpose. Placement keeps the board in one scene viewport and groups selected
 object controls in a single raised dock. Completion shows the deterministic
 crafted object rather than a text-only confirmation.
 
+### Secondary collections are a drawer, field guide, and grouped settings
+
+Inventory uses divider-based material and object rows with scene-backed art
+tiles; record stamps remain a compact visual grid because their captured
+conditions are the comparison target. Codex tiles use silhouettes from the
+real deterministic visitor/object assets instead of repeated question-mark or
+lock illustrations. Recipe entries are borderless field-guide rows. Settings
+uses labeled native-density groups, with accent color removed from passive
+informational icons.
+
 ### Home is scene-first and the scene visitor is persisted
 
 The home header uses one compact resource strip and the visitor goal sits

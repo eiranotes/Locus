@@ -73,6 +73,8 @@ class _VisitorsTab extends StatelessWidget {
         final visitor = controller.catalog.visitors[index];
         final discovered = seenIds.contains(visitor.id);
         return PixelCard(
+          radius: PixelRadii.tile,
+          color: discovered ? PixelPalette.scene : Colors.transparent,
           padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,25 +85,32 @@ class _VisitorsTab extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: discovered
                         ? PixelPalette.blue.withValues(alpha: 0.10)
-                        : PixelPalette.background,
-                    borderRadius: BorderRadius.circular(14),
+                        : PixelPalette.scene,
+                    borderRadius: BorderRadius.circular(PixelRadii.tile),
                   ),
-                  child: discovered
-                      ? Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Image.asset(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: discovered
+                        ? Image.asset(
                             GeneratedArtPaths.visitor(visitor.id),
                             fit: BoxFit.contain,
                             filterQuality: FilterQuality.none,
+                          )
+                        : ColorFiltered(
+                            colorFilter: const ColorFilter.mode(
+                              PixelPalette.textMuted,
+                              BlendMode.srcIn,
+                            ),
+                            child: Opacity(
+                              opacity: 0.32,
+                              child: Image.asset(
+                                GeneratedArtPaths.visitor(visitor.id),
+                                fit: BoxFit.contain,
+                                filterQuality: FilterQuality.none,
+                              ),
+                            ),
                           ),
-                        )
-                      : const Center(
-                          child: Icon(
-                            Icons.help_outline,
-                            color: PixelPalette.muted,
-                            size: 54,
-                          ),
-                        ),
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -163,6 +172,8 @@ class _ObjectKindsTab extends StatelessWidget {
             final made = representative != null;
             final count = matchingObjects.length;
             return PixelCard(
+              radius: PixelRadii.tile,
+              color: made ? PixelPalette.scene : Colors.transparent,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -192,11 +203,19 @@ class _ObjectKindsTab extends StatelessWidget {
                                 controller.catalog.atmosphericTraits,
                             semanticLabel: '${recipe.nameKo} 대표 미리보기',
                           )
-                        : const Center(
-                            child: Icon(
-                              Icons.lock_outline,
-                              color: PixelPalette.muted,
-                              size: 34,
+                        : ColorFiltered(
+                            colorFilter: const ColorFilter.mode(
+                              PixelPalette.textMuted,
+                              BlendMode.srcIn,
+                            ),
+                            child: Opacity(
+                              opacity: 0.26,
+                              child: ObjectVisualPreview(
+                                visual: ObjectVisualDescriptor.forRecipe(
+                                  recipe,
+                                ),
+                                semanticLabel: '${recipe.nameKo} 잠긴 실루엣',
+                              ),
                             ),
                           ),
                   ),
@@ -234,11 +253,14 @@ class _RecipesTab extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 110),
       itemCount: controller.catalog.recipes.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 9),
+      separatorBuilder: (_, __) => const Divider(),
       itemBuilder: (BuildContext context, int index) {
         final recipe = controller.catalog.recipes[index];
         final unlocked = controller.unlockedRecipeIds.contains(recipe.id);
         return PixelCard(
+          color: Colors.transparent,
+          radius: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
           child: Row(
             children: <Widget>[
               Container(
@@ -248,7 +270,7 @@ class _RecipesTab extends StatelessWidget {
                   color: unlocked
                       ? PixelPalette.mint.withValues(alpha: 0.10)
                       : PixelPalette.background,
-                  borderRadius: BorderRadius.circular(13),
+                  borderRadius: BorderRadius.circular(PixelRadii.tile),
                 ),
                 child: unlocked
                     ? Padding(

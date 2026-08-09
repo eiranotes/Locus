@@ -28,6 +28,9 @@
 - Reworked capture as a tonal sensor tray, crafting as a borderless workbench
   list with an object stage, and placement as a scene plus one compact control
   dock. Craft completion now presents the deterministic result artwork.
+- Reworked inventory rows as a collection drawer, replaced repeated codex
+  question marks with deterministic silhouettes and hints, and organized
+  settings into labeled native-density groups.
 - User-visible app identity is Locus.
 - Capture uses a surroundings/sensor glyph instead of a camera glyph.
 - Home, crafting, inventory, and codex object visuals share deterministic

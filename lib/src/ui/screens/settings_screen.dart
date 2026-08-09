@@ -35,19 +35,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: <Widget>[
+          Text('걸음과 작업량', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
           _StepSourceCard(
             controller: controller,
             busy: _changingStepSource,
             onUseRealSteps: () => _useRealSteps(controller),
             onUseFallback: () => _useFallbackSteps(controller),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
+          Text('데이터와 개인정보', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
           PixelCard(
+            radius: PixelRadii.card,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('데이터 원칙', style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 10),
                 const _InfoLine(
                   icon: Icons.phone_iphone,
                   text: '기록과 게임 상태는 기기에 저장됩니다.',
@@ -63,7 +66,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
+          Text('날씨 정보', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
           FutureBuilder<WeatherAttributionInfo>(
             future: _weatherAttribution,
             builder:
@@ -75,14 +80,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   final markUri = attribution?.combinedMarkDarkUri;
                   final legalUri = attribution?.legalPageUri;
                   return PixelCard(
+                    radius: PixelRadii.card,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(
-                          '날씨 정보',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 10),
                         if (markUri != null)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
@@ -122,26 +123,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   );
                 },
           ),
-          const SizedBox(height: 12),
-          PixelCard(
-            child: Row(
-              children: <Widget>[
-                Icon(
-                  widget.demoMode
-                      ? Icons.science_outlined
-                      : Icons.verified_outlined,
-                  color: widget.demoMode
-                      ? PixelPalette.amber
-                      : PixelPalette.success,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    widget.demoMode ? '오프라인 데모 데이터 사용 중' : '기기 센서 모드',
-                    style: Theme.of(context).textTheme.titleMedium,
+          const SizedBox(height: 20),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: PixelPalette.scene,
+              borderRadius: BorderRadius.circular(PixelRadii.tile),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    widget.demoMode
+                        ? Icons.science_outlined
+                        : Icons.verified_outlined,
+                    color: widget.demoMode
+                        ? PixelPalette.amber
+                        : PixelPalette.success,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      widget.demoMode ? '오프라인 데모 데이터 사용 중' : '기기 센서 모드',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -244,13 +252,14 @@ class _StepSourceCard extends StatelessWidget {
     };
 
     return PixelCard(
+      radius: PixelRadii.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Icon(icon, color: PixelPalette.mint),
+              Icon(icon, color: PixelPalette.textBody),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -313,7 +322,7 @@ class _InfoLine extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Icon(icon, size: 20, color: PixelPalette.mint),
+          Icon(icon, size: 20, color: PixelPalette.textMuted),
           const SizedBox(width: 10),
           Expanded(
             child: Text(text, style: Theme.of(context).textTheme.bodyMedium),

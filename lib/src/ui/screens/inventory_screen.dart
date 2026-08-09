@@ -123,6 +123,8 @@ class _RecordCard extends StatelessWidget {
     final kind = weather?.kind ?? WeatherMaterialKind.cloudy;
     final accent = weatherColor(kind);
     return PixelCard(
+      radius: PixelRadii.tile,
+      color: PixelPalette.scene,
       padding: const EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,8 +134,7 @@ class _RecordCard extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 color: accent.withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: accent.withValues(alpha: 0.30)),
+                borderRadius: BorderRadius.circular(PixelRadii.tile),
               ),
               child: Stack(
                 children: <Widget>[
@@ -208,7 +209,7 @@ class _MaterialsTab extends StatelessWidget {
         const SizedBox(height: 8),
         for (final material in weather) ...<Widget>[
           _WeatherMaterialRow(material: material),
-          const SizedBox(height: 8),
+          const Divider(),
         ],
         const SizedBox(height: 14),
         Text('주변', style: Theme.of(context).textTheme.titleMedium),
@@ -218,7 +219,7 @@ class _MaterialsTab extends StatelessWidget {
         else
           for (final material in surroundings) ...<Widget>[
             _SurroundingMaterialRow(material: material),
-            const SizedBox(height: 8),
+            const Divider(),
           ],
       ],
     );
@@ -233,6 +234,9 @@ class _WeatherMaterialRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PixelCard(
+      color: Colors.transparent,
+      radius: 0,
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
       child: Row(
         children: <Widget>[
           MaterialOrb.weather(material.kind),
@@ -282,6 +286,9 @@ class _SurroundingMaterialRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PixelCard(
+      color: Colors.transparent,
+      radius: 0,
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
       child: Row(
         children: <Widget>[
           MaterialOrb.surroundings(material.kind),
@@ -334,7 +341,7 @@ class _ObjectsTab extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 110),
       itemCount: controller.craftedObjects.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 9),
+      separatorBuilder: (_, __) => const Divider(),
       itemBuilder: (BuildContext context, int index) {
         final object = controller.craftedObjects[index];
         final recipe = controller.catalog.recipeById(object.recipeId);
@@ -347,16 +354,19 @@ class _ObjectsTab extends StatelessWidget {
             ? recipe.nameKo
             : '${focusDefinition.namePrefixKo} ${recipe.nameKo}';
         return PixelCard(
+          color: Colors.transparent,
+          radius: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
           child: Row(
             children: <Widget>[
               Container(
-                width: 58,
-                height: 58,
+                width: 68,
+                height: 68,
                 decoration: BoxDecoration(
                   color: weatherColor(
                     object.weatherKind,
                   ).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(PixelRadii.tile),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(3),

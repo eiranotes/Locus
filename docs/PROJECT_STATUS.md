@@ -26,6 +26,12 @@ collection is a scene action rather than an oversized navigation item.
   borderless scene with compact tile and control docks.
 - Added the crafted object preview to the completion confirmation so the reward
   is recognizable without adding ornamental choreography.
+- Converted material, crafted-object, and recipe lists to divider-based rows;
+  kept record and codex tiles only where visual comparison is the real task.
+- Replaced identical undiscovered codex glyphs with muted silhouettes derived
+  from the shipping visitor and deterministic object renderers.
+- Reorganized settings into explicit grouped sections and removed action mint
+  from passive privacy and sensor information.
 - Added missing iOS executable metadata and changed user-visible identity from
   Reality Diorama to Locus.
 - Changed the native launch background patch to `#071522` to avoid a white
