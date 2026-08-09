@@ -23,14 +23,70 @@ final class DeterministicObjectRenderer {
     int rotation = 0,
     Image? sprite,
     bool spriteMirrorX = false,
+    Image? surfacePattern,
+    Image? footprintEffect,
+    Image? traitSurfacePattern,
+    Image? traitFootprintEffect,
+    double surfaceOpacity = 0,
+    double traitSurfaceOpacity = 0,
+    double traitFootprintOpacity = 0.36,
+    bool constructionSprite = false,
   }) {
+    if (visual.usesLayeredWeather && footprintEffect != null) {
+      _drawFootprintEffect(canvas, anchor, footprintEffect);
+    }
+    if (visual.usesLayeredWeather && traitFootprintEffect != null) {
+      _drawFootprintEffect(
+        canvas,
+        anchor,
+        traitFootprintEffect,
+        opacity: traitFootprintOpacity,
+      );
+    }
     if (visual.completion < 1) {
-      _drawConstruction(canvas, anchor, visual.completion);
+      if (constructionSprite && sprite != null) {
+        _drawObjectSprite(
+          canvas,
+          anchor,
+          visual,
+          sprite,
+          mirrorX: spriteMirrorX,
+        );
+        _drawConnectorMark(canvas, anchor, visual.surroundingKind);
+      } else {
+        _drawConstruction(canvas, anchor, visual.completion);
+      }
       return;
     }
 
     if (sprite != null) {
       _drawObjectSprite(canvas, anchor, visual, sprite, mirrorX: spriteMirrorX);
+      if (visual.usesLayeredWeather &&
+          surfacePattern != null &&
+          surfaceOpacity > 0) {
+        _drawSurfacePattern(
+          canvas,
+          anchor,
+          visual,
+          sprite: sprite,
+          pattern: surfacePattern,
+          mirrorX: spriteMirrorX,
+          opacity: surfaceOpacity,
+        );
+      }
+      if (visual.usesLayeredWeather &&
+          traitSurfacePattern != null &&
+          traitSurfaceOpacity > 0) {
+        _drawSurfacePattern(
+          canvas,
+          anchor,
+          visual,
+          sprite: sprite,
+          pattern: traitSurfacePattern,
+          mirrorX: spriteMirrorX,
+          opacity: traitSurfaceOpacity,
+        );
+      }
       _drawConnectorMark(canvas, anchor, visual.surroundingKind);
       return;
     }
@@ -89,6 +145,14 @@ final class DeterministicObjectRenderer {
     int rotation = 0,
     Image? sprite,
     bool spriteMirrorX = false,
+    Image? surfacePattern,
+    Image? footprintEffect,
+    Image? traitSurfacePattern,
+    Image? traitFootprintEffect,
+    double surfaceOpacity = 0,
+    double traitSurfaceOpacity = 0,
+    double traitFootprintOpacity = 0.36,
+    bool constructionSprite = false,
   }) {
     if (outputSize.isEmpty) {
       return;
@@ -112,6 +176,14 @@ final class DeterministicObjectRenderer {
       rotation: rotation,
       sprite: sprite,
       spriteMirrorX: spriteMirrorX,
+      surfacePattern: surfacePattern,
+      footprintEffect: footprintEffect,
+      traitSurfacePattern: traitSurfacePattern,
+      traitFootprintEffect: traitFootprintEffect,
+      surfaceOpacity: surfaceOpacity,
+      traitSurfaceOpacity: traitSurfaceOpacity,
+      traitFootprintOpacity: traitFootprintOpacity,
+      constructionSprite: constructionSprite,
     );
     canvas.restore();
   }
@@ -146,18 +218,7 @@ final class DeterministicObjectRenderer {
     Image sprite, {
     required bool mirrorX,
   }) {
-    final size = switch (visual.kind) {
-      ObjectKind.alleyLamp => const Size(76, 98),
-      ObjectKind.signpost => const Size(78, 78),
-      ObjectKind.planter => const Size(84, 72),
-      ObjectKind.bench => const Size(86, 72),
-      ObjectKind.stairs => const Size(88, 76),
-      ObjectKind.tree => const Size(98, 98),
-      ObjectKind.busStop => const Size(92, 98),
-      ObjectKind.pond => const Size(92, 68),
-      ObjectKind.bridge => const Size(96, 76),
-      ObjectKind.tower => const Size(84, 104),
-    };
+    final size = _spriteSize(visual.kind);
     _drawShadow(canvas, anchor.translate(0, 2), size.width * 0.52, 9);
     canvas.save();
     canvas.translate(anchor.dx, anchor.dy);
@@ -175,6 +236,83 @@ final class DeterministicObjectRenderer {
           BlendMode.modulate,
         ),
     );
+    canvas.restore();
+  }
+
+  Size _spriteSize(ObjectKind kind) => switch (kind) {
+    ObjectKind.alleyLamp => const Size(76, 98),
+    ObjectKind.signpost => const Size(78, 78),
+    ObjectKind.planter => const Size(84, 72),
+    ObjectKind.bench => const Size(86, 72),
+    ObjectKind.stairs => const Size(88, 76),
+    ObjectKind.tree => const Size(98, 98),
+    ObjectKind.busStop => const Size(92, 98),
+    ObjectKind.pond => const Size(92, 68),
+    ObjectKind.bridge => const Size(96, 76),
+    ObjectKind.tower => const Size(84, 104),
+  };
+
+  void _drawFootprintEffect(
+    Canvas canvas,
+    Offset anchor,
+    Image image, {
+    double opacity = 1,
+  }) {
+    const size = Size(104, 104);
+    canvas.drawImageRect(
+      image,
+      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+      Rect.fromLTWH(
+        anchor.dx - size.width / 2,
+        anchor.dy - 72,
+        size.width,
+        size.height,
+      ),
+      Paint()
+        ..filterQuality = FilterQuality.none
+        ..color = Color.fromRGBO(255, 255, 255, opacity.clamp(0, 1).toDouble()),
+    );
+  }
+
+  void _drawSurfacePattern(
+    Canvas canvas,
+    Offset anchor,
+    ObjectVisualDescriptor visual, {
+    required Image sprite,
+    required Image pattern,
+    required bool mirrorX,
+    required double opacity,
+  }) {
+    final size = _spriteSize(visual.kind);
+    final destination = Rect.fromLTWH(
+      -size.width / 2,
+      -size.height,
+      size.width,
+      size.height,
+    );
+    canvas.save();
+    canvas.translate(anchor.dx, anchor.dy);
+    if (mirrorX) {
+      canvas.scale(-1, 1);
+    }
+    canvas.saveLayer(destination, Paint());
+    canvas.drawImageRect(
+      pattern,
+      Rect.fromLTWH(0, 0, pattern.width.toDouble(), pattern.height.toDouble()),
+      destination,
+      Paint()
+        ..filterQuality = FilterQuality.none
+        ..color = Color.fromRGBO(255, 255, 255, opacity.clamp(0, 1).toDouble()),
+    );
+    canvas.drawImageRect(
+      sprite,
+      Rect.fromLTWH(0, 0, sprite.width.toDouble(), sprite.height.toDouble()),
+      destination,
+      Paint()
+        ..filterQuality = FilterQuality.none
+        ..blendMode = BlendMode.dstIn,
+    );
+    canvas.restore();
     canvas.restore();
   }
 

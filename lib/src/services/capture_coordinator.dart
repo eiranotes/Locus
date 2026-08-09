@@ -17,6 +17,7 @@ class CapturePreparation {
     required this.location,
     required this.weatherSnapshot,
     required this.weatherKind,
+    required this.atmosphericTraits,
     required this.timeBand,
     required this.season,
     required this.weatherReadiness,
@@ -26,6 +27,7 @@ class CapturePreparation {
   final LocationFix location;
   final WeatherSnapshot? weatherSnapshot;
   final WeatherMaterialKind? weatherKind;
+  final List<AtmosphericTrait> atmosphericTraits;
   final TimeBand timeBand;
   final Season season;
   final ResourceReadiness weatherReadiness;
@@ -73,6 +75,7 @@ class CaptureCoordinator {
 
     WeatherSnapshot? weather;
     WeatherMaterialKind? weatherKind;
+    var atmosphericTraits = const <AtmosphericTrait>[];
     ResourceReadiness weatherReadiness;
     if (location.isFallback) {
       weatherReadiness = const ResourceReadiness.unavailable(
@@ -82,6 +85,7 @@ class CaptureCoordinator {
       try {
         weather = await weatherGateway.current(location.point);
         weatherKind = const WeatherClassifier().classify(weather);
+        atmosphericTraits = catalog.atmosphericTraits.classify(weather);
         weatherReadiness = cooldown.weatherReadiness(
           now: now,
           currentKind: weatherKind,
@@ -109,6 +113,7 @@ class CaptureCoordinator {
       location: location,
       weatherSnapshot: weather,
       weatherKind: weatherKind,
+      atmosphericTraits: atmosphericTraits,
       timeBand: timeBand,
       season: seasonFor(now, northernHemisphere: location.point.latitude >= 0),
       weatherReadiness: weatherReadiness,
@@ -149,6 +154,8 @@ class CaptureCoordinator {
           preparation.timeBand.name,
         ]),
         providerName: weatherSnapshot.providerName,
+        atmosphericTraits: preparation.atmosphericTraits,
+        traitSchemaVersion: catalog.atmosphericTraits.classifierVersion,
       );
     }
 
@@ -188,7 +195,7 @@ class CaptureCoordinator {
       timeBand: preparation.timeBand,
       season: preparation.season,
       weatherBasis: weatherSnapshot?.basis ?? WeatherBasis.unavailable,
-      sourceVersion: 'capture-v2',
+      sourceVersion: 'capture-v3',
       weatherMaterialId: weatherMaterial?.id,
       surroundingMaterialId: surroundingMaterial?.id,
     );

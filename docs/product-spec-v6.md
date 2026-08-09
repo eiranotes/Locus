@@ -77,6 +77,15 @@ Default cooldown is two hours. A meaningful weather-class or time-band change ca
 
 Weather data is provider model data. UI language must not claim direct measurement at the exact location.
 
+Each collected weather material may also keep zero to two cataloged
+atmospheric traits derived only from numeric fields shared by both weather
+providers: visibility, precipitation rate, cloud cover, wind speed, and
+apparent temperature. The six first-release traits are low visibility, active
+precipitation, strong wind, sharp cold, intense heat, and deep cloud. Priority
+and thresholds are versioned in `atmospheric_traits.json`; classification is
+deterministic and collection cooldown still keys off the broad class and time
+band, so changing a secondary trait cannot be used to reroll materials.
+
 ### Surroundings material
 
 Surroundings are optional and collected only through a foreground 8-second Bluetooth scan. Native code aggregates density, persistence, churn, relative signal strength, and observation coverage. It discards names, peripheral identifiers, MAC addresses, and raw advertisements.
@@ -106,6 +115,7 @@ Visual generation is deterministic:
 ```text
 base object
 + weather skin
++ one selected atmospheric focus trait
 + time palette
 + connector treatment
 + place plaque
@@ -129,7 +139,11 @@ The game computes three rule families.
 
 ### Environment
 
-Wet, light, warm, cool, wind, and nature values are accumulated per cell. Objects affect their own and adjacent cells.
+Wet, light, warm, cool, wind, and nature values are accumulated per cell.
+Objects affect their own and adjacent cells. One user-selected atmospheric
+focus may add a bounded catalog effect to diagonal, adjacent, or distance-two
+cells from the placement anchor. This makes captured conditions affect a
+placement decision without creating another currency or multiplying art files.
 
 ### Connections
 

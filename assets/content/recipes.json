@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "recipes": [
     {
       "id": "alley_lamp",
@@ -11,6 +11,7 @@
       "height": "medium",
       "initiallyUnlocked": true,
       "tags": ["light", "street"],
+      "traitAffinities": ["activePrecipitation", "lowVisibility", "sharpCold", "intenseHeat"],
       "baseEffects": {"light": 1}
     },
     {
@@ -23,6 +24,7 @@
       "height": "low",
       "initiallyUnlocked": false,
       "tags": ["path", "direction"],
+      "traitAffinities": ["lowVisibility", "strongWind"],
       "baseEffects": {}
     },
     {
@@ -35,6 +37,7 @@
       "height": "low",
       "initiallyUnlocked": true,
       "tags": ["nature", "stay"],
+      "traitAffinities": ["activePrecipitation", "deepCloud"],
       "baseEffects": {"nature": 1}
     },
     {
@@ -47,6 +50,7 @@
       "height": "low",
       "initiallyUnlocked": true,
       "tags": ["stay", "path"],
+      "traitAffinities": ["activePrecipitation", "lowVisibility", "deepCloud", "intenseHeat"],
       "baseEffects": {}
     },
     {
@@ -59,6 +63,7 @@
       "height": "medium",
       "initiallyUnlocked": true,
       "tags": ["path", "height"],
+      "traitAffinities": ["strongWind", "sharpCold"],
       "baseEffects": {}
     },
     {
@@ -71,6 +76,7 @@
       "height": "high",
       "initiallyUnlocked": false,
       "tags": ["nature", "shade"],
+      "traitAffinities": ["lowVisibility", "deepCloud", "strongWind"],
       "baseEffects": {"nature": 2, "cool": 1}
     },
     {
@@ -83,6 +89,7 @@
       "height": "medium",
       "initiallyUnlocked": false,
       "tags": ["stay", "light", "path"],
+      "traitAffinities": ["activePrecipitation", "lowVisibility", "strongWind", "intenseHeat"],
       "baseEffects": {"light": 1}
     },
     {
@@ -95,6 +102,7 @@
       "height": "low",
       "initiallyUnlocked": false,
       "tags": ["wet", "nature"],
+      "traitAffinities": ["activePrecipitation", "deepCloud", "sharpCold"],
       "baseEffects": {"wet": 2, "nature": 1}
     },
     {
@@ -107,6 +115,7 @@
       "height": "medium",
       "initiallyUnlocked": false,
       "tags": ["path", "far"],
+      "traitAffinities": ["lowVisibility", "strongWind"],
       "baseEffects": {}
     },
     {
@@ -119,6 +128,7 @@
       "height": "high",
       "initiallyUnlocked": false,
       "tags": ["light", "height", "hub"],
+      "traitAffinities": ["deepCloud", "strongWind", "sharpCold", "intenseHeat"],
       "baseEffects": {"light": 2}
     }
   ]

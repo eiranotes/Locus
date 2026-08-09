@@ -195,6 +195,7 @@ extension AppControllerActions on AppController {
     required RecipeDefinition recipe,
     required WeatherMaterial weather,
     SurroundingMaterial? surroundings,
+    AtmosphericTrait? focusTrait,
   }) async {
     if (!_unlockedRecipeIds.contains(recipe.id)) {
       _errorMessage = '아직 열리지 않은 만드는 법입니다.';
@@ -214,6 +215,7 @@ extension AppControllerActions on AppController {
         recipe: recipe,
         weather: weather,
         surrounding: surroundings,
+        focusTrait: focusTrait,
         stepBuckets: _stepBuckets,
         now: DateTime.now(),
       );
@@ -366,15 +368,15 @@ extension AppControllerActions on AppController {
         EnvironmentGridBuilder(
           columns: catalog.balance.gridColumns,
           rows: catalog.balance.gridRows,
+          atmosphericTraits: catalog.atmosphericTraits,
         ).build(
           placements: _placements,
           objectsById: objectsById,
           recipesById: recipesById,
         );
-    final graph = const ConnectionGraphBuilder().build(
-      placements: _placements,
-      objectsById: objectsById,
-    );
+    final graph = ConnectionGraphBuilder(
+      atmosphericTraits: catalog.atmosphericTraits,
+    ).build(placements: _placements, objectsById: objectsById);
     final visitorContext = VisitorContext(
       grid: grid,
       graph: graph,
@@ -383,6 +385,7 @@ extension AppControllerActions on AppController {
       recipesById: recipesById,
       timeBand: sceneTimeBand,
       weatherKind: currentWeatherKind,
+      atmosphericTraits: catalog.atmosphericTraits,
     );
     const visitorEngine = VisitorEngine();
     final evaluations = catalog.visitors
@@ -402,6 +405,8 @@ extension AppControllerActions on AppController {
       weatherKind: sceneWeatherKind,
       visitorEvaluations: evaluations,
       placementCatalog: catalog.placement,
+      visualLayerCatalog: catalog.visualLayers,
+      atmosphericTraitCatalog: catalog.atmosphericTraits,
       activeVisitorId: _newVisitorId,
     );
   }

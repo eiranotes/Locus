@@ -9,6 +9,7 @@ import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/services/capture_coordinator.dart';
 import 'package:reality_diorama/src/ui/screens/crafting_screen.dart';
 import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
+import 'package:reality_diorama/src/ui/widgets/atmospheric_trait_chips.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 
 class CaptureSheet extends StatefulWidget {
@@ -196,22 +197,41 @@ class _PreparationView extends StatelessWidget {
     if (value == null) {
       return const Center(child: Text('수집 준비 상태를 확인하지 못했습니다.'));
     }
+    final traitCatalog = AppScope.of(context).catalog.atmosphericTraits;
     return ListView(
       children: <Widget>[
         PixelCard(
           highlighted: value.weatherReadiness.isReady,
-          child: _ReadinessRow(
-            icon: value.weatherKind == null
-                ? Icons.cloud_off_outlined
-                : weatherIcon(value.weatherKind!),
-            iconColor: value.weatherKind == null
-                ? PixelPalette.muted
-                : weatherColor(value.weatherKind!),
-            title: '날씨',
-            value: value.weatherKind == null
-                ? '현재 날씨를 사용할 수 없음'
-                : '${value.weatherKind!.labelKo} · ${value.timeBand.labelKo}',
-            readiness: value.weatherReadiness,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              _ReadinessRow(
+                icon: value.weatherKind == null
+                    ? Icons.cloud_off_outlined
+                    : weatherIcon(value.weatherKind!),
+                iconColor: value.weatherKind == null
+                    ? PixelPalette.muted
+                    : weatherColor(value.weatherKind!),
+                title: '날씨',
+                value: value.weatherKind == null
+                    ? '현재 날씨를 사용할 수 없음'
+                    : '${value.weatherKind!.labelKo} · ${value.timeBand.labelKo}',
+                readiness: value.weatherReadiness,
+              ),
+              if (value.atmosphericTraits.isNotEmpty) ...<Widget>[
+                const SizedBox(height: 10),
+                AtmosphericTraitChips(
+                  traits: value.atmosphericTraits,
+                  catalog: traitCatalog,
+                  showEffects: true,
+                ),
+              ],
+              const SizedBox(height: 8),
+              Text(
+                '지역 날씨 모델값을 게임 흔적으로 바꿉니다. 현장 측정값을 뜻하지 않습니다.',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 10),
@@ -371,32 +391,54 @@ class _ResultView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final traitCatalog = AppScope.of(context).catalog.atmosphericTraits;
     return ListView(
       children: <Widget>[
         if (bundle.weatherMaterial != null)
           PixelCard(
             highlighted: true,
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                MaterialOrb.weather(bundle.weatherMaterial!.kind),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        '날씨 재료',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                Row(
+                  children: <Widget>[
+                    MaterialOrb.weather(bundle.weatherMaterial!.kind),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            '날씨 재료',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            '${bundle.weatherMaterial!.kind.labelKo} · '
+                            '${bundle.weatherMaterial!.timeBand.labelKo}',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            '${bundle.weatherMaterial!.providerName} 지역 모델',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 3),
-                      Text(
-                        '${bundle.weatherMaterial!.kind.labelKo} · '
-                        '${bundle.weatherMaterial!.timeBand.labelKo}',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+                if (bundle
+                    .weatherMaterial!
+                    .atmosphericTraits
+                    .isNotEmpty) ...<Widget>[
+                  const SizedBox(height: 10),
+                  AtmosphericTraitChips(
+                    traits: bundle.weatherMaterial!.atmosphericTraits,
+                    catalog: traitCatalog,
+                    showEffects: true,
+                  ),
+                ],
               ],
             ),
           ),

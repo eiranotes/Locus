@@ -92,8 +92,8 @@ Weather identity is a shared 12-asset layer set registered in
 `visual_layer_catalog.json`: six surface patterns and six isometric footprint
 effects. Time palette, surroundings connectors, and seeded details remain
 runtime treatments. Place plaques remain native/code-rendered so Korean labels
-are not baked into images. Weather assets will be drawn only after preview and
-scene composition share one alpha-clipped layer resolver.
+are not baked into images. Preview and scene composition now share one
+alpha-clipped layer resolver for these assets.
 
 ### Editor movement follows the visible isometric axes
 
@@ -102,3 +102,25 @@ northeast, southwest, and southeast arrows in a 2×2 pad. This matches the
 screen-space result of the two logical grid axes. Targets are 48 dp so the same
 control clears both iOS and Android minimum guidance; commit validation still
 comes exclusively from `PlacementEngine`.
+
+### External weather depth is cataloged, bounded, and provider-neutral
+
+The broad six weather kinds remain the cooldown and primary visual identity.
+`atmospheric_traits.json` may add zero to two secondary traces using only
+visibility, precipitation rate, cloud cover, wind speed, and apparent
+temperature already normalized by both current providers. No AQ, pollen,
+calendar, new permission, or server input is added in this slice.
+
+Weather materials persist zero to two classified traits and their classifier
+version. Crafting presents only the intersection of those traits and the
+recipe's affinity list; the user may retain the base form or choose one focus.
+That focus, not the full material list, becomes immutable collectible state.
+Existing visitor requirements remain unchanged, so a rare trait never becomes
+the only route to an unlock.
+
+SQLite schema v2 adds `trait_keys_json` and `trait_schema_version` to weather
+materials, plus nullable `focus_trait` and stable `variant_key` on crafted
+objects. Existing `object-v1` and `object-v2` collectibles keep their previous
+look. New `object-v3` crafts opt into the shared alpha-clipped base-weather and
+focus-trait surface/footprint compositor. The compositor reuses the existing 12
+assets, so the bounded new image inventory for this slice is zero.

@@ -7,6 +7,9 @@
 - cooldown and resource economy;
 - explicit actual-step/fallback-step selection and native bridge contracts;
 - iOS WeatherKit adapter and Android prototype HTTP weather adapter;
+- cataloged zero-to-two atmospheric traces derived from provider-common
+  current-weather values and persisted into materials, with one optional
+  recipe-compatible focus retained by a new craft;
 - production weather/location capture that fails closed;
 - Android and iOS foreground BLE aggregation bridges;
 - crafting/construction flow;
@@ -16,6 +19,8 @@
 - production-bound static pixel-art package shared by the home scene, crafting,
   inventory, and codex, with persisted `visualSeed` tint details and Canvas
   fallbacks;
+- one alpha-clipped object compositor that now draws all 12 shared weather
+  surface/footprint layers across the scene and object preview surfaces;
 - 40 cataloged true-direction object sprites with reproducible source, crop,
   alpha, contact-sheet, and hash validation;
 - inventory, settings, and codex;

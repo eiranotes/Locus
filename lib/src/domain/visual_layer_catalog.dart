@@ -42,6 +42,14 @@ final class VisualLayerCatalog {
   WeatherLayerDefinition forWeather(WeatherMaterialKind kind) =>
       weather.firstWhere((WeatherLayerDefinition value) => value.kind == kind);
 
+  WeatherLayerDefinition? tryForWeather(WeatherMaterialKind? kind) {
+    if (kind == null) return null;
+    for (final definition in weather) {
+      if (definition.kind == kind) return definition;
+    }
+    return null;
+  }
+
   void validate() {
     final kinds = weather
         .map((WeatherLayerDefinition value) => value.kind)

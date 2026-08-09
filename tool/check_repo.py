@@ -29,6 +29,7 @@ def check_content() -> None:
     visitors_doc = load_json("assets/content/visitors.json")
     balance = load_json("assets/content/balance.json")
     placement_doc = load_json("assets/content/placement_catalog.json")
+    atmospheric_doc = load_json("assets/content/atmospheric_traits.json")
     recipes = recipes_doc.get("recipes", [])
     visitors = visitors_doc.get("visitors", [])
     recipe_ids = [item["id"] for item in recipes]
@@ -78,6 +79,26 @@ def check_content() -> None:
         fail("active object limit exceeds grid cells")
     if not 2 <= balance["surroundingScanSeconds"] <= 15:
         fail("surrounding scan duration must be between 2 and 15 seconds")
+    trait_ids = [item.get("id") for item in atmospheric_doc.get("traits", [])]
+    expected_traits = {
+        "lowVisibility", "activePrecipitation", "strongWind", "sharpCold",
+        "intenseHeat", "deepCloud",
+    }
+    if set(trait_ids) != expected_traits or len(trait_ids) != len(expected_traits):
+        fail("atmospheric trait catalog must cover every trait exactly once")
+    if atmospheric_doc.get("maxTraitsPerMaterial") != 2:
+        fail("atmospheric materials must keep exactly a two-trait ceiling")
+    if atmospheric_doc.get("classifierVersion") != "weather-traits-v1":
+        fail("atmospheric classifier version must be weather-traits-v1")
+    for trait in atmospheric_doc["traits"]:
+        if not trait.get("conditions"):
+            fail(f"atmospheric trait {trait['id']} needs conditions")
+        if trait.get("spread") not in {"none", "diagonal", "adjacent", "distanceTwo"}:
+            fail(f"atmospheric trait {trait['id']} has invalid spread")
+    for recipe in recipes:
+        affinities = recipe.get("traitAffinities", [])
+        if not affinities or not set(affinities).issubset(expected_traits):
+            fail(f"recipe {recipe['id']} has invalid trait affinities")
 
 
 def strip_dart_comments_and_strings(source: str) -> str:
@@ -306,7 +327,7 @@ def check_product_contracts() -> None:
         fail("home diorama must use the shared crafted-object renderer")
     for fragment in (
         "legacyObjectGeneratorVersion = 'object-v1'",
-        "currentObjectGeneratorVersion = 'object-v2'",
+        "currentObjectGeneratorVersion = 'object-v3'",
         "timeBand: weather.timeBand",
     ):
         if fragment not in seeded_visuals:
@@ -394,6 +415,7 @@ def check_required_files() -> None:
         "assets/content/placement_catalog.json",
         "assets/content/crafting_art_catalog.json",
         "assets/content/visual_layer_catalog.json",
+        "assets/content/atmospheric_traits.json",
     ]
     missing = [item for item in required if not (ROOT / item).exists()]
     if missing:

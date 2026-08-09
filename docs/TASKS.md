@@ -34,8 +34,13 @@
       expose selected state on material/object catalogs.
 - [x] Keep stored and in-progress objects in the placement catalog so removed
       objects can select a direction and return to a validated empty cell.
-- [ ] Centralize alpha-clipped sprite composition and apply the cataloged
+- [x] Centralize alpha-clipped sprite composition and apply the cataloged
       weather surface/footprint layers identically across every object surface.
+- [x] Catalog and persist up to two provider-neutral atmospheric traces per
+      material, let each recipe retain at most one compatible focus, and apply
+      anchor-based environment/connection modifiers without a new permission.
+- [ ] Tune atmospheric thresholds and focus effects after a structured
+      eight-object playtest; do not add more trait families first.
 - [ ] Make home scene-first, derive scene visitors from persisted sightings,
       and add a semantic scene summary.
 - [ ] Derive the scene visitor from persisted sightings while keeping the

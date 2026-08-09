@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:reality_diorama/src/domain/atmospheric_trait_catalog.dart';
 import 'package:reality_diorama/src/domain/crafting_art_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/placement_catalog.dart';
@@ -62,6 +63,7 @@ class ContentCatalog {
     required this.placement,
     this.craftingArt = CraftingArtCatalog.empty,
     this.visualLayers = VisualLayerCatalog.empty,
+    this.atmosphericTraits = AtmosphericTraitCatalog.empty,
   });
 
   final List<RecipeDefinition> recipes;
@@ -70,6 +72,7 @@ class ContentCatalog {
   final PlacementCatalog placement;
   final CraftingArtCatalog craftingArt;
   final VisualLayerCatalog visualLayers;
+  final AtmosphericTraitCatalog atmosphericTraits;
 
   RecipeDefinition recipeById(String id) =>
       recipes.firstWhere((RecipeDefinition recipe) => recipe.id == id);
@@ -106,6 +109,11 @@ class ContentCatalog {
               ),
             )
             as Map<String, Object?>;
+    final atmosphericTraitDocument =
+        jsonDecode(
+              await bundle.loadString('assets/content/atmospheric_traits.json'),
+            )
+            as Map<String, Object?>;
 
     final recipes = (recipeDocument['recipes']! as List<Object?>)
         .cast<Map<String, Object?>>()
@@ -117,6 +125,9 @@ class ContentCatalog {
       ..validateRecipes(recipes);
     final visualLayers = VisualLayerCatalog.fromJson(visualLayerDocument)
       ..validate();
+    final atmosphericTraits = AtmosphericTraitCatalog.fromJson(
+      atmosphericTraitDocument,
+    )..validate();
 
     return ContentCatalog(
       recipes: recipes,
@@ -128,6 +139,7 @@ class ContentCatalog {
       placement: placement,
       craftingArt: craftingArt,
       visualLayers: visualLayers,
+      atmosphericTraits: atmosphericTraits,
     );
   }
 }

@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/domain/placement_catalog.dart';
+import 'package:reality_diorama/src/domain/visual_layer_catalog.dart';
 
 abstract final class GeneratedArtPaths {
   static const String root = 'assets/art/generated/v1';
@@ -58,6 +59,8 @@ final class DioramaArtImages {
     required this.scenery,
     required this.weatherOverlays,
     required this.timeOverlays,
+    required this.weatherSurfaces,
+    required this.weatherFootprints,
   });
 
   final Map<String, ui.Image> objectAssets;
@@ -65,9 +68,12 @@ final class DioramaArtImages {
   final Map<String, ui.Image> scenery;
   final Map<WeatherMaterialKind, ui.Image> weatherOverlays;
   final Map<TimeBand, ui.Image> timeOverlays;
+  final Map<WeatherMaterialKind, ui.Image> weatherSurfaces;
+  final Map<WeatherMaterialKind, ui.Image> weatherFootprints;
 
   static Future<DioramaArtImages> load(
     PlacementCatalog placementCatalog,
+    VisualLayerCatalog visualLayerCatalog,
   ) async {
     final catalogPaths = <String>{
       for (final entry in placementCatalog.entries)
@@ -115,6 +121,14 @@ final class DioramaArtImages {
       for (final timeBand in TimeBand.values)
         timeBand: GeneratedArtPaths.timeOverlay(timeBand),
     };
+    final surfacePaths = <WeatherMaterialKind, String>{
+      for (final layer in visualLayerCatalog.weather)
+        layer.kind: layer.surfacePatternPath,
+    };
+    final footprintPaths = <WeatherMaterialKind, String>{
+      for (final layer in visualLayerCatalog.weather)
+        layer.kind: layer.footprintEffectPath,
+    };
 
     return DioramaArtImages(
       objectAssets: await _loadMap(objectPaths),
@@ -122,17 +136,30 @@ final class DioramaArtImages {
       scenery: await _loadMap(sceneryPaths),
       weatherOverlays: await _loadMap(weatherPaths),
       timeOverlays: await _loadMap(timePaths),
+      weatherSurfaces: await _loadMap(surfacePaths),
+      weatherFootprints: await _loadMap(footprintPaths),
     );
   }
 
   static Future<Map<K, ui.Image>> _loadMap<K>(Map<K, String> paths) async {
     final entries = await Future.wait(
       paths.entries.map((entry) async {
-        return MapEntry<K, ui.Image>(entry.key, await _load(entry.value));
+        return MapEntry<K, ui.Image>(
+          entry.key,
+          await GeneratedArtImageCache.load(entry.value),
+        );
       }),
     );
     return Map<K, ui.Image>.fromEntries(entries);
   }
+}
+
+abstract final class GeneratedArtImageCache {
+  static final Map<String, Future<ui.Image>> _images =
+      <String, Future<ui.Image>>{};
+
+  static Future<ui.Image> load(String path) =>
+      _images.putIfAbsent(path, () => _load(path));
 
   static Future<ui.Image> _load(String path) async {
     final data = await rootBundle.load(path);

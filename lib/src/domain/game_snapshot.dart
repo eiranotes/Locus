@@ -5,6 +5,8 @@ import 'package:reality_diorama/src/domain/engines/environment_grid.dart';
 import 'package:reality_diorama/src/domain/engines/visitor_engine.dart';
 import 'package:reality_diorama/src/domain/engines/placement_engine.dart';
 import 'package:reality_diorama/src/domain/placement_catalog.dart';
+import 'package:reality_diorama/src/domain/visual_layer_catalog.dart';
+import 'package:reality_diorama/src/domain/atmospheric_trait_catalog.dart';
 
 class DioramaSnapshot {
   const DioramaSnapshot({
@@ -18,6 +20,8 @@ class DioramaSnapshot {
     required this.weatherKind,
     required this.visitorEvaluations,
     required this.placementCatalog,
+    this.visualLayerCatalog = VisualLayerCatalog.empty,
+    this.atmosphericTraitCatalog = AtmosphericTraitCatalog.empty,
     this.activeVisitorId,
     this.editorOverlay,
   });
@@ -32,6 +36,8 @@ class DioramaSnapshot {
   final WeatherMaterialKind weatherKind;
   final List<VisitorEvaluation> visitorEvaluations;
   final PlacementCatalog placementCatalog;
+  final VisualLayerCatalog visualLayerCatalog;
+  final AtmosphericTraitCatalog atmosphericTraitCatalog;
   final String? activeVisitorId;
   final DioramaEditorOverlay? editorOverlay;
 
@@ -47,6 +53,8 @@ class DioramaSnapshot {
         weatherKind: weatherKind,
         visitorEvaluations: visitorEvaluations,
         placementCatalog: placementCatalog,
+        visualLayerCatalog: visualLayerCatalog,
+        atmosphericTraitCatalog: atmosphericTraitCatalog,
         activeVisitorId: activeVisitorId,
         editorOverlay: overlay,
       );

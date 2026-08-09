@@ -64,6 +64,32 @@ void main() {
 
       expect(second, first);
     });
+
+    test('focus choice becomes a stable, distinct variant', () {
+      final recipe = testRecipe(
+        traitAffinities: const <AtmosphericTrait>{
+          AtmosphericTrait.activePrecipitation,
+        },
+      );
+      final weather = testWeather(
+        atmosphericTraits: const <AtmosphericTrait>[
+          AtmosphericTrait.activePrecipitation,
+        ],
+      );
+
+      final base = objectVisualSeedForCraft(recipe: recipe, weather: weather);
+      final focused = objectVisualSeedForCraft(
+        recipe: recipe,
+        weather: weather,
+        focusTrait: AtmosphericTrait.activePrecipitation,
+      );
+
+      expect(focused, isNot(base));
+      expect(
+        objectVariantKeyFor(AtmosphericTrait.activePrecipitation),
+        'weather-trait-v1/activePrecipitation',
+      );
+    });
   });
 
   group('ObjectVisualDescriptor', () {

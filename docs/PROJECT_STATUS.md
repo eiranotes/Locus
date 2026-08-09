@@ -6,9 +6,9 @@ Last updated: 2026-08-09
 
 `main` contains the iOS simulator fixes, deterministic demo isolation, shared
 renderer, cataloged pixel-art packages, and a catalog-driven directional
-editor. The current working slice closes the stored-object replacement gap and
-continues the Pro-reviewed shift from generic Material utility UI toward a
-scene-first collection/crafting game shell.
+editor. The current working slice deepens real-world weather input with bounded
+atmospheric traces and activates the already-authored shared weather layers
+without expanding the bitmap matrix.
 
 ## Completed in the current slice
 
@@ -65,6 +65,22 @@ scene-first collection/crafting game shell.
   bypassing collision or eight-object limits.
 - Recorded a dual-agent Pro UI review and an independent Pro asset-system
   review in `docs/UI_GAME_CONCEPT_REVIEW.md`.
+- Added `atmospheric_traits.json` as the source of truth for six
+  provider-neutral traces, numeric thresholds, priority, Korean copy, spread,
+  environment effects, and visual-strength modifiers. Each capture keeps at
+  most two.
+- Added schema-v2 migration columns so classified traces survive weather
+  consumption while each `object-v3` craft stores only one optional,
+  user-selected focus and stable variant key. Previous materials and objects
+  keep their prior visual contract.
+- Turned the 12 staged weather assets into one alpha-clipped compositor used by
+  the home scene, crafting, inventory, codex, and placement preview. No new
+  bitmap was required for this slice.
+- Added capture and crafting copy that identifies the provider result as a
+  regional weather model rather than an exact on-site measurement.
+- Added recipe-specific trait affinities, a base-or-focus choice in crafting,
+  anchor-based environment effects, strong-wind connection range, and a
+  low-visibility quiet-zone override without changing visitor reachability.
 
 ## Simulator evidence
 
@@ -110,6 +126,17 @@ repository checks, formatting, analyzer, all 48 tests, and the Debug simulator
 build passed; recent Runner logs contained no Flutter exception, RenderFlex, or
 overflow report.
 
+The atmospheric-focus slice was then built from a temporary platform-wrapper
+recovery checkout and installed on the existing AppAudit simulator without
+creating another device. Demo capture exposed `Demo 지역 모델`, the `짙은 구름`
+trace, and its bounded effect copy; the planter recipe offered `기본 형태` or
+`짙은 구름`, and selecting it updated the preview name to `구름빛 화분` with no
+visible overflow. The installed local Flutter was 3.44.1 rather than the pinned
+3.44.9. Repository/content/manifest/Swift checks and analyzer passed. The full
+test run found one incorrect comparison cell in the new diagonal-spread test;
+after correcting only that assertion, the focused five-test diorama rule file
+passed. The Debug iOS simulator build, install, and launch all succeeded.
+
 ## Known risks and gates
 
 - The first production-bound atlas pass is installed, but it still needs final
@@ -121,9 +148,9 @@ overflow report.
 - Direct drag placement and visitor-condition deltas remain future editor
   enhancements; the current catalog-driven button editor validates each move,
   rotation, removal, and replacement commit.
-- Weather treatment assets are authored and cataloged but are not drawn yet;
-  preview and Flame scene composition must first share one alpha-clipped layer
-  resolver so every surface remains deterministic and identical.
+- Atmospheric thresholds are initial balance values and need product telemetry
+  or structured playtest evidence before expanding providers or adding more
+  traits.
 - The scene-first home, persisted visitor presence, and a semantic diorama
   summary are the next P1 UI slice from the Pro review.
 - Directional art is authoring-complete for the current ten recipes, but a later

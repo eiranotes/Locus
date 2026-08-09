@@ -21,6 +21,8 @@ WeatherMaterial testWeather({
   String id = 'weather-1',
   WeatherMaterialKind kind = WeatherMaterialKind.rain,
   TimeBand timeBand = TimeBand.evening,
+  List<AtmosphericTrait> atmosphericTraits = const <AtmosphericTrait>[],
+  String traitSchemaVersion = 'weather-traits-v1',
   DateTime? capturedAt,
 }) => WeatherMaterial(
   id: id,
@@ -32,6 +34,8 @@ WeatherMaterial testWeather({
   sourceRecordId: 'capture-$id',
   visualSeed: 42,
   providerName: 'Test Weather',
+  atmosphericTraits: atmosphericTraits,
+  traitSchemaVersion: traitSchemaVersion,
 );
 
 SurroundingMaterial testSurrounding({
@@ -57,6 +61,7 @@ RecipeDefinition testRecipe({
   HeightBand heightBand = HeightBand.low,
   Set<String> tags = const <String>{'light'},
   Map<String, int> effects = const <String, int>{'light': 1},
+  Set<AtmosphericTrait> traitAffinities = const <AtmosphericTrait>{},
 }) => RecipeDefinition(
   id: id,
   kind: kind,
@@ -68,6 +73,7 @@ RecipeDefinition testRecipe({
   initiallyUnlocked: true,
   tags: tags,
   baseEffects: effects,
+  traitAffinities: traitAffinities,
 );
 
 CraftedObject testObject({
@@ -78,6 +84,8 @@ CraftedObject testObject({
   SurroundingMaterialKind? surroundingKind = SurroundingMaterialKind.dynamic,
   int requiredSteps = 1500,
   int appliedSteps = 1500,
+  AtmosphericTrait? focusTrait,
+  String? variantKey,
 }) => CraftedObject(
   id: id,
   recipeId: recipeId,
@@ -94,4 +102,8 @@ CraftedObject testObject({
   visualSeed: 99,
   generatorVersion: 'test-v1',
   createdAt: DateTime.utc(2026, 8, 8),
+  focusTrait: focusTrait,
+  variantKey:
+      variantKey ??
+      (focusTrait == null ? 'base' : 'weather-trait-v1/${focusTrait.name}'),
 );

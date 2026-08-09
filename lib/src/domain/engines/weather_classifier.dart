@@ -19,7 +19,7 @@ class WeatherClassifier {
         (code >= 51 && code <= 67) ||
         (code >= 80 && code <= 82) ||
         (code >= 95 && code <= 99);
-    if (snapshot.precipitationMillimeters >= 0.1 ||
+    if (snapshot.precipitationRateMmPerHour >= 0.1 ||
         isRainCondition ||
         isRainCode) {
       return WeatherMaterialKind.rain;

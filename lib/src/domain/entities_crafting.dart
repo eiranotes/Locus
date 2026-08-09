@@ -65,6 +65,7 @@ class RecipeDefinition {
     required this.initiallyUnlocked,
     required this.tags,
     required this.baseEffects,
+    this.traitAffinities = const <AtmosphericTrait>{},
   });
 
   final String id;
@@ -77,6 +78,7 @@ class RecipeDefinition {
   final bool initiallyUnlocked;
   final Set<String> tags;
   final Map<String, int> baseEffects;
+  final Set<AtmosphericTrait> traitAffinities;
 
   factory RecipeDefinition.fromJson(Map<String, Object?> json) {
     final rawEffects = json['baseEffects']! as Map<String, Object?>;
@@ -102,6 +104,11 @@ class RecipeDefinition {
         (String key, Object? value) =>
             MapEntry<String, int>(key, value! as int),
       ),
+      traitAffinities:
+          ((json['traitAffinities'] as List<Object?>?) ?? const <Object?>[])
+              .whereType<String>()
+              .map(AtmosphericTrait.values.byName)
+              .toSet(),
     );
   }
 }
@@ -119,6 +126,8 @@ class CraftedObject {
     required this.visualSeed,
     required this.generatorVersion,
     required this.createdAt,
+    this.focusTrait,
+    this.variantKey = 'base',
     this.surroundingMaterialId,
     this.surroundingKind,
   });
@@ -136,6 +145,8 @@ class CraftedObject {
   final int visualSeed;
   final String generatorVersion;
   final DateTime createdAt;
+  final AtmosphericTrait? focusTrait;
+  final String variantKey;
 
   int get remainingSteps =>
       (requiredSteps - appliedSteps).clamp(0, 1 << 31).toInt();
@@ -156,6 +167,8 @@ class CraftedObject {
         visualSeed: visualSeed,
         generatorVersion: generatorVersion,
         createdAt: createdAt,
+        focusTrait: focusTrait,
+        variantKey: variantKey,
       );
 
   Map<String, Object?> toMap() => <String, Object?>{
@@ -172,6 +185,8 @@ class CraftedObject {
     'visual_seed': visualSeed,
     'generator_version': generatorVersion,
     'created_at': createdAt.millisecondsSinceEpoch,
+    'focus_trait': focusTrait?.name,
+    'variant_key': variantKey,
   };
 
   factory CraftedObject.fromMap(Map<String, Object?> map) => CraftedObject(
@@ -206,6 +221,8 @@ class CraftedObject {
     visualSeed: map['visual_seed']! as int,
     generatorVersion: map['generator_version']! as String,
     createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at']! as int),
+    focusTrait: _decodeAtmosphericTrait(map['focus_trait']),
+    variantKey: map['variant_key'] as String? ?? 'base',
   );
 }
 

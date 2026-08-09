@@ -4,10 +4,13 @@ import 'package:reality_diorama/src/app/app_controller.dart';
 import 'package:reality_diorama/src/app/app_scope.dart';
 import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/domain/crafting_art_catalog.dart';
+import 'package:reality_diorama/src/domain/atmospheric_trait_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
+import 'package:reality_diorama/src/domain/visual_layer_catalog.dart';
 import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
+import 'package:reality_diorama/src/ui/widgets/atmospheric_trait_chips.dart';
 import 'package:reality_diorama/src/ui/widgets/object_visual_preview.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 
@@ -124,6 +127,7 @@ class CraftingDetailScreen extends StatefulWidget {
 class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
   String? _weatherId;
   String? _surroundingId;
+  AtmosphericTrait? _focusTrait;
   bool _submitting = false;
 
   @override
@@ -153,6 +157,20 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
     final surroundings = controller.availableSurroundingMaterials
         .where((SurroundingMaterial item) => item.id == _surroundingId)
         .firstOrNull;
+    final supportedTraits =
+        weather?.atmosphericTraits
+            .where((trait) {
+              if (!widget.recipe.traitAffinities.contains(trait)) return false;
+              return trait != AtmosphericTrait.strongWind ||
+                  surroundings == null ||
+                  (surroundings.kind != SurroundingMaterialKind.dynamic &&
+                      surroundings.kind != SurroundingMaterialKind.stable);
+            })
+            .toList(growable: false) ??
+        const <AtmosphericTrait>[];
+    final focusTrait = supportedTraits.contains(_focusTrait)
+        ? _focusTrait
+        : null;
     final canSubmit =
         weather != null && !_submitting && controller.construction == null;
 
@@ -170,6 +188,9 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
               widget.recipe.id,
               _projectedCompletion(controller.availableSteps),
             ),
+            visualLayerCatalog: controller.catalog.visualLayers,
+            atmosphericTraitCatalog: controller.catalog.atmosphericTraits,
+            focusTrait: focusTrait,
           ),
           const SizedBox(height: 14),
           Text('날씨 재료', style: Theme.of(context).textTheme.titleMedium),
@@ -179,9 +200,33 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
           else
             _WeatherPicker(
               materials: controller.availableWeatherMaterials,
+              catalog: controller.catalog.atmosphericTraits,
               selectedId: _weatherId,
-              onSelected: (String id) => setState(() => _weatherId = id),
+              onSelected: (String id) => setState(() {
+                _weatherId = id;
+                _focusTrait = null;
+              }),
             ),
+          if (weather != null) ...<Widget>[
+            const SizedBox(height: 18),
+            Text(
+              '이번 물건에서 살릴 흔적',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '재료의 흔적 중 하나만 골라 형태와 배치 효과를 또렷하게 남깁니다.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 8),
+            _TraitFocusPicker(
+              traits: supportedTraits,
+              selected: focusTrait,
+              catalog: controller.catalog.atmosphericTraits,
+              onSelected: (AtmosphericTrait? value) =>
+                  setState(() => _focusTrait = value),
+            ),
+          ],
           const SizedBox(height: 18),
           Row(
             children: <Widget>[
@@ -194,7 +239,10 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
               TextButton(
                 onPressed: _surroundingId == null
                     ? null
-                    : () => setState(() => _surroundingId = null),
+                    : () => setState(() {
+                        _surroundingId = null;
+                        _focusTrait = null;
+                      }),
                 child: const Text('사용 안 함'),
               ),
             ],
@@ -206,7 +254,10 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
             _SurroundingPicker(
               materials: controller.availableSurroundingMaterials,
               selectedId: _surroundingId,
-              onSelected: (String id) => setState(() => _surroundingId = id),
+              onSelected: (String id) => setState(() {
+                _surroundingId = id;
+                _focusTrait = null;
+              }),
             ),
           const SizedBox(height: 18),
           PixelCard(
@@ -251,7 +302,7 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
           const SizedBox(height: 22),
           FilledButton.icon(
             onPressed: canSubmit
-                ? () => _craft(controller, weather, surroundings)
+                ? () => _craft(controller, weather, surroundings, focusTrait)
                 : null,
             icon: const Icon(Icons.handyman_outlined),
             label: Text(
@@ -277,6 +328,7 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
     AppController controller,
     WeatherMaterial weather,
     SurroundingMaterial? surroundings,
+    AtmosphericTrait? focusTrait,
   ) async {
     setState(() => _submitting = true);
     try {
@@ -296,6 +348,7 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
         recipe: widget.recipe,
         weather: weather,
         surroundings: surroundings,
+        focusTrait: focusTrait,
       );
       if (!mounted || object == null) {
         return;
@@ -340,6 +393,9 @@ class _ObjectPreview extends StatelessWidget {
     required this.surroundings,
     required this.availableSteps,
     required this.constructionStage,
+    required this.visualLayerCatalog,
+    required this.atmosphericTraitCatalog,
+    required this.focusTrait,
   });
 
   final RecipeDefinition recipe;
@@ -347,6 +403,9 @@ class _ObjectPreview extends StatelessWidget {
   final SurroundingMaterial? surroundings;
   final int availableSteps;
   final ConstructionArtStage? constructionStage;
+  final VisualLayerCatalog visualLayerCatalog;
+  final AtmosphericTraitCatalog atmosphericTraitCatalog;
+  final AtmosphericTrait? focusTrait;
 
   @override
   Widget build(BuildContext context) {
@@ -359,6 +418,7 @@ class _ObjectPreview extends StatelessWidget {
             recipe: recipe,
             weather: weather!,
             surrounding: surroundings,
+            focusTrait: focusTrait,
             completion: completion,
           );
     return PixelCard(
@@ -376,12 +436,27 @@ class _ObjectPreview extends StatelessWidget {
               child: ObjectVisualPreview(
                 visual: visual,
                 constructionAssetPath: constructionStage?.assetPath,
+                visualLayerCatalog: visualLayerCatalog,
+                atmosphericTraitCatalog: atmosphericTraitCatalog,
                 semanticLabel: '${recipe.nameKo} 제작 미리보기',
               ),
             ),
           ),
           const SizedBox(height: 12),
-          Text(recipe.nameKo, style: Theme.of(context).textTheme.headlineSmall),
+          Text(
+            focusTrait == null
+                ? recipe.nameKo
+                : '${atmosphericTraitCatalog.definitionFor(focusTrait!).namePrefixKo} ${recipe.nameKo}',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          if (focusTrait != null) ...<Widget>[
+            const SizedBox(height: 8),
+            AtmosphericTraitChips(
+              traits: <AtmosphericTrait>[focusTrait!],
+              catalog: atmosphericTraitCatalog,
+              showEffects: true,
+            ),
+          ],
           if (constructionStage != null) ...<Widget>[
             const SizedBox(height: 8),
             Row(
@@ -421,18 +496,20 @@ class _ObjectPreview extends StatelessWidget {
 class _WeatherPicker extends StatelessWidget {
   const _WeatherPicker({
     required this.materials,
+    required this.catalog,
     required this.selectedId,
     required this.onSelected,
   });
 
   final List<WeatherMaterial> materials;
+  final AtmosphericTraitCatalog catalog;
   final String? selectedId;
   final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 94,
+      height: 112,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: materials.length,
@@ -441,7 +518,7 @@ class _WeatherPicker extends StatelessWidget {
           final material = materials[index];
           final selected = material.id == selectedId;
           return SizedBox(
-            width: 136,
+            width: 156,
             child: PixelCard(
               highlighted: selected,
               selected: selected,
@@ -462,6 +539,16 @@ class _WeatherPicker extends StatelessWidget {
                           material.timeBand.labelKo,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
+                        if (material.atmosphericTraits.isNotEmpty)
+                          Text(
+                            atmosphericTraitSummary(
+                              material.atmosphericTraits,
+                              catalog,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                       ],
                     ),
                   ),
@@ -471,6 +558,41 @@ class _WeatherPicker extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _TraitFocusPicker extends StatelessWidget {
+  const _TraitFocusPicker({
+    required this.traits,
+    required this.selected,
+    required this.catalog,
+    required this.onSelected,
+  });
+
+  final List<AtmosphericTrait> traits;
+  final AtmosphericTrait? selected;
+  final AtmosphericTraitCatalog catalog;
+  final ValueChanged<AtmosphericTrait?> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: <Widget>[
+        ChoiceChip(
+          label: const Text('기본 형태'),
+          selected: selected == null,
+          onSelected: (_) => onSelected(null),
+        ),
+        for (final trait in traits)
+          ChoiceChip(
+            label: Text(catalog.definitionFor(trait).labelKo),
+            selected: selected == trait,
+            onSelected: (_) => onSelected(trait),
+          ),
+      ],
     );
   }
 }

@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reality_diorama/src/domain/atmospheric_trait_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/engines/connection_graph.dart';
 import 'package:reality_diorama/src/domain/engines/environment_grid.dart';
@@ -118,6 +122,86 @@ void main() {
       objectsById: objects,
     );
     expect(graph.edges.length, 3);
+  });
+
+  test('active precipitation spreads diagonally from one anchor', () {
+    final traitCatalog = AtmosphericTraitCatalog.fromJson(
+      jsonDecode(
+            File('assets/content/atmospheric_traits.json').readAsStringSync(),
+          )
+          as Map<String, Object?>,
+    );
+    final recipe = testRecipe();
+    final object = testObject(
+      weatherKind: WeatherMaterialKind.rain,
+      focusTrait: AtmosphericTrait.activePrecipitation,
+    );
+    final grid =
+        EnvironmentGridBuilder(
+          columns: 5,
+          rows: 5,
+          atmosphericTraits: traitCatalog,
+        ).build(
+          placements: const <Placement>[
+            Placement(
+              id: 'rain-placement',
+              craftedObjectId: 'object-1',
+              column: 1,
+              row: 1,
+              rotation: 0,
+            ),
+          ],
+          objectsById: <String, CraftedObject>{object.id: object},
+          recipesById: <String, RecipeDefinition>{recipe.id: recipe},
+        );
+
+    expect(grid.at(0, 0).wet, 1);
+    expect(grid.at(2, 0).wet, 1);
+    expect(grid.at(0, 2).wet, 1);
+    expect(grid.at(2, 2).wet, 1);
+    expect(grid.at(3, 1).wet, 0);
+  });
+
+  test('strong-wind focus extends a sparse connection by one cell', () {
+    final traitCatalog = AtmosphericTraitCatalog.fromJson(
+      jsonDecode(
+            File('assets/content/atmospheric_traits.json').readAsStringSync(),
+          )
+          as Map<String, Object?>,
+    );
+    final focused = testObject(
+      id: 'wind-a',
+      surroundingKind: SurroundingMaterialKind.sparse,
+      focusTrait: AtmosphericTrait.strongWind,
+    );
+    final other = testObject(
+      id: 'wind-b',
+      surroundingKind: SurroundingMaterialKind.sparse,
+    );
+    final graph = ConnectionGraphBuilder(atmosphericTraits: traitCatalog).build(
+      placements: const <Placement>[
+        Placement(
+          id: 'wind-pa',
+          craftedObjectId: 'wind-a',
+          column: 1,
+          row: 1,
+          rotation: 0,
+        ),
+        Placement(
+          id: 'wind-pb',
+          craftedObjectId: 'wind-b',
+          column: 2,
+          row: 1,
+          rotation: 0,
+        ),
+      ],
+      objectsById: <String, CraftedObject>{
+        focused.id: focused,
+        other.id: other,
+      },
+    );
+
+    expect(graph.countMode(ConnectionMode.far), 1);
   });
   test(
     'weather requirements fail closed when current weather is unavailable',

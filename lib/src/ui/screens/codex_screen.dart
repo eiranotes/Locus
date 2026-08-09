@@ -187,6 +187,9 @@ class _ObjectKindsTab extends StatelessWidget {
                                       : representative.appliedSteps /
                                             representative.requiredSteps,
                                 ),
+                            visualLayerCatalog: controller.catalog.visualLayers,
+                            atmosphericTraitCatalog:
+                                controller.catalog.atmosphericTraits,
                             semanticLabel: '${recipe.nameKo} 대표 미리보기',
                           )
                         : const Center(

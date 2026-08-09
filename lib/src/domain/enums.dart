@@ -1,5 +1,18 @@
 enum WeatherMaterialKind { clear, rain, cloudy, windy, cold, warm }
 
+/// A bounded, provider-neutral trace derived from numeric current-weather
+/// fields. At most two are attached to one collected material.
+enum AtmosphericTrait {
+  lowVisibility,
+  activePrecipitation,
+  strongWind,
+  sharpCold,
+  intenseHeat,
+  deepCloud,
+}
+
+enum AtmosphericTraitSpread { none, diagonal, adjacent, distanceTwo }
+
 enum SurroundingMaterialKind { dense, dynamic, stable, sparse }
 
 enum TimeBand { dawn, morning, afternoon, evening, night }

@@ -27,7 +27,10 @@ class DioramaGame extends FlameGame {
   Future<void> onLoad() async {
     await super.onLoad();
     try {
-      _art = await DioramaArtImages.load(_snapshot.placementCatalog);
+      _art = await DioramaArtImages.load(
+        _snapshot.placementCatalog,
+        _snapshot.visualLayerCatalog,
+      );
     } catch (error, stackTrace) {
       debugPrint('Generated diorama art failed to load: $error\n$stackTrace');
       _art = null;
@@ -368,17 +371,50 @@ class DioramaScenePainter {
         placement.column.toDouble(),
         placement.row.toDouble(),
       );
+      final visual = ObjectVisualDescriptor.fromCraftedObject(
+        object,
+        timeBand:
+            snapshot.weatherMaterialsById[object.weatherMaterialId]?.timeBand,
+      );
+      final weatherLayer = snapshot.visualLayerCatalog.tryForWeather(
+        visual.weatherKind,
+      );
+      final traitDefinition = visual.focusTrait == null
+          ? null
+          : snapshot.atmosphericTraitCatalog.tryDefinitionFor(
+              visual.focusTrait!,
+            );
+      final traitLayer = traitDefinition == null
+          ? null
+          : snapshot.visualLayerCatalog.tryForWeather(
+              traitDefinition.layerKind,
+            );
+      final distinctTraitLayer =
+          traitLayer != null && traitLayer.kind != weatherLayer?.kind;
+      final traitOpacityBoost = traitDefinition?.surfaceOpacityBoost ?? 0;
       _objectRenderer.paintAt(
         canvas,
         anchor: anchor,
-        visual: ObjectVisualDescriptor.fromCraftedObject(
-          object,
-          timeBand:
-              snapshot.weatherMaterialsById[object.weatherMaterialId]?.timeBand,
-        ),
+        visual: visual,
         rotation: placement.rotation,
         sprite: art?.objectAssets[placementVisual.assetPath],
         spriteMirrorX: placementVisual.mirrorX,
+        surfacePattern: art?.weatherSurfaces[visual.weatherKind],
+        footprintEffect: art?.weatherFootprints[visual.weatherKind],
+        traitSurfacePattern: distinctTraitLayer
+            ? art?.weatherSurfaces[traitLayer.kind]
+            : null,
+        traitFootprintEffect: distinctTraitLayer
+            ? art?.weatherFootprints[traitLayer.kind]
+            : null,
+        surfaceOpacity:
+            (weatherLayer?.surfaceOpacity ?? 0) +
+            (distinctTraitLayer ? 0 : traitOpacityBoost),
+        traitSurfaceOpacity: distinctTraitLayer
+            ? (traitLayer.surfaceOpacity * 0.58 + traitOpacityBoost)
+                  .clamp(0, 0.32)
+                  .toDouble()
+            : 0,
       );
     }
   }

@@ -14,7 +14,7 @@ WeatherSnapshot snapshot({
 }) => WeatherSnapshot(
   temperatureCelsius: apparent,
   apparentTemperatureCelsius: apparent,
-  precipitationMillimeters: precipitation,
+  precipitationRateMmPerHour: precipitation,
   cloudCoverPercent: clouds,
   windSpeedKph: wind,
   visibilityMeters: 10000,

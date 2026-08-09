@@ -101,6 +101,36 @@ void main() {
 
     expect(secondDirection, isNot(orderedEquals(firstDirection)));
   });
+
+  test('v3 alpha-clips weather surface and draws its footprint', () async {
+    final sprite = await _decodeSprite(
+      'assets/art/generated/v1/directional/object_alley_lamp_r0.png',
+    );
+    final surface = await _decodeSprite(
+      'assets/art/generated/v1/weather/surface_rain.png',
+    );
+    final footprint = await _decodeSprite(
+      'assets/art/generated/v1/weather/footprint_rain.png',
+    );
+    final visual = _visual(
+      generatorVersion: currentObjectGeneratorVersion,
+      focusTrait: AtmosphericTrait.activePrecipitation,
+    );
+    final plain = await _render(renderer, visual, sprite: sprite);
+    final layered = await _render(
+      renderer,
+      visual,
+      sprite: sprite,
+      surfacePattern: surface,
+      footprintEffect: footprint,
+      surfaceOpacity: 0.5,
+    );
+    sprite.dispose();
+    surface.dispose();
+    footprint.dispose();
+
+    expect(layered, isNot(orderedEquals(plain)));
+  });
 }
 
 Future<Image> _decodeSprite(String path) async {
@@ -118,6 +148,7 @@ ObjectVisualDescriptor _visual({
   int visualSeed = 99,
   double completion = 1,
   String generatorVersion = 'test-v1',
+  AtmosphericTrait? focusTrait,
 }) => ObjectVisualDescriptor(
   kind: kind,
   weatherKind: weatherKind,
@@ -126,6 +157,10 @@ ObjectVisualDescriptor _visual({
   visualSeed: visualSeed,
   generatorVersion: generatorVersion,
   completion: completion,
+  focusTrait: focusTrait,
+  variantKey: focusTrait == null
+      ? 'base'
+      : 'weather-trait-v1/${focusTrait.name}',
 );
 
 Future<Uint8List> _render(
@@ -134,6 +169,9 @@ Future<Uint8List> _render(
   int rotation = 0,
   Image? sprite,
   bool spriteMirrorX = false,
+  Image? surfacePattern,
+  Image? footprintEffect,
+  double surfaceOpacity = 0,
 }) async {
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
@@ -144,6 +182,9 @@ Future<Uint8List> _render(
     rotation: rotation,
     sprite: sprite,
     spriteMirrorX: spriteMirrorX,
+    surfacePattern: surfacePattern,
+    footprintEffect: footprintEffect,
+    surfaceOpacity: surfaceOpacity,
   );
   final image = await recorder.endRecording().toImage(96, 104);
   final data = await image.toByteData(format: ImageByteFormat.rawRgba);

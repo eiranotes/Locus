@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+
+import 'package:reality_diorama/src/domain/atmospheric_trait_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 
@@ -29,7 +32,11 @@ class ConnectionGraph {
 }
 
 class ConnectionGraphBuilder {
-  const ConnectionGraphBuilder();
+  const ConnectionGraphBuilder({
+    this.atmosphericTraits = AtmosphericTraitCatalog.empty,
+  });
+
+  final AtmosphericTraitCatalog atmosphericTraits;
 
   ConnectionGraph build({
     required List<Placement> placements,
@@ -58,10 +65,14 @@ class ConnectionGraphBuilder {
       }
 
       final mode = _modeFor(object.surroundingKind);
+      final focusDefinition = object.focusTrait == null
+          ? null
+          : atmosphericTraits.tryDefinitionFor(object.focusTrait!);
+      final rangeBonus = focusDefinition?.connectionRangeBonus ?? 0;
       switch (mode) {
         case ConnectionMode.adjacent:
           for (final other in others.where(
-            (Placement other) => _distance(placement, other) <= 1,
+            (Placement other) => _distance(placement, other) <= 1 + rangeBonus,
           )) {
             _addEdge(
               edges,
@@ -75,7 +86,7 @@ class ConnectionGraphBuilder {
           break;
         case ConnectionMode.dense:
           for (final other in others.where(
-            (Placement other) => _distance(placement, other) <= 2,
+            (Placement other) => _distance(placement, other) <= 2 + rangeBonus,
           )) {
             _addEdge(
               edges,
@@ -121,7 +132,10 @@ class ConnectionGraphBuilder {
           break;
         case ConnectionMode.far:
           final eligible = others
-              .where((Placement other) => _distance(placement, other) >= 2)
+              .where(
+                (Placement other) =>
+                    _distance(placement, other) >= math.max(1, 2 - rangeBonus),
+              )
               .toList(growable: false);
           if (eligible.isEmpty) {
             continue;

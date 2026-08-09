@@ -23,8 +23,8 @@
 - Home, crafting, inventory, and codex object visuals share deterministic
   geometry, weather and capture-time palettes, connector marks, construction
   state, and `visualSeed` detail channels.
-- New crafts use the `object-v2` visual contract while saved `object-v1`
-  collectibles retain their previous geometry.
+- New crafts use the layered `object-v3` visual contract while saved
+  `object-v1` and `object-v2` collectibles retain their previous appearance.
 - Native launch background generation uses Locus navy `#071522`.
 - Added `pubspec.lock` so application dependency resolution is reproducible.
 - Placement editing now presents placed objects as an artwork catalog with
@@ -41,6 +41,13 @@
 - Placement movement now follows the four visible isometric diagonals with
   48 dp controls. Material and placed-object selections expose semantic state,
   and tappable pixel cards show visible pressed ink.
+- Weather capture now retains up to two cataloged atmospheric traces from
+  provider-common numeric values and describes them as regional model data.
+- Each recipe declares compatible traces. Crafting can keep the base form or
+  retain one focus, which deterministically changes its name, layered treatment,
+  environment footprint, or connection behavior.
+- Existing visitor requirements remain reachable without obtaining a rare
+  atmospheric trace.
 
 ### Assets
 
@@ -59,7 +66,9 @@
   ordering, contact sheet, SHA-256 manifest, and reproducible processor.
 - Added 12 shared weather-treatment assets (six surface patterns and six
   footprint effects), plus exact prompt/source/hash provenance and a visual
-  layer catalog for the upcoming shared compositor.
+  layer catalog for the shared compositor.
+- Activated those 12 treatments in one alpha-clipped scene/preview compositor;
+  this slice adds no new bitmap files.
 - Generated art is now used by the home scene, object previews, inventory,
   codex, visitor goal, and material indicators; Canvas rendering remains the
   deterministic fallback.
@@ -73,3 +82,6 @@
   iOS-sized movement targets.
 - Added exact crafting-art and weather-layer catalog coverage, stage-resolution,
   file-existence, and 48 dp isometric movement tests.
+- Added atmospheric catalog thresholds, two-trait ceiling, schema-versioned
+  persistence, focus selection, anchor projection, capture propagation, and
+  layered-render coverage.

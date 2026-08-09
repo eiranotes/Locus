@@ -1,3 +1,4 @@
+import 'package:reality_diorama/src/domain/atmospheric_trait_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/domain/engines/connection_graph.dart';
@@ -40,6 +41,7 @@ class VisitorContext {
     required this.recipesById,
     required this.timeBand,
     required this.weatherKind,
+    this.atmosphericTraits = AtmosphericTraitCatalog.empty,
   });
 
   final EnvironmentGrid grid;
@@ -49,6 +51,7 @@ class VisitorContext {
   final Map<String, RecipeDefinition> recipesById;
   final TimeBand timeBand;
   final WeatherMaterialKind? weatherKind;
+  final AtmosphericTraitCatalog atmosphericTraits;
 
   Iterable<CraftedObject> get placedObjects sync* {
     for (final placement in placements) {
@@ -140,11 +143,16 @@ class VisitorEngine {
         }).length;
         return _numeric('높은 물건', count, minimum);
       case 'quietZones':
-        final count = context.placedObjects
-            .where(
-              (CraftedObject object) => context.graph.degree(object.id) == 0,
-            )
-            .length;
+        final count = context.placedObjects.where((CraftedObject object) {
+          final trait = object.focusTrait;
+          final override =
+              trait != null &&
+              context.atmosphericTraits
+                      .tryDefinitionFor(trait)
+                      ?.quietZoneOverride ==
+                  true;
+          return context.graph.degree(object.id) == 0 || override;
+        }).length;
         return _numeric('조용한 구역', count, minimum);
       case 'taggedObjects':
         final tag = requirement.tag ?? '';

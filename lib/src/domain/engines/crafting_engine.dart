@@ -29,6 +29,7 @@ class CraftingEngine {
     required List<StepBucket> stepBuckets,
     required DateTime now,
     SurroundingMaterial? surrounding,
+    AtmosphericTrait? focusTrait,
   }) {
     if (!weather.isAvailable) {
       throw StateError('The selected weather material is already consumed.');
@@ -36,6 +37,22 @@ class CraftingEngine {
     if (surrounding != null && !surrounding.isAvailable) {
       throw StateError(
         'The selected surrounding material is already consumed.',
+      );
+    }
+    if (focusTrait != null && !weather.atmosphericTraits.contains(focusTrait)) {
+      throw StateError(
+        'The selected atmospheric trait is not on this material.',
+      );
+    }
+    if (focusTrait != null && !recipe.traitAffinities.contains(focusTrait)) {
+      throw StateError('The selected recipe does not support this trait.');
+    }
+    if (focusTrait == AtmosphericTrait.strongWind &&
+        surrounding != null &&
+        (surrounding.kind == SurroundingMaterialKind.dynamic ||
+            surrounding.kind == SurroundingMaterialKind.stable)) {
+      throw StateError(
+        'Strong-wind range cannot modify sequential or stable connections.',
       );
     }
 
@@ -48,6 +65,7 @@ class CraftingEngine {
       recipe: recipe,
       weather: weather,
       surrounding: surrounding,
+      focusTrait: focusTrait,
       generatorVersion: generatorVersion,
     );
 
@@ -65,6 +83,8 @@ class CraftingEngine {
       visualSeed: visualSeed,
       generatorVersion: generatorVersion,
       createdAt: now,
+      focusTrait: focusTrait,
+      variantKey: objectVariantKeyFor(focusTrait),
     );
 
     return CraftingResult(

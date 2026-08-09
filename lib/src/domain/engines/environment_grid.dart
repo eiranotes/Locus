@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:reality_diorama/src/domain/atmospheric_trait_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/domain/engines/placement_engine.dart';
@@ -81,10 +82,15 @@ class EnvironmentGrid {
 }
 
 class EnvironmentGridBuilder {
-  const EnvironmentGridBuilder({required this.columns, required this.rows});
+  const EnvironmentGridBuilder({
+    required this.columns,
+    required this.rows,
+    this.atmosphericTraits = AtmosphericTraitCatalog.empty,
+  });
 
   final int columns;
   final int rows;
+  final AtmosphericTraitCatalog atmosphericTraits;
 
   EnvironmentGrid build({
     required List<Placement> placements,
@@ -127,9 +133,58 @@ class EnvironmentGridBuilder {
           );
         }
       }
+      final trait = object.focusTrait;
+      if (trait != null) {
+        _applyAtmosphericTrait(
+          grid,
+          placement: placement,
+          definition: atmosphericTraits.definitionFor(trait),
+        );
+      }
     }
     return grid;
   }
+
+  void _applyAtmosphericTrait(
+    EnvironmentGrid grid, {
+    required Placement placement,
+    required AtmosphericTraitDefinition definition,
+  }) {
+    final effects = _effectsFromMap(definition.effects);
+    final targets = switch (definition.spread) {
+      AtmosphericTraitSpread.none => const <GridCell>{},
+      AtmosphericTraitSpread.diagonal => <GridCell>{
+        GridCell(placement.column - 1, placement.row - 1),
+        GridCell(placement.column + 1, placement.row - 1),
+        GridCell(placement.column - 1, placement.row + 1),
+        GridCell(placement.column + 1, placement.row + 1),
+      },
+      AtmosphericTraitSpread.adjacent => <GridCell>{
+        GridCell(placement.column - 1, placement.row),
+        GridCell(placement.column + 1, placement.row),
+        GridCell(placement.column, placement.row - 1),
+        GridCell(placement.column, placement.row + 1),
+      },
+      AtmosphericTraitSpread.distanceTwo => <GridCell>{
+        GridCell(placement.column - 2, placement.row),
+        GridCell(placement.column + 2, placement.row),
+        GridCell(placement.column, placement.row - 2),
+        GridCell(placement.column, placement.row + 2),
+      },
+    };
+    for (final target in targets) {
+      grid.addAt(target.column, target.row, effects);
+    }
+  }
+
+  CellEffects _effectsFromMap(Map<String, int> effects) => CellEffects(
+    wet: effects['wet'] ?? 0,
+    light: effects['light'] ?? 0,
+    warm: effects['warm'] ?? 0,
+    cool: effects['cool'] ?? 0,
+    wind: effects['wind'] ?? 0,
+    nature: effects['nature'] ?? 0,
+  );
 
   CellEffects _baseEffects(RecipeDefinition recipe) => CellEffects(
     wet: recipe.baseEffects['wet'] ?? 0,

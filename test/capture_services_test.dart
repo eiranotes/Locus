@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reality_diorama/src/domain/atmospheric_trait_catalog.dart';
 import 'package:reality_diorama/src/domain/content_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
@@ -11,11 +15,17 @@ import 'package:reality_diorama/src/services/weather_gateway.dart';
 import 'test_fixtures.dart';
 
 void main() {
+  final traitCatalog = AtmosphericTraitCatalog.fromJson(
+    jsonDecode(
+          File('assets/content/atmospheric_traits.json').readAsStringSync(),
+        )
+        as Map<String, Object?>,
+  );
   final now = DateTime(2026, 8, 8, 19, 14);
   final snapshot = WeatherSnapshot(
     temperatureCelsius: 22,
     apparentTemperatureCelsius: 22,
-    precipitationMillimeters: 0.7,
+    precipitationRateMmPerHour: 0.7,
     cloudCoverPercent: 90,
     windSpeedKph: 8,
     visibilityMeters: 12000,
@@ -37,6 +47,7 @@ void main() {
           visitors: const <VisitorDefinition>[],
           balance: testBalance(),
           placement: PlacementCatalog.empty,
+          atmosphericTraits: traitCatalog,
         ),
       );
 
@@ -104,6 +115,7 @@ void main() {
           visitors: const <VisitorDefinition>[],
           balance: testBalance(),
           placement: PlacementCatalog.empty,
+          atmosphericTraits: traitCatalog,
         ),
       );
 
@@ -118,6 +130,10 @@ void main() {
       );
 
       expect(result.weatherMaterial?.providerName, 'Test provider');
+      expect(result.weatherMaterial?.atmosphericTraits, <AtmosphericTrait>[
+        AtmosphericTrait.deepCloud,
+      ]);
+      expect(result.weatherMaterial?.traitSchemaVersion, 'weather-traits-v1');
       expect(result.record.weatherBasis, WeatherBasis.providerCurrentModel);
     },
   );

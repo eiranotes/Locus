@@ -9,6 +9,7 @@ import 'package:reality_diorama/src/ui/screens/crafting_screen.dart';
 import 'package:reality_diorama/src/ui/screens/placement_editor_screen.dart';
 import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
 import 'package:reality_diorama/src/ui/widgets/object_visual_preview.dart';
+import 'package:reality_diorama/src/ui/widgets/atmospheric_trait_chips.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 
 class InventoryScreen extends StatelessWidget {
@@ -337,6 +338,14 @@ class _ObjectsTab extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         final object = controller.craftedObjects[index];
         final recipe = controller.catalog.recipeById(object.recipeId);
+        final focusDefinition = object.focusTrait == null
+            ? null
+            : controller.catalog.atmosphericTraits.definitionFor(
+                object.focusTrait!,
+              );
+        final displayName = focusDefinition == null
+            ? recipe.nameKo
+            : '${focusDefinition.namePrefixKo} ${recipe.nameKo}';
         return PixelCard(
           child: Row(
             children: <Widget>[
@@ -364,7 +373,10 @@ class _ObjectsTab extends StatelessWidget {
                               ? 1
                               : object.appliedSteps / object.requiredSteps,
                         ),
-                    semanticLabel: '${recipe.nameKo} 미리보기',
+                    visualLayerCatalog: controller.catalog.visualLayers,
+                    atmosphericTraitCatalog:
+                        controller.catalog.atmosphericTraits,
+                    semanticLabel: '$displayName 미리보기',
                   ),
                 ),
               ),
@@ -374,7 +386,7 @@ class _ObjectsTab extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      recipe.nameKo,
+                      displayName,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 3),
@@ -386,6 +398,17 @@ class _ObjectsTab extends StatelessWidget {
                           : '${object.remainingSteps}걸음 남음',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
+                    if (object.focusTrait != null) ...<Widget>[
+                      const SizedBox(height: 2),
+                      Text(
+                        atmosphericTraitSummary(<AtmosphericTrait>[
+                          object.focusTrait!,
+                        ], controller.catalog.atmosphericTraits),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
                     if (!object.isComplete) ...<Widget>[
                       const SizedBox(height: 7),
                       LinearProgressIndicator(

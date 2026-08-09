@@ -22,7 +22,7 @@ class WeatherSnapshot {
   const WeatherSnapshot({
     required this.temperatureCelsius,
     required this.apparentTemperatureCelsius,
-    required this.precipitationMillimeters,
+    required this.precipitationRateMmPerHour,
     required this.cloudCoverPercent,
     required this.windSpeedKph,
     required this.visibilityMeters,
@@ -35,7 +35,7 @@ class WeatherSnapshot {
 
   final double temperatureCelsius;
   final double apparentTemperatureCelsius;
-  final double precipitationMillimeters;
+  final double precipitationRateMmPerHour;
   final double cloudCoverPercent;
   final double windSpeedKph;
   final double visibilityMeters;
@@ -184,6 +184,8 @@ class WeatherMaterial {
     required this.sourceRecordId,
     required this.visualSeed,
     required this.providerName,
+    this.atmosphericTraits = const <AtmosphericTrait>[],
+    this.traitSchemaVersion = 'legacy-none',
     this.coarseCellId,
     this.consumedAt,
     this.craftedObjectId,
@@ -198,6 +200,8 @@ class WeatherMaterial {
   final String sourceRecordId;
   final int visualSeed;
   final String providerName;
+  final List<AtmosphericTrait> atmosphericTraits;
+  final String traitSchemaVersion;
   final DateTime? consumedAt;
   final String? craftedObjectId;
 
@@ -214,6 +218,8 @@ class WeatherMaterial {
         sourceRecordId: sourceRecordId,
         visualSeed: visualSeed,
         providerName: providerName,
+        atmosphericTraits: atmosphericTraits,
+        traitSchemaVersion: traitSchemaVersion,
         consumedAt: at,
         craftedObjectId: objectId,
       );
@@ -228,6 +234,10 @@ class WeatherMaterial {
     'source_record_id': sourceRecordId,
     'visual_seed': visualSeed,
     'provider_name': providerName,
+    'trait_keys_json': jsonEncode(
+      atmosphericTraits.map((AtmosphericTrait value) => value.name).toList(),
+    ),
+    'trait_schema_version': traitSchemaVersion,
     'consumed_at': consumedAt?.millisecondsSinceEpoch,
     'crafted_object_id': craftedObjectId,
   };
@@ -250,11 +260,37 @@ class WeatherMaterial {
     sourceRecordId: map['source_record_id']! as String,
     visualSeed: map['visual_seed']! as int,
     providerName: map['provider_name']! as String,
+    atmosphericTraits: _decodeAtmosphericTraits(map['trait_keys_json']),
+    traitSchemaVersion: map['trait_schema_version'] as String? ?? 'legacy-none',
     consumedAt: map['consumed_at'] == null
         ? null
         : DateTime.fromMillisecondsSinceEpoch(map['consumed_at']! as int),
     craftedObjectId: map['crafted_object_id'] as String?,
   );
+}
+
+List<AtmosphericTrait> _decodeAtmosphericTraits(Object? raw) {
+  if (raw is! String || raw.isEmpty) {
+    return const <AtmosphericTrait>[];
+  }
+  try {
+    final names = (jsonDecode(raw) as List<Object?>)
+        .whereType<String>()
+        .toSet();
+    return AtmosphericTrait.values
+        .where((AtmosphericTrait value) => names.contains(value.name))
+        .toList(growable: false);
+  } on Object {
+    return const <AtmosphericTrait>[];
+  }
+}
+
+AtmosphericTrait? _decodeAtmosphericTrait(Object? raw) {
+  if (raw is! String) return null;
+  for (final trait in AtmosphericTrait.values) {
+    if (trait.name == raw) return trait;
+  }
+  return null;
 }
 
 class SurroundingMaterial {

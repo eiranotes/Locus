@@ -105,6 +105,7 @@ surroundings choices already equals 300, and direction/time expansion reaches
 recipe/direction base
 + shared weather surface treatment
 + shared weather footprint effect
++ one selected atmospheric focus from up to two collected traces
 + runtime time palette
 + runtime surroundings connector
 + deterministic seeded detail
@@ -121,9 +122,10 @@ Current bounded packages:
   never be baked into a bitmap.
 
 The construction pack is live in the crafting/inventory preview path. Weather
-treatments are generated, processed, validated, and cataloged, but compositor
-integration is intentionally deferred until preview and scene sprite
-composition share one alpha-clipped layer resolver.
+treatments are generated, processed, validated, cataloged, and now resolved
+through the same alpha-clipped compositor in previews and the home scene.
+Provider-common atmospheric traces can raise the authored surface strength
+slightly, but no per-combination bitmap is introduced.
 
 ## Platform and accessibility requirements
 

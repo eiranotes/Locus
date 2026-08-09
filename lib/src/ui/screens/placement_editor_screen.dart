@@ -320,6 +320,9 @@ class _PlacementObjectCatalog extends StatelessWidget {
                                 ? 1
                                 : object.appliedSteps / object.requiredSteps,
                           ),
+                      visualLayerCatalog: controller.catalog.visualLayers,
+                      atmosphericTraitCatalog:
+                          controller.catalog.atmosphericTraits,
                       semanticLabel: '${recipe.nameKo} ${direction.labelKo}',
                     ),
                   ),

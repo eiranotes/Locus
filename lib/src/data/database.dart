@@ -6,7 +6,7 @@ class AppDatabase {
 
   final Database database;
 
-  static const int schemaVersion = 1;
+  static const int schemaVersion = 2;
   static const String productionDatabaseName = 'reality_diorama.sqlite3';
   static const String demoDatabaseName = 'reality_diorama_demo.sqlite3';
 
@@ -20,6 +20,7 @@ class AppDatabase {
         await db.setJournalMode('WAL');
       },
       onCreate: _create,
+      onUpgrade: _upgrade,
     );
     return AppDatabase._(database);
   }
@@ -50,6 +51,8 @@ class AppDatabase {
         source_record_id TEXT NOT NULL,
         visual_seed INTEGER NOT NULL,
         provider_name TEXT NOT NULL,
+        trait_keys_json TEXT NOT NULL DEFAULT '[]',
+        trait_schema_version TEXT NOT NULL DEFAULT 'legacy-none',
         consumed_at INTEGER,
         crafted_object_id TEXT
       )
@@ -89,7 +92,9 @@ class AppDatabase {
         lifecycle TEXT NOT NULL,
         visual_seed INTEGER NOT NULL,
         generator_version TEXT NOT NULL,
-        created_at INTEGER NOT NULL
+        created_at INTEGER NOT NULL,
+        focus_trait TEXT,
+        variant_key TEXT NOT NULL DEFAULT 'base'
       )
     ''');
     await db.execute('''
@@ -126,6 +131,23 @@ class AppDatabase {
     await db.execute(
       'CREATE INDEX idx_surrounding_available ON surrounding_materials(consumed_at, captured_at DESC)',
     );
+  }
+
+  static Future<void> _upgrade(Database db, int oldVersion, int _) async {
+    if (oldVersion < 2) {
+      await db.execute(
+        "ALTER TABLE weather_materials ADD COLUMN trait_keys_json TEXT NOT NULL DEFAULT '[]'",
+      );
+      await db.execute(
+        "ALTER TABLE weather_materials ADD COLUMN trait_schema_version TEXT NOT NULL DEFAULT 'legacy-none'",
+      );
+      await db.execute(
+        'ALTER TABLE crafted_objects ADD COLUMN focus_trait TEXT',
+      );
+      await db.execute(
+        "ALTER TABLE crafted_objects ADD COLUMN variant_key TEXT NOT NULL DEFAULT 'base'",
+      );
+    }
   }
 
   Future<void> close() => database.close();

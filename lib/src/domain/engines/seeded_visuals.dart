@@ -2,7 +2,8 @@ import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 
 const String legacyObjectGeneratorVersion = 'object-v1';
-const String currentObjectGeneratorVersion = 'object-v2';
+const String seededObjectGeneratorVersion = 'object-v2';
+const String currentObjectGeneratorVersion = 'object-v3';
 
 int stableSeed(Iterable<Object?> parts) {
   var hash = 0x811c9dc5;
@@ -21,14 +22,19 @@ int objectVisualSeedForCraft({
   required RecipeDefinition recipe,
   required WeatherMaterial weather,
   SurroundingMaterial? surrounding,
+  AtmosphericTrait? focusTrait,
   String generatorVersion = currentObjectGeneratorVersion,
 }) => stableSeed(<Object?>[
   recipe.id,
   weather.id,
   surrounding?.id,
+  objectVariantKeyFor(focusTrait),
   weather.capturedAt.millisecondsSinceEpoch ~/ Duration.millisecondsPerMinute,
   generatorVersion,
 ]);
+
+String objectVariantKeyFor(AtmosphericTrait? focusTrait) =>
+    focusTrait == null ? 'base' : 'weather-trait-v1/${focusTrait.name}';
 
 final class ObjectVisualDescriptor {
   const ObjectVisualDescriptor({
@@ -39,6 +45,8 @@ final class ObjectVisualDescriptor {
     required this.visualSeed,
     required this.generatorVersion,
     required this.completion,
+    this.focusTrait,
+    this.variantKey = 'base',
   });
 
   factory ObjectVisualDescriptor.fromCraftedObject(
@@ -52,12 +60,15 @@ final class ObjectVisualDescriptor {
     visualSeed: object.visualSeed,
     generatorVersion: object.generatorVersion,
     completion: _completionFor(object),
+    focusTrait: object.focusTrait,
+    variantKey: object.variantKey,
   );
 
   factory ObjectVisualDescriptor.forCraftingPreview({
     required RecipeDefinition recipe,
     required WeatherMaterial weather,
     SurroundingMaterial? surrounding,
+    AtmosphericTrait? focusTrait,
     String generatorVersion = currentObjectGeneratorVersion,
     double completion = 1,
   }) => ObjectVisualDescriptor(
@@ -69,10 +80,13 @@ final class ObjectVisualDescriptor {
       recipe: recipe,
       weather: weather,
       surrounding: surrounding,
+      focusTrait: focusTrait,
       generatorVersion: generatorVersion,
     ),
     generatorVersion: generatorVersion,
     completion: completion.clamp(0, 1).toDouble(),
+    focusTrait: focusTrait,
+    variantKey: objectVariantKeyFor(focusTrait),
   );
 
   factory ObjectVisualDescriptor.forRecipe(
@@ -87,6 +101,8 @@ final class ObjectVisualDescriptor {
     visualSeed: stableSeed(<Object?>[recipe.id, 'neutral', generatorVersion]),
     generatorVersion: generatorVersion,
     completion: completion.clamp(0, 1).toDouble(),
+    focusTrait: null,
+    variantKey: 'base',
   );
 
   final ObjectKind kind;
@@ -96,6 +112,11 @@ final class ObjectVisualDescriptor {
   final int visualSeed;
   final String generatorVersion;
   final double completion;
+  final AtmosphericTrait? focusTrait;
+  final String variantKey;
+
+  bool get usesLayeredWeather =>
+      generatorVersion == currentObjectGeneratorVersion && weatherKind != null;
 
   static double _completionFor(CraftedObject object) {
     if (object.requiredSteps <= 0) {

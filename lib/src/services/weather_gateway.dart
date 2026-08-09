@@ -88,7 +88,7 @@ class MethodChannelWeatherGateway implements WeatherGateway {
     return WeatherSnapshot(
       temperatureCelsius: number('temperatureCelsius'),
       apparentTemperatureCelsius: number('apparentTemperatureCelsius'),
-      precipitationMillimeters: number('precipitationIntensity'),
+      precipitationRateMmPerHour: number('precipitationIntensity'),
       cloudCoverPercent: number('cloudCoverPercent'),
       windSpeedKph: number('windSpeedKph'),
       visibilityMeters: number('visibilityMeters'),
@@ -149,10 +149,14 @@ class OpenMeteoWeatherGateway implements WeatherGateway {
     }
     final document = jsonDecode(response.body) as Map<String, Object?>;
     final current = document['current']! as Map<String, Object?>;
+    final intervalSeconds = (current['interval'] as num?)?.toDouble() ?? 0;
+    final precipitationRate = intervalSeconds > 0
+        ? _number(current, 'precipitation') * 3600 / intervalSeconds
+        : double.nan;
     return WeatherSnapshot(
       temperatureCelsius: _number(current, 'temperature_2m'),
       apparentTemperatureCelsius: _number(current, 'apparent_temperature'),
-      precipitationMillimeters: _number(current, 'precipitation'),
+      precipitationRateMmPerHour: precipitationRate,
       cloudCoverPercent: _number(current, 'cloud_cover'),
       windSpeedKph: _number(current, 'wind_speed_10m'),
       visibilityMeters: _number(current, 'visibility'),
@@ -186,9 +190,9 @@ class DemoWeatherGateway implements WeatherGateway {
     return WeatherSnapshot(
       temperatureCelsius: wetHour ? 18 : 23,
       apparentTemperatureCelsius: wetHour ? 17 : 23,
-      precipitationMillimeters: wetHour ? 0.8 : 0,
-      cloudCoverPercent: wetHour ? 92 : 62,
-      windSpeedKph: 13,
+      precipitationRateMmPerHour: wetHour ? 1.4 : 0,
+      cloudCoverPercent: wetHour ? 94 : 90,
+      windSpeedKph: 25,
       visibilityMeters: 18000,
       weatherCode: wetHour ? 61 : 3,
       conditionKey: wetHour ? 'rain' : 'cloudy',

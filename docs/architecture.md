@@ -33,6 +33,7 @@ The domain engines are deterministic and independently testable:
 
 - cooldown engine;
 - weather classifier;
+- cataloged atmospheric-trait classifier;
 - surroundings classifier;
 - step ledger;
 - recipe/crafting engine;
@@ -51,6 +52,13 @@ from tracked source atlases and validated for exact recipe/rotation coverage,
 distinct hashes, RGBA dimensions, and installed paths, so a later asset pack can
 replace one direction without editor code changes. Deterministic Canvas geometry
 remains the construction and load-failure fallback.
+
+Completed `object-v3` visuals use one alpha-clipped compositor for the home
+scene and Flutter previews. It resolves a directional recipe sprite, the
+weather catalog's isometric footprint effect and surface pattern, time tint,
+surroundings connector, and one bounded focus-trait layer. `object-v1` and
+`object-v2` rows preserve their previous appearance; schema v2 adds versioned
+weather-trait JSON plus nullable object focus and stable variant-key columns.
 
 `PlacementEngine` is the single source for rotated footprints, bounds,
 collisions, and valid anchors. The editor queries that engine before enabling a

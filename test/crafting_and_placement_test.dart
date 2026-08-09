@@ -10,10 +10,20 @@ void main() {
   final now = DateTime.utc(2026, 8, 8, 18);
 
   test('crafting consumes materials and starts construction when short', () {
+    final weather = testWeather(
+      atmosphericTraits: const <AtmosphericTrait>[
+        AtmosphericTrait.strongWind,
+        AtmosphericTrait.deepCloud,
+      ],
+    );
+    final recipe = testRecipe(
+      stepCost: 1500,
+      traitAffinities: const <AtmosphericTrait>{AtmosphericTrait.deepCloud},
+    );
     final result = const CraftingEngine().start(
       objectId: 'object-1',
-      recipe: testRecipe(stepCost: 1500),
-      weather: testWeather(),
+      recipe: recipe,
+      weather: weather,
       surrounding: testSurrounding(),
       stepBuckets: <StepBucket>[
         StepBucket(
@@ -24,10 +34,13 @@ void main() {
         ),
       ],
       now: now,
+      focusTrait: AtmosphericTrait.deepCloud,
     );
     expect(result.object.lifecycle, ObjectLifecycle.building);
     expect(result.object.appliedSteps, 900);
     expect(result.object.remainingSteps, 600);
+    expect(result.object.focusTrait, AtmosphericTrait.deepCloud);
+    expect(result.object.variantKey, 'weather-trait-v1/deepCloud');
     expect(result.weatherMaterial.isAvailable, isFalse);
     expect(result.surroundingMaterial?.isAvailable, isFalse);
   });
@@ -56,5 +69,23 @@ void main() {
       recipeByObjectId: <String, RecipeDefinition>{'object-a': wide},
     );
     expect(validation.valid, isFalse);
+  });
+
+  test('crafting rejects a trace outside the recipe affinity catalog', () {
+    expect(
+      () => const CraftingEngine().start(
+        objectId: 'object-invalid',
+        recipe: testRecipe(),
+        weather: testWeather(
+          atmosphericTraits: const <AtmosphericTrait>[
+            AtmosphericTrait.strongWind,
+          ],
+        ),
+        stepBuckets: const <StepBucket>[],
+        now: now,
+        focusTrait: AtmosphericTrait.strongWind,
+      ),
+      throwsStateError,
+    );
   });
 }
