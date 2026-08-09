@@ -32,6 +32,8 @@
 - [x] Generate and catalog the bounded 12-asset shared weather-treatment pack.
 - [x] Replace linear placement arrows with a 48 dp isometric direction pad and
       expose selected state on material/object catalogs.
+- [x] Keep stored and in-progress objects in the placement catalog so removed
+      objects can select a direction and return to a validated empty cell.
 - [ ] Centralize alpha-clipped sprite composition and apply the cataloged
       weather surface/footprint layers identically across every object surface.
 - [ ] Make home scene-first, derive scene visitors from persisted sightings,

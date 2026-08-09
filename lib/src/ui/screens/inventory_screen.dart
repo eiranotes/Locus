@@ -405,7 +405,9 @@ class _ObjectsTab extends StatelessWidget {
                           PlacementEditorScreen(initialObjectId: object.id),
                     ),
                   ),
-                  tooltip: '배치 편집',
+                  tooltip: object.lifecycle == ObjectLifecycle.placed
+                      ? '배치 편집'
+                      : '배치하기',
                   icon: const Icon(Icons.grid_view_outlined),
                 ),
             ],

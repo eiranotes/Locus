@@ -13,6 +13,8 @@
   production-mode launch.
 - Compact codex cards and the crafting detail preview retain usable layout at
   narrow widths and larger text sizes.
+- Objects returned to storage remain in the placement catalog and can be
+  direction-adjusted and placed again on the first validated empty cell.
 
 ### Changed
 

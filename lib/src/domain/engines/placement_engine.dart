@@ -121,4 +121,27 @@ class PlacementEngine {
             GridCell(column, row),
     };
   }
+
+  GridCell? firstValidAnchor({
+    required Placement candidate,
+    required RecipeDefinition recipe,
+    required List<Placement> existing,
+    required Map<String, RecipeDefinition> recipeByObjectId,
+    Set<int> allowedRotations = const <int>{0, 1, 2, 3},
+  }) {
+    final anchors = validAnchors(
+      candidate: candidate,
+      recipe: recipe,
+      existing: existing,
+      recipeByObjectId: recipeByObjectId,
+      allowedRotations: allowedRotations,
+    );
+    for (var row = 0; row < rows; row += 1) {
+      for (var column = 0; column < columns; column += 1) {
+        final cell = GridCell(column, row);
+        if (anchors.contains(cell)) return cell;
+      }
+    }
+    return null;
+  }
 }

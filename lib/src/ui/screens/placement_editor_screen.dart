@@ -24,6 +24,7 @@ class PlacementEditorScreen extends StatefulWidget {
 
 class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
   String? _selectedObjectId;
+  final Map<String, int> _pendingRotations = <String, int>{};
 
   @override
   void didChangeDependencies() {
@@ -49,12 +50,22 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
     final selectedCatalogEntry = selectedRecipe == null
         ? null
         : controller.catalog.placement.entryForRecipe(selectedRecipe.id);
+    final selectedRotation =
+        selectedPlacement?.rotation ??
+        (selectedCatalogEntry == null
+            ? 0
+            : _pendingRotations.putIfAbsent(
+                selectedObject!.id,
+                () => selectedCatalogEntry.allowedRotations.first,
+              ));
+    final editorObjects = _editorObjects(controller);
     final editorSnapshot = _editorSnapshot(
       controller: controller,
       placement: selectedPlacement,
       object: selectedObject,
       recipe: selectedRecipe,
       catalogEntry: selectedCatalogEntry,
+      rotation: selectedRotation,
     );
 
     return Scaffold(
@@ -87,14 +98,16 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              if (controller.placements.isEmpty)
+              if (editorObjects.isEmpty)
                 const PixelCard(
-                  child: Text('배치된 물건이 없습니다. 물건을 만들면 빈 칸에 자동으로 놓입니다.'),
+                  child: Text('배치할 물건이 없습니다. 물건을 만들면 이 카탈로그에 추가됩니다.'),
                 )
               else ...<Widget>[
-                _PlacedObjectCatalog(
+                _PlacementObjectCatalog(
                   controller: controller,
+                  objects: editorObjects,
                   selectedObjectId: _selectedObjectId,
+                  pendingRotations: _pendingRotations,
                   onSelected: (String objectId) {
                     HapticFeedback.selectionClick();
                     setState(() => _selectedObjectId = objectId);
@@ -117,6 +130,28 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
                         _rotate(controller, selectedPlacement, rotation),
                     onRemove: () => _remove(controller, selectedPlacement),
                   ),
+                if (selectedPlacement == null &&
+                    selectedObject != null &&
+                    selectedRecipe != null &&
+                    selectedCatalogEntry != null)
+                  _StoredObjectPlacementControls(
+                    controller: controller,
+                    object: selectedObject,
+                    recipe: selectedRecipe,
+                    catalogEntry: selectedCatalogEntry,
+                    rotation: selectedRotation,
+                    onRotate: (int rotation) {
+                      HapticFeedback.selectionClick();
+                      setState(
+                        () => _pendingRotations[selectedObject.id] = rotation,
+                      );
+                    },
+                    onPlace: () => _placeStoredObject(
+                      controller,
+                      selectedObject,
+                      selectedRotation,
+                    ),
+                  ),
               ],
             ],
           ),
@@ -131,12 +166,10 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
     required CraftedObject? object,
     required RecipeDefinition? recipe,
     required PlacementCatalogEntry? catalogEntry,
+    required int rotation,
   }) {
     final snapshot = controller.dioramaSnapshot;
-    if (placement == null ||
-        object == null ||
-        recipe == null ||
-        catalogEntry == null) {
+    if (object == null || recipe == null || catalogEntry == null) {
       return snapshot;
     }
     final engine = PlacementEngine(
@@ -146,16 +179,33 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
     return snapshot.withEditorOverlay(
       DioramaEditorOverlay(
         selectedObjectId: object.id,
-        selectedCells: engine.occupiedCells(
-          placement: placement,
-          footprint: recipe.footprint,
-        ),
+        selectedCells: placement == null
+            ? const <GridCell>{}
+            : engine.occupiedCells(
+                placement: placement,
+                footprint: recipe.footprint,
+              ),
         validAnchorCells: controller.validPlacementAnchors(
           craftedObjectId: object.id,
-          rotation: placement.rotation,
+          rotation: rotation,
         ),
       ),
     );
+  }
+
+  List<CraftedObject> _editorObjects(AppController controller) =>
+      controller.craftedObjects.toList(growable: false);
+
+  Future<void> _placeStoredObject(
+    AppController controller,
+    CraftedObject object,
+    int rotation,
+  ) async {
+    final placed = await controller.placeObjectAtFirstAvailable(
+      craftedObjectId: object.id,
+      rotation: rotation,
+    );
+    if (placed) HapticFeedback.lightImpact();
   }
 
   Future<void> _move(
@@ -199,15 +249,19 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
   }
 }
 
-class _PlacedObjectCatalog extends StatelessWidget {
-  const _PlacedObjectCatalog({
+class _PlacementObjectCatalog extends StatelessWidget {
+  const _PlacementObjectCatalog({
     required this.controller,
+    required this.objects,
     required this.selectedObjectId,
+    required this.pendingRotations,
     required this.onSelected,
   });
 
   final AppController controller;
+  final List<CraftedObject> objects;
   final String? selectedObjectId;
+  final Map<String, int> pendingRotations;
   final ValueChanged<String> onSelected;
 
   @override
@@ -220,26 +274,29 @@ class _PlacedObjectCatalog extends StatelessWidget {
       child: ListView.separated(
         key: const ValueKey<String>('placement-object-catalog'),
         scrollDirection: Axis.horizontal,
-        itemCount: controller.placements.length,
+        itemCount: objects.length,
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (BuildContext context, int index) {
-          final placement = controller.placements[index];
-          final object = controller.craftedObjects.firstWhere(
-            (CraftedObject value) => value.id == placement.craftedObjectId,
-          );
+          final object = objects[index];
+          final placement = controller.placements
+              .where((Placement value) => value.craftedObjectId == object.id)
+              .firstOrNull;
           final recipe = controller.catalog.recipeById(object.recipeId);
           final entry = controller.catalog.placement.entryForRecipe(recipe.id);
-          final visual = entry.visualFor(placement.rotation);
-          final direction = controller.catalog.placement.directionFor(
-            placement.rotation,
-          );
+          final rotation =
+              placement?.rotation ??
+              pendingRotations[object.id] ??
+              entry.allowedRotations.first;
+          final visual = entry.visualFor(rotation);
+          final direction = controller.catalog.placement.directionFor(rotation);
           final selected = object.id == selectedObjectId;
           return SizedBox(
             width: 132,
             child: PixelCard(
               highlighted: selected,
               selected: selected,
-              semanticLabel: '${recipe.nameKo} ${direction.labelKo}',
+              semanticLabel:
+                  '${recipe.nameKo} ${direction.labelKo} ${placement == null ? '보관 중' : '배치됨'}',
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
               onTap: () => onSelected(object.id),
               child: Row(
@@ -253,9 +310,16 @@ class _PlacedObjectCatalog extends StatelessWidget {
                         timeBand:
                             weatherById[object.weatherMaterialId]?.timeBand,
                       ),
-                      rotation: placement.rotation,
+                      rotation: rotation,
                       assetPath: visual.assetPath,
                       mirrorX: visual.mirrorX,
+                      constructionAssetPath: controller.catalog.craftingArt
+                          .constructionAssetFor(
+                            object.recipeId,
+                            object.requiredSteps <= 0
+                                ? 1
+                                : object.appliedSteps / object.requiredSteps,
+                          ),
                       semanticLabel: '${recipe.nameKo} ${direction.labelKo}',
                     ),
                   ),
@@ -286,6 +350,135 @@ class _PlacedObjectCatalog extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class _StoredObjectPlacementControls extends StatelessWidget {
+  const _StoredObjectPlacementControls({
+    required this.controller,
+    required this.object,
+    required this.recipe,
+    required this.catalogEntry,
+    required this.rotation,
+    required this.onRotate,
+    required this.onPlace,
+  });
+
+  final AppController controller;
+  final CraftedObject object;
+  final RecipeDefinition recipe;
+  final PlacementCatalogEntry catalogEntry;
+  final int rotation;
+  final ValueChanged<int> onRotate;
+  final VoidCallback onPlace;
+
+  @override
+  Widget build(BuildContext context) {
+    final placementCatalog = controller.catalog.placement;
+    final direction = placementCatalog.directionFor(rotation);
+    final footprint = PlacementEngine(
+      columns: controller.catalog.balance.gridColumns,
+      rows: controller.catalog.balance.gridRows,
+    ).rotatedFootprint(footprint: recipe.footprint, rotation: rotation);
+    final atLimit =
+        controller.placements.length >=
+        controller.catalog.balance.activeObjectLimit;
+    final anchors = atLimit
+        ? const <GridCell>{}
+        : controller.validPlacementAnchors(
+            craftedObjectId: object.id,
+            rotation: rotation,
+          );
+    final nextRotation = _nextPlaceableRotation(atLimit: atLimit);
+    final lifecycleLabel = object.isComplete ? '보관 중' : '공사 중';
+
+    return PixelCard(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      recipe.nameKo,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '$lifecycleLabel · ${direction.labelKo} · '
+                      '${footprint.width}×${footprint.height}칸 · '
+                      '배치 가능 ${anchors.length}곳',
+                      key: const ValueKey<String>('placement-status'),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.inventory_2_outlined),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: <Widget>[
+              SizedBox(
+                height: 52,
+                child: FilledButton.tonalIcon(
+                  key: const ValueKey<String>('placement-rotate-stored'),
+                  onPressed: nextRotation == null
+                      ? null
+                      : () => onRotate(nextRotation),
+                  icon: const Icon(Icons.rotate_right),
+                  label: Text(
+                    nextRotation == null
+                        ? '회전 공간 필요'
+                        : placementCatalog
+                              .directionFor(nextRotation)
+                              .shortLabelKo,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: SizedBox(
+                  height: 52,
+                  child: FilledButton.icon(
+                    key: const ValueKey<String>('placement-place-stored'),
+                    onPressed: anchors.isEmpty ? null : onPlace,
+                    icon: const Icon(Icons.grid_view_outlined),
+                    label: Text(atLimit ? '배치 한도 도달' : '빈 칸에 배치'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  int? _nextPlaceableRotation({required bool atLimit}) {
+    if (atLimit) return null;
+    var candidate = rotation;
+    for (
+      var attempt = 0;
+      attempt < catalogEntry.allowedRotations.length;
+      attempt += 1
+    ) {
+      candidate = catalogEntry.nextRotation(candidate);
+      if (candidate == rotation) break;
+      if (controller
+          .validPlacementAnchors(
+            craftedObjectId: object.id,
+            rotation: candidate,
+          )
+          .isNotEmpty) {
+        return candidate;
+      }
+    }
+    return null;
   }
 }
 

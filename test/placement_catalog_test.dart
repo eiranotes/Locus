@@ -175,4 +175,42 @@ void main() {
     expect(normalizeQuarterTurns(-1), 3);
     expect(normalizeQuarterTurns(5), 1);
   });
+
+  test('first valid anchor is deterministic and skips occupied cells', () {
+    const engine = PlacementEngine(columns: 5, rows: 5);
+    final oneCell = recipes.firstWhere(
+      (RecipeDefinition recipe) => recipe.id == 'alley_lamp',
+    );
+    final stairs = recipes.firstWhere(
+      (RecipeDefinition recipe) => recipe.id == 'stairs',
+    );
+    const occupied = Placement(
+      id: 'occupied',
+      craftedObjectId: 'lamp-object',
+      column: 0,
+      row: 0,
+      rotation: 0,
+    );
+    const candidate = Placement(
+      id: 'candidate',
+      craftedObjectId: 'stairs-object',
+      column: 0,
+      row: 0,
+      rotation: 1,
+    );
+
+    final anchor = engine.firstValidAnchor(
+      candidate: candidate,
+      recipe: stairs,
+      existing: const <Placement>[occupied],
+      recipeByObjectId: <String, RecipeDefinition>{
+        occupied.craftedObjectId: oneCell,
+      },
+      allowedRotations: catalog.entryForRecipe(stairs.id).allowedRotations,
+    );
+
+    expect(anchor, isNotNull);
+    expect(anchor!.column, 1);
+    expect(anchor.row, 0);
+  });
 }

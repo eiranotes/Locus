@@ -4,11 +4,11 @@ Last updated: 2026-08-09
 
 ## Current state
 
-`main` at `e8b240f` contains the iOS simulator fixes, deterministic demo
-isolation, shared renderer, 42-asset pixel-art package, and catalog-driven
-directional editor. The current working slice adds bounded construction and
-weather-layer catalogs and begins the Pro-reviewed shift from generic Material
-utility UI toward a scene-first collection/crafting game shell.
+`main` contains the iOS simulator fixes, deterministic demo isolation, shared
+renderer, cataloged pixel-art packages, and a catalog-driven directional
+editor. The current working slice closes the stored-object replacement gap and
+continues the Pro-reviewed shift from generic Material utility UI toward a
+scene-first collection/crafting game shell.
 
 ## Completed in the current slice
 
@@ -59,6 +59,10 @@ utility UI toward a scene-first collection/crafting game shell.
 - Replaced the editor's misleading linear movement row with a spatially
   truthful 2×2 isometric direction pad and 48 dp targets. Selectable material
   and object cards now expose selected semantics and visible ink feedback.
+- Expanded the placement catalog to include placed, stored, and in-progress
+  objects. A stored object can choose a supported direction, preview every
+  valid anchor, and return to the first deterministic empty cell without
+  bypassing collision or eight-object limits.
 - Recorded a dual-agent Pro UI review and an independent Pro asset-system
   review in `docs/UI_GAME_CONCEPT_REVIEW.md`.
 
@@ -94,6 +98,18 @@ capture shows the generated house, tree, bench, fence, path, atmospheric layer,
 and visitor portrait; excessive daytime overlay noise was removed after the
 first visual pass.
 
+The catalog replacement slice was verified on the same AppAudit simulator with
+its existing demo database left intact. Clear/evening weather plus surroundings
+were collected, a 2,400-step bench started at 53% and showed the authored frame
+stage in crafting, home, and inventory, and both the completed stairs and the
+in-progress bench moved and rotated through validated isometric controls. The
+stairs were then returned to storage, selected from the same editor catalog,
+rotated from 1×2 to 2×1, placed on a valid empty anchor, and restored as 2/8
+placed objects after termination, reinstall, and relaunch. Flutter 3.44.9
+repository checks, formatting, analyzer, all 48 tests, and the Debug simulator
+build passed; recent Runner logs contained no Flutter exception, RenderFlex, or
+overflow report.
+
 ## Known risks and gates
 
 - The first production-bound atlas pass is installed, but it still needs final
@@ -103,7 +119,8 @@ first visual pass.
 - Visitor scene persistence still depends on transient arrival state rather
   than persisted sightings.
 - Direct drag placement and visitor-condition deltas remain future editor
-  enhancements; the current catalog-driven button editor validates each commit.
+  enhancements; the current catalog-driven button editor validates each move,
+  rotation, removal, and replacement commit.
 - Weather treatment assets are authored and cataloged but are not drawn yet;
   preview and Flame scene composition must first share one alpha-clipped layer
   resolver so every surface remains deterministic and identical.

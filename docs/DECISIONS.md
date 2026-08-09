@@ -73,6 +73,13 @@ and valid anchors are visible on the board, and only connections involving the
 selected object remain emphasized. Direct drag is deferred until coordinate,
 gesture-cancellation, and accessibility behavior can be tested together.
 
+The editor catalog includes every crafted object, not only rows already present
+in the placements table. Stored or temporarily unplaced construction objects
+remain selectable, may preview any catalog-supported direction, and are written
+back only after the user presses the explicit empty-cell placement action. The
+first cell is deterministic row-major order; normal collision, footprint, and
+active-object-limit validation remains authoritative.
+
 ### Combination art is layered, not exhaustively baked
 
 Crafted visuals do not receive one bitmap per recipe × weather × surroundings ×

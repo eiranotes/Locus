@@ -78,6 +78,79 @@ extension AppControllerActions on AppController {
     );
   }
 
+  GridCell? firstAvailablePlacementAnchor({
+    required String craftedObjectId,
+    required int rotation,
+  }) {
+    final object = _craftedObjects
+        .where((CraftedObject candidate) => candidate.id == craftedObjectId)
+        .firstOrNull;
+    if (object == null) return null;
+    final existing = _placements
+        .where((Placement item) => item.craftedObjectId == craftedObjectId)
+        .firstOrNull;
+    if (existing == null &&
+        _placements.length >= catalog.balance.activeObjectLimit) {
+      return null;
+    }
+    final recipe = catalog.recipeById(object.recipeId);
+    final placementEntry = catalog.placement.entryForRecipe(recipe.id);
+    return PlacementEngine(
+      columns: catalog.balance.gridColumns,
+      rows: catalog.balance.gridRows,
+    ).firstValidAnchor(
+      candidate: Placement(
+        id: existing?.id ?? 'preview-$craftedObjectId',
+        craftedObjectId: craftedObjectId,
+        column: existing?.column ?? 0,
+        row: existing?.row ?? 0,
+        rotation: normalizeQuarterTurns(rotation),
+      ),
+      recipe: recipe,
+      existing: _placements,
+      recipeByObjectId: <String, RecipeDefinition>{
+        for (final item in _craftedObjects)
+          item.id: catalog.recipeById(item.recipeId),
+      },
+      allowedRotations: placementEntry.allowedRotations,
+    );
+  }
+
+  Future<bool> placeObjectAtFirstAvailable({
+    required String craftedObjectId,
+    required int rotation,
+  }) async {
+    final object = _craftedObjects
+        .where((CraftedObject candidate) => candidate.id == craftedObjectId)
+        .firstOrNull;
+    if (object == null) return false;
+    final alreadyPlaced = _placements.any(
+      (Placement item) => item.craftedObjectId == craftedObjectId,
+    );
+    if (!alreadyPlaced &&
+        _placements.length >= catalog.balance.activeObjectLimit) {
+      _errorMessage =
+          '내 공간에는 물건을 ${catalog.balance.activeObjectLimit}개까지 놓을 수 있습니다.';
+      notifyChanged();
+      return false;
+    }
+    final anchor = firstAvailablePlacementAnchor(
+      craftedObjectId: craftedObjectId,
+      rotation: rotation,
+    );
+    if (anchor == null) {
+      _errorMessage = '배치할 수 있는 빈 칸이 없습니다.';
+      notifyChanged();
+      return false;
+    }
+    return placeOrMoveObject(
+      craftedObjectId: craftedObjectId,
+      column: anchor.column,
+      row: anchor.row,
+      rotation: rotation,
+    );
+  }
+
   Future<CaptureBundle?> performCapture({
     required bool includeSurroundings,
   }) async {
