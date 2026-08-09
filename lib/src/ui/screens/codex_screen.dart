@@ -177,6 +177,16 @@ class _ObjectKindsTab extends StatelessWidget {
                                   weatherById[representative.weatherMaterialId]
                                       ?.timeBand,
                             ),
+                            constructionAssetPath: controller
+                                .catalog
+                                .craftingArt
+                                .constructionAssetFor(
+                                  representative.recipeId,
+                                  representative.requiredSteps <= 0
+                                      ? 1
+                                      : representative.appliedSteps /
+                                            representative.requiredSteps,
+                                ),
                             semanticLabel: '${recipe.nameKo} 대표 미리보기',
                           )
                         : const Center(

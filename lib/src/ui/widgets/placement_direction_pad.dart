@@ -19,32 +19,45 @@ class PlacementDirectionPad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        _MoveButton(
-          key: const ValueKey<String>('move-left'),
-          icon: Icons.arrow_left,
-          tooltip: '왼쪽 칸으로 이동',
-          onTap: canLeft ? () => onMove(-1, 0) : null,
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            _MoveButton(
+              key: const ValueKey<String>('move-left'),
+              icon: Icons.north_west,
+              tooltip: '화면 왼쪽 위 칸으로 이동',
+              onTap: canLeft ? () => onMove(-1, 0) : null,
+            ),
+            const SizedBox(width: 6),
+            _MoveButton(
+              key: const ValueKey<String>('move-up'),
+              icon: Icons.north_east,
+              tooltip: '화면 오른쪽 위 칸으로 이동',
+              onTap: canUp ? () => onMove(0, -1) : null,
+            ),
+          ],
         ),
-        _MoveButton(
-          key: const ValueKey<String>('move-up'),
-          icon: Icons.arrow_upward,
-          tooltip: '위쪽 칸으로 이동',
-          onTap: canUp ? () => onMove(0, -1) : null,
-        ),
-        _MoveButton(
-          key: const ValueKey<String>('move-down'),
-          icon: Icons.arrow_downward,
-          tooltip: '아래쪽 칸으로 이동',
-          onTap: canDown ? () => onMove(0, 1) : null,
-        ),
-        _MoveButton(
-          key: const ValueKey<String>('move-right'),
-          icon: Icons.arrow_right,
-          tooltip: '오른쪽 칸으로 이동',
-          onTap: canRight ? () => onMove(1, 0) : null,
+        const SizedBox(height: 6),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            _MoveButton(
+              key: const ValueKey<String>('move-down'),
+              icon: Icons.south_west,
+              tooltip: '화면 왼쪽 아래 칸으로 이동',
+              onTap: canDown ? () => onMove(0, 1) : null,
+            ),
+            const SizedBox(width: 6),
+            _MoveButton(
+              key: const ValueKey<String>('move-right'),
+              icon: Icons.south_east,
+              tooltip: '화면 오른쪽 아래 칸으로 이동',
+              onTap: canRight ? () => onMove(1, 0) : null,
+            ),
+          ],
         ),
       ],
     );
@@ -70,7 +83,7 @@ class _MoveButton extends StatelessWidget {
       tooltip: tooltip,
       icon: Icon(icon),
       color: PixelPalette.mint,
-      constraints: const BoxConstraints.tightFor(width: 44, height: 44),
+      constraints: const BoxConstraints.tightFor(width: 48, height: 48),
     );
   }
 }

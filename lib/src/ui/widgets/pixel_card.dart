@@ -7,6 +7,8 @@ class PixelCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(16),
     this.onTap,
     this.highlighted = false,
+    this.selected,
+    this.semanticLabel,
     super.key,
   });
 
@@ -14,30 +16,36 @@ class PixelCard extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
   final bool highlighted;
+  final bool? selected;
+  final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
-    final content = Container(
-      padding: padding,
-      decoration: BoxDecoration(
-        color: highlighted ? PixelPalette.surfaceRaised : PixelPalette.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: highlighted ? PixelPalette.mint : PixelPalette.line,
-          width: highlighted ? 1.4 : 1,
-        ),
+    final borderRadius = BorderRadius.circular(18);
+    final decoration = BoxDecoration(
+      color: highlighted ? PixelPalette.surfaceRaised : PixelPalette.surface,
+      borderRadius: borderRadius,
+      border: Border.all(
+        color: highlighted ? PixelPalette.mint : PixelPalette.line,
+        width: highlighted ? 1.4 : 1,
       ),
-      child: child,
     );
     if (onTap == null) {
-      return content;
+      return Container(padding: padding, decoration: decoration, child: child);
     }
     return Semantics(
       button: true,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: content,
+      selected: selected,
+      label: semanticLabel,
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: borderRadius,
+          splashColor: PixelPalette.mint.withValues(alpha: 0.14),
+          highlightColor: PixelPalette.mint.withValues(alpha: 0.08),
+          child: Ink(padding: padding, decoration: decoration, child: child),
+        ),
       ),
     );
   }

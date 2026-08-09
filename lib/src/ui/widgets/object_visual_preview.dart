@@ -12,6 +12,7 @@ class ObjectVisualPreview extends StatelessWidget {
     this.rotation = 0,
     this.semanticLabel,
     this.assetPath,
+    this.constructionAssetPath,
     this.mirrorX,
     super.key,
   });
@@ -20,6 +21,7 @@ class ObjectVisualPreview extends StatelessWidget {
   final int rotation;
   final String? semanticLabel;
   final String? assetPath;
+  final String? constructionAssetPath;
   final bool? mirrorX;
 
   @override
@@ -28,7 +30,11 @@ class ObjectVisualPreview extends StatelessWidget {
       painter: ObjectVisualPainter(visual: visual, rotation: rotation),
       size: Size.zero,
     );
-    final preview = visual.completion < 1
+    final isConstruction = visual.completion < 1;
+    final spritePath = isConstruction
+        ? constructionAssetPath
+        : assetPath ?? GeneratedArtPaths.object(visual.kind);
+    final preview = spritePath == null
         ? fallback
         : Stack(
             fit: StackFit.expand,
@@ -41,9 +47,9 @@ class ObjectVisualPreview extends StatelessWidget {
                     BlendMode.modulate,
                   ),
                   child: Transform.flip(
-                    flipX: mirrorX ?? rotation.isOdd,
+                    flipX: isConstruction ? false : mirrorX ?? rotation.isOdd,
                     child: Image.asset(
-                      assetPath ?? GeneratedArtPaths.object(visual.kind),
+                      spritePath,
                       fit: BoxFit.contain,
                       filterQuality: FilterQuality.none,
                       errorBuilder: (_, __, ___) => fallback,

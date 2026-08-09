@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "recipes": [
+    {
+      "recipeId": "alley_lamp",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_alley_lamp_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_alley_lamp_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_alley_lamp_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "signpost",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_signpost_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_signpost_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_signpost_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "planter",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_planter_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_planter_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_planter_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "bench",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_bench_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_bench_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_bench_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "stairs",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_stairs_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_stairs_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_stairs_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "tree",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_tree_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_tree_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_tree_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "bus_stop",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_bus_stop_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_bus_stop_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_bus_stop_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "pond",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_pond_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_pond_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_pond_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "bridge",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_bridge_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_bridge_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_bridge_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "tower",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_tower_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_tower_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_tower_finish.png"}
+      ]
+    }
+  ]
+}

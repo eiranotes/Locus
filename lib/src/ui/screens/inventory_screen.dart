@@ -357,6 +357,13 @@ class _ObjectsTab extends StatelessWidget {
                       object,
                       timeBand: weatherById[object.weatherMaterialId]?.timeBand,
                     ),
+                    constructionAssetPath: controller.catalog.craftingArt
+                        .constructionAssetFor(
+                          object.recipeId,
+                          object.requiredSteps <= 0
+                              ? 1
+                              : object.appliedSteps / object.requiredSteps,
+                        ),
                     semanticLabel: '${recipe.nameKo} 미리보기',
                   ),
                 ),

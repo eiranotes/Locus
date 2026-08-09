@@ -3,6 +3,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:reality_diorama/src/app/app_controller.dart';
 import 'package:reality_diorama/src/app/app_scope.dart';
 import 'package:reality_diorama/src/app/theme.dart';
+import 'package:reality_diorama/src/domain/crafting_art_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
@@ -164,6 +165,11 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
             recipe: widget.recipe,
             weather: weather,
             surroundings: surroundings,
+            availableSteps: controller.availableSteps,
+            constructionStage: controller.catalog.craftingArt.stageFor(
+              widget.recipe.id,
+              _projectedCompletion(controller.availableSteps),
+            ),
           ),
           const SizedBox(height: 14),
           Text('날씨 재료', style: Theme.of(context).textTheme.titleMedium),
@@ -320,6 +326,11 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
       }
     }
   }
+
+  double _projectedCompletion(int availableSteps) {
+    if (widget.recipe.stepCost <= 0) return 1;
+    return (availableSteps / widget.recipe.stepCost).clamp(0, 1).toDouble();
+  }
 }
 
 class _ObjectPreview extends StatelessWidget {
@@ -327,20 +338,28 @@ class _ObjectPreview extends StatelessWidget {
     required this.recipe,
     required this.weather,
     required this.surroundings,
+    required this.availableSteps,
+    required this.constructionStage,
   });
 
   final RecipeDefinition recipe;
   final WeatherMaterial? weather;
   final SurroundingMaterial? surroundings;
+  final int availableSteps;
+  final ConstructionArtStage? constructionStage;
 
   @override
   Widget build(BuildContext context) {
+    final completion = recipe.stepCost <= 0
+        ? 1.0
+        : (availableSteps / recipe.stepCost).clamp(0, 1).toDouble();
     final visual = weather == null
-        ? ObjectVisualDescriptor.forRecipe(recipe)
+        ? ObjectVisualDescriptor.forRecipe(recipe, completion: completion)
         : ObjectVisualDescriptor.forCraftingPreview(
             recipe: recipe,
             weather: weather!,
             surrounding: surroundings,
+            completion: completion,
           );
     return PixelCard(
       child: Column(
@@ -356,12 +375,37 @@ class _ObjectPreview extends StatelessWidget {
               padding: const EdgeInsets.all(18),
               child: ObjectVisualPreview(
                 visual: visual,
+                constructionAssetPath: constructionStage?.assetPath,
                 semanticLabel: '${recipe.nameKo} 제작 미리보기',
               ),
             ),
           ),
           const SizedBox(height: 12),
           Text(recipe.nameKo, style: Theme.of(context).textTheme.headlineSmall),
+          if (constructionStage != null) ...<Widget>[
+            const SizedBox(height: 8),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: LinearProgressIndicator(
+                    value: completion,
+                    minHeight: 7,
+                    color: PixelPalette.amber,
+                    backgroundColor: PixelPalette.line,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  '예상 ${_constructionStageLabel(constructionStage!.stage)}',
+                  style: const TextStyle(
+                    color: PixelPalette.amber,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 5),
           Text(
             recipe.descriptionKo,
@@ -400,6 +444,8 @@ class _WeatherPicker extends StatelessWidget {
             width: 136,
             child: PixelCard(
               highlighted: selected,
+              selected: selected,
+              semanticLabel: '${material.kind.labelKo} 날씨 재료',
               padding: const EdgeInsets.all(10),
               onTap: () => onSelected(material.id),
               child: Row(
@@ -455,6 +501,8 @@ class _SurroundingPicker extends StatelessWidget {
             width: 150,
             child: PixelCard(
               highlighted: selected,
+              selected: selected,
+              semanticLabel: '${material.kind.shortLabelKo} 주변 재료',
               padding: const EdgeInsets.all(10),
               onTap: () => onSelected(material.id),
               child: Row(
@@ -485,6 +533,13 @@ String? _findPreferred(Iterable<String> ids, String? preferred) {
   }
   return list.isEmpty ? null : list.first;
 }
+
+String _constructionStageLabel(String stage) => switch (stage) {
+  'foundation' => '기초 단계',
+  'frame' => '골조 단계',
+  'finish' => '마감 단계',
+  _ => '공사 단계',
+};
 
 extension _FirstOrNull<T> on Iterable<T> {
   T? get firstOrNull {

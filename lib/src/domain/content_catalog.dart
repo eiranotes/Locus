@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:reality_diorama/src/domain/crafting_art_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/placement_catalog.dart';
+import 'package:reality_diorama/src/domain/visual_layer_catalog.dart';
 
 class BalanceDefinition {
   const BalanceDefinition({
@@ -58,12 +60,16 @@ class ContentCatalog {
     required this.visitors,
     required this.balance,
     required this.placement,
+    this.craftingArt = CraftingArtCatalog.empty,
+    this.visualLayers = VisualLayerCatalog.empty,
   });
 
   final List<RecipeDefinition> recipes;
   final List<VisitorDefinition> visitors;
   final BalanceDefinition balance;
   final PlacementCatalog placement;
+  final CraftingArtCatalog craftingArt;
+  final VisualLayerCatalog visualLayers;
 
   RecipeDefinition recipeById(String id) =>
       recipes.firstWhere((RecipeDefinition recipe) => recipe.id == id);
@@ -86,6 +92,20 @@ class ContentCatalog {
               await bundle.loadString('assets/content/placement_catalog.json'),
             )
             as Map<String, Object?>;
+    final craftingArtDocument =
+        jsonDecode(
+              await bundle.loadString(
+                'assets/content/crafting_art_catalog.json',
+              ),
+            )
+            as Map<String, Object?>;
+    final visualLayerDocument =
+        jsonDecode(
+              await bundle.loadString(
+                'assets/content/visual_layer_catalog.json',
+              ),
+            )
+            as Map<String, Object?>;
 
     final recipes = (recipeDocument['recipes']! as List<Object?>)
         .cast<Map<String, Object?>>()
@@ -93,6 +113,10 @@ class ContentCatalog {
         .toList(growable: false);
     final placement = PlacementCatalog.fromJson(placementDocument)
       ..validateRecipes(recipes);
+    final craftingArt = CraftingArtCatalog.fromJson(craftingArtDocument)
+      ..validateRecipes(recipes);
+    final visualLayers = VisualLayerCatalog.fromJson(visualLayerDocument)
+      ..validate();
 
     return ContentCatalog(
       recipes: recipes,
@@ -102,6 +126,8 @@ class ContentCatalog {
           .toList(growable: false),
       balance: BalanceDefinition.fromJson(balanceDocument),
       placement: placement,
+      craftingArt: craftingArt,
+      visualLayers: visualLayers,
     );
   }
 }

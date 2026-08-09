@@ -35,3 +35,5 @@ flutter:
     - assets/art/
     - assets/art/generated/v1/
     - assets/art/generated/v1/directional/
+    - assets/art/generated/v1/construction/
+    - assets/art/generated/v1/weather/

@@ -27,6 +27,15 @@
       catalog with exhaustive four-direction and boundary tests.
 - [x] Generate, process, and catalog true four-direction sprites for all ten
       placeable objects with source/hash/contact-sheet provenance.
+- [x] Generate and catalog three recipe-specific construction stages for every
+      recipe and use them in projected crafting and incomplete-object previews.
+- [x] Generate and catalog the bounded 12-asset shared weather-treatment pack.
+- [x] Replace linear placement arrows with a 48 dp isometric direction pad and
+      expose selected state on material/object catalogs.
+- [ ] Centralize alpha-clipped sprite composition and apply the cataloged
+      weather surface/footprint layers identically across every object surface.
+- [ ] Make home scene-first, derive scene visitors from persisted sightings,
+      and add a semantic scene summary.
 - [ ] Derive the scene visitor from persisted sightings while keeping the
       one-time arrival dialog transient.
 - [ ] Add an integration test for the deterministic demo core loop.
@@ -40,6 +49,8 @@
 - [ ] Add direct drag-to-cell manipulation after Flame/Flutter coordinate and
       accessibility behavior has a tested contract.
 - [ ] Add target-visitor condition deltas for proposed placements.
+- [ ] Add compact/medium/expanded layout policies and large-text fallbacks for
+      records, visitors, material pickers, and the placement catalog.
 
 ## Deferred release work
 

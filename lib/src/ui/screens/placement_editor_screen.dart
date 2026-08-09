@@ -238,6 +238,8 @@ class _PlacedObjectCatalog extends StatelessWidget {
             width: 132,
             child: PixelCard(
               highlighted: selected,
+              selected: selected,
+              semanticLabel: '${recipe.nameKo} ${direction.labelKo}',
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
               onTap: () => onSelected(object.id),
               child: Row(

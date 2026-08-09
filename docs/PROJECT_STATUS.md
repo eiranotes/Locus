@@ -4,11 +4,11 @@ Last updated: 2026-08-09
 
 ## Current state
 
-`main` at `e17d579` contains the iOS simulator fixes, deterministic demo
-isolation, shared renderer, and 42-asset pixel-art package. The current working
-slice makes placement authoring catalog-driven, hardens movement, direction,
-collision, edge, and editor feedback, and adds true directional art for future
-recipe expansion.
+`main` at `e8b240f` contains the iOS simulator fixes, deterministic demo
+isolation, shared renderer, 42-asset pixel-art package, and catalog-driven
+directional editor. The current working slice adds bounded construction and
+weather-layer catalogs and begins the Pro-reviewed shift from generic Material
+utility UI toward a scene-first collection/crafting game shell.
 
 ## Completed in the current slice
 
@@ -48,6 +48,19 @@ recipe expansion.
 - Added exhaustive coverage for every recipe across all four rotations, board
   edges, collisions, unsupported rotations, asset existence, and minimum touch
   targets.
+- Generated and installed 30 recipe-specific construction sprites: ten recipes
+  × foundation/frame/finish. Crafting now previews the expected authored stage
+  from available steps, and incomplete inventory/codex objects resolve through
+  the same exact crafting-art catalog.
+- Generated, processed, and cataloged 12 reusable weather treatments: six
+  object-surface patterns and six isometric footprint effects. They are staged
+  for the next shared-compositor slice rather than expanding into hundreds of
+  complete recipe combinations.
+- Replaced the editor's misleading linear movement row with a spatially
+  truthful 2×2 isometric direction pad and 48 dp targets. Selectable material
+  and object cards now expose selected semantics and visible ink feedback.
+- Recorded a dual-agent Pro UI review and an independent Pro asset-system
+  review in `docs/UI_GAME_CONCEPT_REVIEW.md`.
 
 ## Simulator evidence
 
@@ -91,6 +104,11 @@ first visual pass.
   than persisted sightings.
 - Direct drag placement and visitor-condition deltas remain future editor
   enhancements; the current catalog-driven button editor validates each commit.
+- Weather treatment assets are authored and cataloged but are not drawn yet;
+  preview and Flame scene composition must first share one alpha-clipped layer
+  resolver so every surface remains deterministic and identical.
+- The scene-first home, persisted visitor presence, and a semantic diorama
+  summary are the next P1 UI slice from the Pro review.
 - Directional art is authoring-complete for the current ten recipes, but a later
   populated-neighborhood visual pass may still tune individual scale/occlusion.
 - The AppIcon candidate requires owner review at actual icon sizes before use.

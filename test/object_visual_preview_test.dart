@@ -39,6 +39,24 @@ void main() {
                   semanticLabel: '상세 골목등 미리보기',
                 ),
               ),
+              SizedBox(
+                width: 120,
+                height: 120,
+                child: ObjectVisualPreview(
+                  visual: ObjectVisualDescriptor(
+                    kind: ObjectKind.alleyLamp,
+                    weatherKind: WeatherMaterialKind.rain,
+                    timeBand: TimeBand.evening,
+                    surroundingKind: SurroundingMaterialKind.dynamic,
+                    visualSeed: 99,
+                    generatorVersion: 'test-v1',
+                    completion: 0.25,
+                  ),
+                  constructionAssetPath:
+                      'assets/art/generated/v1/construction/construction_alley_lamp_foundation.png',
+                  semanticLabel: '공사 중 골목등 미리보기',
+                ),
+              ),
             ],
           ),
         ),
@@ -46,9 +64,10 @@ void main() {
     );
 
     expect(tester.takeException(), isNull);
-    expect(find.byType(ObjectVisualPreview), findsNWidgets(2));
+    expect(find.byType(ObjectVisualPreview), findsNWidgets(3));
     expect(find.bySemanticsLabel('목록 골목등 미리보기'), findsOneWidget);
     expect(find.bySemanticsLabel('상세 골목등 미리보기'), findsOneWidget);
+    expect(find.bySemanticsLabel('공사 중 골목등 미리보기'), findsOneWidget);
   });
 
   test('preview painter repaints when the descriptor changes', () {

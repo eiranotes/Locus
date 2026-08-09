@@ -72,3 +72,26 @@ Invalid moves and rotations are disabled before mutation, selected footprints
 and valid anchors are visible on the board, and only connections involving the
 selected object remain emphasized. Direct drag is deferred until coordinate,
 gesture-cancellation, and accessibility behavior can be tested together.
+
+### Combination art is layered, not exhaustively baked
+
+Crafted visuals do not receive one bitmap per recipe × weather × surroundings ×
+time × direction combination. That would create 300 craft combinations and up
+to 3,600 placed states before seeded details. Recipe identity remains in the 40
+directional completed sprites. Ten recipes each receive three bounded authored
+construction stages through `crafting_art_catalog.json`.
+
+Weather identity is a shared 12-asset layer set registered in
+`visual_layer_catalog.json`: six surface patterns and six isometric footprint
+effects. Time palette, surroundings connectors, and seeded details remain
+runtime treatments. Place plaques remain native/code-rendered so Korean labels
+are not baked into images. Weather assets will be drawn only after preview and
+scene composition share one alpha-clipped layer resolver.
+
+### Editor movement follows the visible isometric axes
+
+The 5×5 logical grid remains unchanged, but movement controls now use northwest,
+northeast, southwest, and southeast arrows in a 2×2 pad. This matches the
+screen-space result of the two logical grid axes. Targets are 48 dp so the same
+control clears both iOS and Android minimum guidance; commit validation still
+comes exclusively from `PlacementEngine`.

@@ -33,6 +33,12 @@
 - Directional artwork and allowed rotations now come from
   `assets/content/placement_catalog.json`; every direction resolves to a unique
   production sprite rather than an interim mirror transform.
+- Crafting previews now show the authored construction stage that current
+  available steps can reach, and incomplete object previews use the same
+  cataloged recipe stage.
+- Placement movement now follows the four visible isometric diagonals with
+  48 dp controls. Material and placed-object selections expose semantic state,
+  and tappable pixel cards show visible pressed ink.
 
 ### Assets
 
@@ -46,6 +52,12 @@
   sprites covering all ten placeable objects in four true quarter-turn views.
 - Added a directional contact sheet, exact inventory/hash manifest, reviewed
   crop bounds, and a standalone reproducible processing/validation tool.
+- Added 30 construction sprites covering all ten recipes at foundation, frame,
+  and finish stages, with raw ImageGen sources, exact prompts, reviewed cell
+  ordering, contact sheet, SHA-256 manifest, and reproducible processor.
+- Added 12 shared weather-treatment assets (six surface patterns and six
+  footprint effects), plus exact prompt/source/hash provenance and a visual
+  layer catalog for the upcoming shared compositor.
 - Generated art is now used by the home scene, object previews, inventory,
   codex, visitor goal, and material indicators; Canvas rendering remains the
   deterministic fallback.
@@ -57,3 +69,5 @@
 - Added exhaustive placement-catalog tests across every recipe, four rotations,
   all board edges, collision rejection, unsupported directions, art files, and
   iOS-sized movement targets.
+- Added exact crafting-art and weather-layer catalog coverage, stage-resolution,
+  file-existence, and 48 dp isometric movement tests.

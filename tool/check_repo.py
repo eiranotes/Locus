@@ -342,7 +342,12 @@ def check_tools_and_ci() -> None:
 
 
 def check_generated_art() -> None:
-    for script in ("process_generated_art.py", "process_directional_art.py"):
+    for script in (
+        "process_generated_art.py",
+        "process_directional_art.py",
+        "process_construction_art.py",
+        "process_weather_art.py",
+    ):
         result = subprocess.run(
             [sys.executable, str(ROOT / f"tool/{script}"), "--validate-only"],
             cwd=ROOT,
@@ -357,6 +362,10 @@ def check_generated_art() -> None:
         fail("pubspec.yaml must bundle the generated art directory")
     if "assets/art/generated/v1/directional/" not in pubspec:
         fail("pubspec.yaml must bundle the directional art directory")
+    if "assets/art/generated/v1/construction/" not in pubspec:
+        fail("pubspec.yaml must bundle the construction art directory")
+    if "assets/art/generated/v1/weather/" not in pubspec:
+        fail("pubspec.yaml must bundle the weather art directory")
     catalog = (ROOT / "lib/src/diorama/generated_art_catalog.dart").read_text(
         encoding="utf-8"
     )
@@ -376,9 +385,15 @@ def check_required_files() -> None:
         "tool/bootstrap_platforms.sh", "tool/publish_github.sh",
         "tool/process_generated_art.py",
         "tool/process_directional_art.py",
+        "tool/process_construction_art.py",
+        "tool/process_weather_art.py",
         "artifacts/imagegen/locus-art-v1/manifest.json",
         "artifacts/imagegen/locus-directional-art-v1/manifest.json",
+        "artifacts/imagegen/locus-construction-art-v1/manifest.json",
+        "artifacts/imagegen/locus-weather-treatments-v1/manifest.json",
         "assets/content/placement_catalog.json",
+        "assets/content/crafting_art_catalog.json",
+        "assets/content/visual_layer_catalog.json",
     ]
     missing = [item for item in required if not (ROOT / item).exists()]
     if missing:

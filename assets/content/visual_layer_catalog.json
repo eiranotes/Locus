@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "weather": [
+    {"kind": "clear", "surfacePatternPath": "assets/art/generated/v1/weather/surface_clear.png", "footprintEffectPath": "assets/art/generated/v1/weather/footprint_clear.png", "surfaceOpacity": 0.30},
+    {"kind": "rain", "surfacePatternPath": "assets/art/generated/v1/weather/surface_rain.png", "footprintEffectPath": "assets/art/generated/v1/weather/footprint_rain.png", "surfaceOpacity": 0.40},
+    {"kind": "cloudy", "surfacePatternPath": "assets/art/generated/v1/weather/surface_cloudy.png", "footprintEffectPath": "assets/art/generated/v1/weather/footprint_cloudy.png", "surfaceOpacity": 0.30},
+    {"kind": "windy", "surfacePatternPath": "assets/art/generated/v1/weather/surface_windy.png", "footprintEffectPath": "assets/art/generated/v1/weather/footprint_windy.png", "surfaceOpacity": 0.38},
+    {"kind": "cold", "surfacePatternPath": "assets/art/generated/v1/weather/surface_cold.png", "footprintEffectPath": "assets/art/generated/v1/weather/footprint_cold.png", "surfaceOpacity": 0.40},
+    {"kind": "warm", "surfacePatternPath": "assets/art/generated/v1/weather/surface_warm.png", "footprintEffectPath": "assets/art/generated/v1/weather/footprint_warm.png", "surfaceOpacity": 0.34}
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "package": "locus-weather-treatments-v1",
+  "generator": "OpenAI built-in image_gen",
+  "styleReference": "artifacts/imagegen/locus-directional-art-v1/contact-sheet.png",
+  "chromaKey": "#FF00FF",
+  "chromaKeyFuzz": "28%",
+  "kinds": [
+    "clear",
+    "rain",
+    "cloudy",
+    "windy",
+    "cold",
+    "warm"
+  ],
+  "sources": [
+    {
+      "path": "artifacts/imagegen/locus-weather-treatments-v1/sources/footprint-effects.png",
+      "sha256": "25707408975ec9d1e0679d9eb40ed4eae3acd8215abccd911e4d0d3399719722",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "path": "artifacts/imagegen/locus-weather-treatments-v1/sources/surface-treatments.png",
+      "sha256": "06e18fd5b2a7d289696f9b890051665050b4c19e75c348e020516c8bde1efbfe",
+      "width": 1536,
+      "height": 1024
+    }
+  ],
+  "assets": [
+    {
+      "name": "footprint_clear",
+      "kind": "clear",
+      "layer": "footprint",
+      "path": "assets/art/generated/v1/weather/footprint_clear.png",
+      "source": "artifacts/imagegen/locus-weather-treatments-v1/sources/footprint-effects.png",
+      "sourceCell": 0,
+      "width": 256,
+      "height": 256,
+      "pngColorType": 6,
+      "sha256": "2a202fe878e33fbee27adbdc7a0b56084d1572842f4e836d441f23f745d48e1a"
+    },
+    {
+      "name": "footprint_cloudy",
+      "kind": "cloudy",
+      "layer": "footprint",
+      "path": "assets/art/generated/v1/weather/footprint_cloudy.png",
+      "source": "artifacts/imagegen/locus-weather-treatments-v1/sources/footprint-effects.png",
+      "sourceCell": 2,
+      "width": 256,
+      "height": 256,
+      "pngColorType": 6,
+      "sha256": "50d714a6bf953c9a5f29db96e9e231c5bdb9c76b8675fd6ab0001bd788ea171a"
+    },
+    {
+      "name": "footprint_cold",
+      "kind": "cold",
+      "layer": "footprint",
+      "path": "assets/art/generated/v1/weather/footprint_cold.png",
+      "source": "artifacts/imagegen/locus-weather-treatments-v1/sources/footprint-effects.png",
+      "sourceCell": 4,
+      "width": 256,
+      "height": 256,
+      "pngColorType": 6,
+      "sha256": "ecb60614d02757d1dfabb70254cc7b6b000ada840881531158a19963267bbbec"
+    },
+    {
+      "name": "footprint_rain",
+      "kind": "rain",
+      "layer": "footprint",
+      "path": "assets/art/generated/v1/weather/footprint_rain.png",
+      "source": "artifacts/imagegen/locus-weather-treatments-v1/sources/footprint-effects.png",
+      "sourceCell": 1,
+      "width": 256,
+      "height": 256,
+      "pngColorType": 6,
+      "sha256": "da845e58f1c21832330f92fb9c926782a04c09a2656586ff06004be00a221287"
+    },
+    {
+      "name": "footprint_warm",
+      "kind": "warm",
+      "layer": "footprint",
+      "path": "assets/art/generated/v1/weather/footprint_warm.png",
+      "source": "artifacts/imagegen/locus-weather-treatments-v1/sources/footprint-effects.png",
+      "sourceCell": 5,
+      "width": 256,
+      "height": 256,
+      "pngColorType": 6,
+      "sha256": "1627228c6ad31f386a6efffa5158849cd4e87c2d6e7985303de8d57d4a862e32"
+    },
+    {
+      "name": "footprint_windy",
+      "kind": "windy",
+      "layer": "footprint",
+      "path": "assets/art/generated/v1/weather/footprint_windy.png",
+      "source": "artifacts/imagegen/locus-weather-treatments-v1/sources/footprint-effects.png",
+      "sourceCell": 3,
+      "width": 256,
+      "height": 256,
+      "pngColorType": 6,
+      "sha256": "e7e23bcb2852c010fe36bd0cf16183588429f9185f0e434fe115dbf5ddb5a0aa"
+    },
+    {
+      "name": "surface_clear",
+      "kind": "clear",
+      "layer": "surface",
+      "path": "assets/art/generated/v1/weather/surface_clear.png",
+      "source": "artifacts/imagegen/locus-weather-treatments-v1/sources/surface-treatments.png",
+      "sourceCell": 0,
+      "width": 128,
+      "height": 128,
+      "pngColorType": 6,
+      "sha256": "d7805114b6dfd0ccedd5aa0e320391984365eecbc36e6767b9842e66b36f4d6a"
+    },
+    {
+      "name": "surface_cloudy",
+      "kind": "cloudy",
+      "layer": "surface",
+      "path": "assets/art/generated/v1/weather/surface_cloudy.png",
+      "source": "artifacts/imagegen/locus-weather-treatments-v1/sources/surface-treatments.png",
+      "sourceCell": 2,
+      "width": 128,
+      "height": 128,
+      "pngColorType": 6,
+      "sha256": "2094ce2a581ea71b02c2e737161c12e549e3ade37ed8c7e68378eee7d114121a"
+    },
+    {
+      "name": "surface_cold",
+      "kind": "cold",
+      "layer": "surface",
+      "path": "assets/art/generated/v1/weather/surface_cold.png",
+      "source": "artifacts/imagegen/locus-weather-treatments-v1/sources/surface-treatments.png",
+      "sourceCell": 4,
+      "width": 128,
+      "height": 128,
+      "pngColorType": 6,
+      "sha256": "6e91fa5f77ba0ce42364d4d3401b30ecea9ae1fb7fe36e2f75730ae72ff3c462"
+    },
+    {
+      "name": "surface_rain",
+      "kind": "rain",
+      "layer": "surface",
+      "path": "assets/art/generated/v1/weather/surface_rain.png",
+      "source": "artifacts/imagegen/locus-weather-treatments-v1/sources/surface-treatments.png",
+      "sourceCell": 1,
+      "width": 128,
+      "height": 128,
+      "pngColorType": 6,
+      "sha256": "057728f4ad8c518feaf909b08d820f3f00952ac51f316ff69c779dc731fa3195"
+    },
+    {
+      "name": "surface_warm",
+      "kind": "warm",
+      "layer": "surface",
+      "path": "assets/art/generated/v1/weather/surface_warm.png",
+      "source": "artifacts/imagegen/locus-weather-treatments-v1/sources/surface-treatments.png",
+      "sourceCell": 5,
+      "width": 128,
+      "height": 128,
+      "pngColorType": 6,
+      "sha256": "98a639e0ab52d19b75ad21d2f9b8dae45cb6995d114f82a7716402dc15e09e12"
+    },
+    {
+      "name": "surface_windy",
+      "kind": "windy",
+      "layer": "surface",
+      "path": "assets/art/generated/v1/weather/surface_windy.png",
+      "source": "artifacts/imagegen/locus-weather-treatments-v1/sources/surface-treatments.png",
+      "sourceCell": 3,
+      "width": 128,
+      "height": 128,
+      "pngColorType": 6,
+      "sha256": "5fd292522d5fd01a75dc544f1ee9b856a9c74f7f8a1f636fbff102fe9f09dde4"
+    }
+  ]
+}
