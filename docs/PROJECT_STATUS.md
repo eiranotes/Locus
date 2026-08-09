@@ -4,11 +4,10 @@ Last updated: 2026-08-09
 
 ## Current state
 
-`main` at `3dc564a7fa4c1c2caac5cbb4d7f08f1dcc592627` contained the imported Flutter
-MVP. The current working tree continues that implementation with local iOS
-simulator launch fixes, Locus identity cleanup, deterministic demo permission
-handling, and the first shared object-rendering slice. These changes are not
-committed or pushed yet.
+`main` at `41c8b79` contains the iOS simulator launch fixes, Locus identity
+cleanup, deterministic demo isolation, and shared deterministic object-rendering
+contract. The current slice replaces the visibly provisional runtime art with a
+production-bound generated pixel-art package while retaining Canvas fallbacks.
 
 ## Completed in the current slice
 
@@ -28,6 +27,14 @@ committed or pushed yet.
   use `object-v2`; persisted `object-v1` collectibles keep their legacy shape.
 - Generated one Pro-model AppIcon candidate and normalized it to an opaque
   1024 × 1024 sRGB PNG. It remains unselected and is not wired into iOS assets.
+- Generated, keyed, cropped, and installed 42 production-bound pixel assets:
+  10 crafted objects, 6 visitors, 8 scenery pieces, 10 material emblems, and 8
+  weather/time overlays.
+- Connected the generated art to the home diorama, object previews, inventory,
+  codex, visitor goal, and material UI. The deterministic renderer remains the
+  construction-state and asset-load fallback.
+- Added reproducible prompt/source provenance, an exact manifest with SHA-256
+  hashes, and a standard-library validation gate for the generated package.
 
 ## Simulator evidence
 
@@ -53,10 +60,17 @@ installed and cold-relaunched successfully. The fresh demo home showed 4,275
 steps, and the simulator container contained a separate
 `reality_diorama_demo.sqlite3` with its own unspent bucket.
 
+The generated-art slice was then verified with the same pinned SDK: the exact
+42-asset manifest passed, `flutter analyze` reported no issues, all 39 tests
+passed, and a Debug iOS simulator build installed and launched. The final home
+capture shows the generated house, tree, bench, fence, path, atmospheric layer,
+and visitor portrait; excessive daytime overlay noise was removed after the
+first visual pass.
+
 ## Known risks and gates
 
-- The object renderer is still code-generated geometry, not the deferred G2
-  production atlas.
+- The first production-bound atlas pass is installed, but it still needs final
+  composition tuning against a range of populated neighborhoods and text sizes.
 - Place plaques and a share-output renderer remain outside this first shared
   renderer slice.
 - Visitor scene persistence still depends on transient arrival state rather

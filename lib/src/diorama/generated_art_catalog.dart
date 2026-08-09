@@ -1,0 +1,132 @@
+import 'dart:ui' as ui;
+
+import 'package:flutter/services.dart';
+import 'package:reality_diorama/src/domain/enums.dart';
+
+abstract final class GeneratedArtPaths {
+  static const String root = 'assets/art/generated/v1';
+
+  static String object(ObjectKind kind) =>
+      '$root/${switch (kind) {
+        ObjectKind.alleyLamp => 'object_alley_lamp',
+        ObjectKind.signpost => 'object_signpost',
+        ObjectKind.planter => 'object_planter',
+        ObjectKind.bench => 'object_bench',
+        ObjectKind.stairs => 'object_stairs',
+        ObjectKind.tree => 'object_tree',
+        ObjectKind.busStop => 'object_bus_stop',
+        ObjectKind.pond => 'object_pond',
+        ObjectKind.bridge => 'object_bridge',
+        ObjectKind.tower => 'object_tower',
+      }}.png';
+
+  static String visitor(String id) => '$root/visitor_$id.png';
+
+  static String weatherMaterial(WeatherMaterialKind kind) =>
+      '$root/material_${kind.name}.png';
+
+  static String surroundingMaterial(SurroundingMaterialKind kind) =>
+      '$root/material_${kind.name}.png';
+
+  static String weatherOverlay(WeatherMaterialKind kind) =>
+      '$root/${switch (kind) {
+        WeatherMaterialKind.rain => 'overlay_rain',
+        WeatherMaterialKind.cloudy => 'overlay_fog',
+        WeatherMaterialKind.windy => 'overlay_wind',
+        WeatherMaterialKind.cold => 'overlay_snow',
+        WeatherMaterialKind.clear => 'overlay_morning',
+        WeatherMaterialKind.warm => 'overlay_evening',
+      }}.png';
+
+  static String timeOverlay(TimeBand timeBand) =>
+      '$root/${switch (timeBand) {
+        TimeBand.dawn => 'overlay_dawn',
+        TimeBand.morning => 'overlay_morning',
+        TimeBand.afternoon => 'overlay_morning',
+        TimeBand.evening => 'overlay_evening',
+        TimeBand.night => 'overlay_night',
+      }}.png';
+
+  static String scenery(String name) => '$root/scenery_$name.png';
+}
+
+final class DioramaArtImages {
+  const DioramaArtImages({
+    required this.objects,
+    required this.visitors,
+    required this.scenery,
+    required this.weatherOverlays,
+    required this.timeOverlays,
+  });
+
+  final Map<ObjectKind, ui.Image> objects;
+  final Map<String, ui.Image> visitors;
+  final Map<String, ui.Image> scenery;
+  final Map<WeatherMaterialKind, ui.Image> weatherOverlays;
+  final Map<TimeBand, ui.Image> timeOverlays;
+
+  static Future<DioramaArtImages> load() async {
+    final objectPaths = <ObjectKind, String>{
+      for (final kind in ObjectKind.values)
+        kind: GeneratedArtPaths.object(kind),
+    };
+    final visitorPaths = <String, String>{
+      for (final id in const <String>[
+        'umbrella_walker',
+        'night_moth',
+        'roof_bird',
+        'fog_cat',
+        'transfer_guest',
+        'light_swarm',
+      ])
+        id: GeneratedArtPaths.visitor(id),
+    };
+    final sceneryPaths = <String, String>{
+      for (final name in const <String>[
+        'house',
+        'workshop',
+        'kiosk',
+        'shed',
+        'tree',
+        'bench',
+        'fence',
+        'path_junction',
+      ])
+        name: GeneratedArtPaths.scenery(name),
+    };
+    final weatherPaths = <WeatherMaterialKind, String>{
+      for (final kind in WeatherMaterialKind.values)
+        kind: GeneratedArtPaths.weatherOverlay(kind),
+    };
+    final timePaths = <TimeBand, String>{
+      for (final timeBand in TimeBand.values)
+        timeBand: GeneratedArtPaths.timeOverlay(timeBand),
+    };
+
+    return DioramaArtImages(
+      objects: await _loadMap(objectPaths),
+      visitors: await _loadMap(visitorPaths),
+      scenery: await _loadMap(sceneryPaths),
+      weatherOverlays: await _loadMap(weatherPaths),
+      timeOverlays: await _loadMap(timePaths),
+    );
+  }
+
+  static Future<Map<K, ui.Image>> _loadMap<K>(Map<K, String> paths) async {
+    final entries = await Future.wait(
+      paths.entries.map((entry) async {
+        return MapEntry<K, ui.Image>(entry.key, await _load(entry.value));
+      }),
+    );
+    return Map<K, ui.Image>.fromEntries(entries);
+  }
+
+  static Future<ui.Image> _load(String path) async {
+    final data = await rootBundle.load(path);
+    final bytes = Uint8List.sublistView(data);
+    final codec = await ui.instantiateImageCodec(bytes);
+    final frame = await codec.getNextFrame();
+    codec.dispose();
+    return frame.image;
+  }
+}

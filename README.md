@@ -105,12 +105,13 @@ name for archive publishing. See `docs/repository-publishing.md`.
 
 ## Art status
 
-The app renders a coherent placeholder diorama from code. Images under
-`docs/references` are mood and composition references only, not production
-assets. One owner-review AppIcon candidate is stored under `assets/branding`.
-Production object/visitor art remains deferred and must use a fixed 2:1
-isometric grid, one pixel scale, one light direction, shared atlases, and integer
-scaling.
+The app ships a 42-asset static pixel-art package for objects, visitors, fixed
+scenery, materials, weather, and time effects. It uses a fixed 2:1 isometric
+grid, one pixel scale, one light direction, and nearest-neighbor scaling. Exact
+prompts, source sheets, crop rules, and hashes live under
+`artifacts/imagegen/locus-art-v1`; deterministic Canvas geometry remains the
+fallback. Images under `docs/references` remain mood references only. The
+AppIcon under `assets/branding` is still an owner-review candidate.
 
 ## License
 

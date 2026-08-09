@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -324,6 +325,26 @@ def check_tools_and_ci() -> None:
         fail("source archive root must remain stable")
 
 
+def check_generated_art() -> None:
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "tool/process_generated_art.py"), "--validate-only"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        fail(f"generated art validation failed: {result.stderr or result.stdout}")
+    pubspec = (ROOT / "pubspec.yaml").read_text(encoding="utf-8")
+    if "assets/art/generated/v1/" not in pubspec:
+        fail("pubspec.yaml must bundle the generated art directory")
+    catalog = (ROOT / "lib/src/diorama/generated_art_catalog.dart").read_text(
+        encoding="utf-8"
+    )
+    if "static Future<DioramaArtImages> load()" not in catalog or "static String object(" not in catalog:
+        fail("generated art catalog must expose runtime paths and preload images")
+
+
 def check_required_files() -> None:
     required = [
         "README.md", "LICENSE", "AGENTS.md", ".metadata", "pubspec.yaml",
@@ -334,6 +355,8 @@ def check_required_files() -> None:
         "test/cooldown_engine_test.dart", "test/diorama_rules_test.dart",
         "test/capture_services_test.dart", "test/step_sync_service_test.dart",
         "tool/bootstrap_platforms.sh", "tool/publish_github.sh",
+        "tool/process_generated_art.py",
+        "artifacts/imagegen/locus-art-v1/manifest.json",
     ]
     missing = [item for item in required if not (ROOT / item).exists()]
     if missing:
@@ -351,6 +374,7 @@ def main() -> None:
     check_weatherkit_unit_contract()
     check_atomic_persistence_contracts()
     check_product_contracts()
+    check_generated_art()
     check_tools_and_ci()
     print("repository checks passed")
 

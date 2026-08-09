@@ -14,6 +14,10 @@
       collectible compatibility.
 - [x] Ask the Locus Pro conversation to review the next slice and generate one
       AppIcon candidate from a recorded production prompt.
+- [x] Generate and install the first complete object, visitor, scenery,
+      material, and atmosphere art package with prompt/source/hash provenance.
+- [x] Use generated sprites across the home scene, crafting, inventory, codex,
+      visitor goal, and materials while preserving deterministic fallbacks.
 
 ## Next
 
@@ -26,13 +30,14 @@
       object renderer.
 - [ ] Review the AppIcon candidate at 1024, 180, 60, and 29 pt; either approve
       it or request one focused revision before wiring wrapper generation.
-- [ ] Replace the fixed umbrella icon in the home visitor target with the
-      actual visitor identity and count unique visitors rather than sightings.
+- [ ] Count unique visitors rather than sightings in the home visitor target.
+- [ ] Tune sprite scale and occlusion against neighborhoods containing the full
+      eight-object limit and validate large-text card layouts.
 
 ## Deferred release work
 
-- [ ] Production object/visitor atlas and frame animation after G2 geometry is
-      stable.
+- [ ] Frame animation and expanded scenery variants after the static v1 atlas
+      composition is approved.
 - [ ] WeatherKit App ID/profile activation and physical-device verification.
 - [ ] Store product identifiers, analytics gates, backup/import UI, widgets,
       high-resolution sharing, and device accessibility/battery/thermal audit.

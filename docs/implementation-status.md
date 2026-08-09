@@ -11,14 +11,15 @@
 - Android and iOS foreground BLE aggregation bridges;
 - crafting/construction flow;
 - 5×5 placement and visitor rules;
-- pixel-style isometric prototype renderer shared by the home scene, crafting,
-  inventory, and codex with persisted `visualSeed` details;
+- production-bound static pixel-art package shared by the home scene, crafting,
+  inventory, and codex, with persisted `visualSeed` tint details and Canvas
+  fallbacks;
 - inventory, settings, and codex;
 - tests, repository contracts, Android/iOS compile CI, and reproducible publish/archive helpers.
 
 ## Deliberately not represented as complete
 
-- production pixel atlases and frame animation;
+- frame animation and additional scenery variants beyond the static v1 atlas;
 - Apple Developer portal App ID/profile activation for WeatherKit;
 - Play Billing/App Store product identifiers;
 - home-screen widgets and Android Quick Settings tile;
@@ -64,6 +65,7 @@ The normal Flutter workflow is read-only. A separate `workflow_run` reporter may
 
 Distribution signing, store configuration, WeatherKit provisioning, production Android weather-provider selection, and physical-device accessibility/battery/thermal testing remain release gates rather than import gates.
 
-The current image-asset scope is one owner-review AppIcon candidate under
-`assets/branding/candidates`. Production sprite atlases remain deferred until
-the G2 renderer and placement geometry are stable.
+The current image-asset scope includes one owner-review AppIcon candidate plus
+the 42-asset static runtime package under `assets/art/generated/v1`. Prompts,
+source sheets, contact sheet, crop contract, and hashes are tracked under
+`artifacts/imagegen/locus-art-v1`.

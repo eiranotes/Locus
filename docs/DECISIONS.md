@@ -32,12 +32,19 @@ crafting preview and the created object share one seed function. New objects use
 `object-v2`, while `object-v1` bypasses new detail channels to preserve existing
 collectibles.
 
-### Production art remains deferred; AppIcon is a review candidate
+### Generated static art is now the primary renderer input
 
-The G2 object/visitor atlas is not commissioned until renderer geometry and
-placement feedback stabilize. The only generated image in this slice is one
-AppIcon candidate. It stays outside `AppIcon.appiconset` until owner approval.
-Launch uses a solid native background, not generated splash art.
+The owner explicitly approved moving beyond prototype geometry. A fixed v1
+package of 42 generated sprites now supplies crafted objects, visitors, fixed
+scenery, material emblems, and weather/time effects. Generation happens only at
+authoring time: sources, exact prompts, crop rules, output dimensions, alpha
+contract, and SHA-256 hashes are tracked. Locus never generates artwork at
+runtime. Deterministic Canvas geometry remains available for construction state
+and asset-load failure, preventing saved objects from becoming unreadable.
+
+The AppIcon remains a separate review candidate outside `AppIcon.appiconset`.
+Launch continues to use a solid native background rather than generated splash
+art.
 
 ### Application dependencies are locked
 

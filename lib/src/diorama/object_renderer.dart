@@ -21,9 +21,16 @@ final class DeterministicObjectRenderer {
     required Offset anchor,
     required ObjectVisualDescriptor visual,
     int rotation = 0,
+    Image? sprite,
   }) {
     if (visual.completion < 1) {
       _drawConstruction(canvas, anchor, visual.completion);
+      return;
+    }
+
+    if (sprite != null) {
+      _drawObjectSprite(canvas, anchor, visual, sprite);
+      _drawConnectorMark(canvas, anchor, visual.surroundingKind);
       return;
     }
 
@@ -64,6 +71,14 @@ final class DeterministicObjectRenderer {
         break;
     }
     _drawConnectorMark(canvas, anchor, visual.surroundingKind);
+  }
+
+  Color spriteTint(ObjectVisualDescriptor visual) {
+    final weatherAccent = _weatherAccent(visual.weatherKind);
+    final accent = _hasSeededDetails(visual)
+        ? _applyTimePalette(weatherAccent, visual.timeBand)
+        : weatherAccent;
+    return Color.lerp(Colors.white, accent, 0.10)!;
   }
 
   void paintFitted(
@@ -111,6 +126,43 @@ final class DeterministicObjectRenderer {
     canvas.drawRect(
       Rect.fromLTWH(anchor.dx - 15, anchor.dy - 34, 30 * completion, 3),
       Paint()..color = PixelPalette.mint,
+    );
+  }
+
+  void _drawObjectSprite(
+    Canvas canvas,
+    Offset anchor,
+    ObjectVisualDescriptor visual,
+    Image sprite,
+  ) {
+    final size = switch (visual.kind) {
+      ObjectKind.alleyLamp => const Size(76, 98),
+      ObjectKind.signpost => const Size(78, 78),
+      ObjectKind.planter => const Size(84, 72),
+      ObjectKind.bench => const Size(86, 72),
+      ObjectKind.stairs => const Size(88, 76),
+      ObjectKind.tree => const Size(98, 98),
+      ObjectKind.busStop => const Size(92, 98),
+      ObjectKind.pond => const Size(92, 68),
+      ObjectKind.bridge => const Size(96, 76),
+      ObjectKind.tower => const Size(84, 104),
+    };
+    _drawShadow(canvas, anchor.translate(0, 2), size.width * 0.52, 9);
+    canvas.drawImageRect(
+      sprite,
+      Rect.fromLTWH(0, 0, sprite.width.toDouble(), sprite.height.toDouble()),
+      Rect.fromLTWH(
+        anchor.dx - size.width / 2,
+        anchor.dy - size.height,
+        size.width,
+        size.height,
+      ),
+      Paint()
+        ..filterQuality = FilterQuality.none
+        ..colorFilter = ColorFilter.mode(
+          spriteTint(visual),
+          BlendMode.modulate,
+        ),
     );
   }
 

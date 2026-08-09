@@ -2,8 +2,10 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flame/game.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/material.dart' show Colors, RadialGradient;
 import 'package:reality_diorama/src/app/theme.dart';
+import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/diorama/object_renderer.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
@@ -14,9 +16,21 @@ class DioramaGame extends FlameGame {
   DioramaGame(this._snapshot);
 
   DioramaSnapshot _snapshot;
+  DioramaArtImages? _art;
 
   void updateSnapshot(DioramaSnapshot snapshot) {
     _snapshot = snapshot;
+  }
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    try {
+      _art = await DioramaArtImages.load();
+    } catch (error, stackTrace) {
+      debugPrint('Generated diorama art failed to load: $error\n$stackTrace');
+      _art = null;
+    }
   }
 
   @override
@@ -25,12 +39,15 @@ class DioramaGame extends FlameGame {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    DioramaScenePainter(_snapshot).paint(canvas, Size(size.x, size.y));
+    DioramaScenePainter(
+      _snapshot,
+      art: _art,
+    ).paint(canvas, Size(size.x, size.y));
   }
 }
 
 class DioramaScenePainter {
-  DioramaScenePainter(this.snapshot);
+  DioramaScenePainter(this.snapshot, {this.art});
 
   static const double logicalSize = 360;
   static const double tileWidth = 52;
@@ -40,6 +57,7 @@ class DioramaScenePainter {
       DeterministicObjectRenderer();
 
   final DioramaSnapshot snapshot;
+  final DioramaArtImages? art;
 
   void paint(Canvas canvas, Size outputSize) {
     final scale = math.min(
@@ -169,6 +187,40 @@ class DioramaScenePainter {
 
   void _drawFixedArchitecture(Canvas canvas) {
     final houseBase = _tileTop(2.6, 0.15).translate(0, -4);
+    final generatedArt = art;
+    if (generatedArt != null) {
+      _drawArtImage(
+        canvas,
+        generatedArt.scenery['house'],
+        anchor: houseBase,
+        size: const Size(132, 132),
+      );
+      _drawArtImage(
+        canvas,
+        generatedArt.scenery['tree'],
+        anchor: _tileTop(0.25, 0.35),
+        size: const Size(94, 94),
+      );
+      _drawArtImage(
+        canvas,
+        generatedArt.scenery['bench'],
+        anchor: _tileTop(0.45, 1.6),
+        size: const Size(88, 72),
+      );
+      _drawArtImage(
+        canvas,
+        generatedArt.scenery['fence'],
+        anchor: _tileTop(4.25, 1.0),
+        size: const Size(92, 70),
+      );
+      _drawArtImage(
+        canvas,
+        generatedArt.scenery['path_junction'],
+        anchor: _tileTop(2.6, 4.15).translate(0, 3),
+        size: const Size(96, 66),
+      );
+      return;
+    }
     final wall = Paint()
       ..isAntiAlias = false
       ..color = const Color(0xFF354047);
@@ -297,6 +349,7 @@ class DioramaScenePainter {
               snapshot.weatherMaterialsById[object.weatherMaterialId]?.timeBand,
         ),
         rotation: placement.rotation,
+        sprite: art?.objects[object.kind],
       );
     }
   }
@@ -306,6 +359,16 @@ class DioramaScenePainter {
       return;
     }
     final anchor = _tileTop(2.2, 4.1).translate(0, -4);
+    final generatedVisitor = art?.visitors[snapshot.activeVisitorId];
+    if (generatedVisitor != null) {
+      _drawArtImage(
+        canvas,
+        generatedVisitor,
+        anchor: anchor,
+        size: const Size(66, 66),
+      );
+      return;
+    }
     _drawShadow(canvas, anchor, 20, 7);
     final coat = snapshot.activeVisitorId == 'umbrella_walker'
         ? PixelPalette.amber
@@ -337,6 +400,39 @@ class DioramaScenePainter {
   }
 
   void _drawWeather(Canvas canvas) {
+    final generatedArt = art;
+    if (generatedArt != null) {
+      final timeOpacity = switch (snapshot.timeBand) {
+        TimeBand.dawn => 0.14,
+        TimeBand.morning => 0.0,
+        TimeBand.afternoon => 0.0,
+        TimeBand.evening => 0.12,
+        TimeBand.night => 0.14,
+      };
+      if (timeOpacity > 0) {
+        _drawOverlay(
+          canvas,
+          generatedArt.timeOverlays[snapshot.timeBand],
+          opacity: timeOpacity,
+        );
+      }
+      final weatherOpacity = switch (snapshot.weatherKind) {
+        WeatherMaterialKind.rain => 0.24,
+        WeatherMaterialKind.cloudy => 0.14,
+        WeatherMaterialKind.windy => 0.18,
+        WeatherMaterialKind.cold => 0.22,
+        WeatherMaterialKind.clear => 0.0,
+        WeatherMaterialKind.warm => 0.10,
+      };
+      if (weatherOpacity > 0) {
+        _drawOverlay(
+          canvas,
+          generatedArt.weatherOverlays[snapshot.weatherKind],
+          opacity: weatherOpacity,
+        );
+      }
+      return;
+    }
     switch (snapshot.weatherKind) {
       case WeatherMaterialKind.rain:
         final paint = Paint()
@@ -390,6 +486,42 @@ class DioramaScenePainter {
     origin.dx + (column - row) * tileWidth / 2,
     origin.dy + (column + row) * tileHeight / 2,
   );
+
+  void _drawArtImage(
+    Canvas canvas,
+    Image? image, {
+    required Offset anchor,
+    required Size size,
+  }) {
+    if (image == null) {
+      return;
+    }
+    canvas.drawImageRect(
+      image,
+      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+      Rect.fromLTWH(
+        anchor.dx - size.width / 2,
+        anchor.dy - size.height,
+        size.width,
+        size.height,
+      ),
+      Paint()..filterQuality = FilterQuality.none,
+    );
+  }
+
+  void _drawOverlay(Canvas canvas, Image? image, {required double opacity}) {
+    if (image == null || opacity <= 0) {
+      return;
+    }
+    canvas.drawImageRect(
+      image,
+      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+      const Rect.fromLTWH(0, 0, logicalSize, logicalSize),
+      Paint()
+        ..filterQuality = FilterQuality.none
+        ..color = Colors.white.withValues(alpha: opacity),
+    );
+  }
 
   void _drawShadow(Canvas canvas, Offset anchor, double width, double height) {
     canvas.drawOval(

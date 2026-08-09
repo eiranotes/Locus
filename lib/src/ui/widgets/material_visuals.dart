@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reality_diorama/src/app/theme.dart';
+import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 
 Color weatherColor(WeatherMaterialKind kind) => switch (kind) {
@@ -57,6 +58,9 @@ class MaterialOrb extends StatelessWidget {
     final icon = weather == null
         ? surroundingIcon(surroundings!)
         : weatherIcon(weather!);
+    final assetPath = weather == null
+        ? GeneratedArtPaths.surroundingMaterial(surroundings!)
+        : GeneratedArtPaths.weatherMaterial(weather!);
     return Container(
       width: 54,
       height: 54,
@@ -65,7 +69,15 @@ class MaterialOrb extends StatelessWidget {
         color: color.withValues(alpha: 0.13),
         border: Border.all(color: color.withValues(alpha: 0.72)),
       ),
-      child: Icon(icon, color: color, size: 27),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Image.asset(
+          assetPath,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.none,
+          errorBuilder: (_, __, ___) => Icon(icon, color: color, size: 27),
+        ),
+      ),
     );
   }
 }

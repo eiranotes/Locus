@@ -193,9 +193,15 @@ Visitors, crafted object families, and recipes. Undiscovered visitors show direc
 - one fixed pixel scale and one light direction;
 - limited local glow;
 - native Korean text, not baked pixel text;
-- no production use of generated concept-image fragments.
+- no production use of fragments cut from exploratory concept screens;
+- authoring-time generated sprites require an explicit inventory, shared atlas
+  contract, transparent outputs, recorded prompts/sources, and deterministic
+  runtime fallbacks.
 
-The prototype uses deterministic canvas primitives. Production art should replace them with shared atlases only after the diorama-quality gate.
+The static v1 art package passed the initial shared-renderer gate and replaces
+prototype primitives on primary surfaces. Canvas geometry remains the
+construction and asset-load fallback. The application never generates artwork
+at runtime.
 
 ## Privacy and provenance
 

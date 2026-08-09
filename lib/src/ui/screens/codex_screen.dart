@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:reality_diorama/src/app/app_controller.dart';
 import 'package:reality_diorama/src/app/app_scope.dart';
 import 'package:reality_diorama/src/app/theme.dart';
+import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/ui/widgets/object_visual_preview.dart';
@@ -85,17 +86,22 @@ class _VisitorsTab extends StatelessWidget {
                         : PixelPalette.background,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: Center(
-                    child: Icon(
-                      discovered
-                          ? _visitorIcon(visitor.id)
-                          : Icons.help_outline,
-                      color: discovered
-                          ? PixelPalette.blue
-                          : PixelPalette.muted,
-                      size: 54,
-                    ),
-                  ),
+                  child: discovered
+                      ? Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Image.asset(
+                            GeneratedArtPaths.visitor(visitor.id),
+                            fit: BoxFit.contain,
+                            filterQuality: FilterQuality.none,
+                          ),
+                        )
+                      : const Center(
+                          child: Icon(
+                            Icons.help_outline,
+                            color: PixelPalette.muted,
+                            size: 54,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -267,13 +273,3 @@ class _RecipesTab extends StatelessWidget {
     );
   }
 }
-
-IconData _visitorIcon(String id) => switch (id) {
-  'umbrella_walker' => Icons.umbrella_outlined,
-  'night_moth' => Icons.flutter_dash,
-  'roof_bird' => Icons.flight,
-  'fog_cat' => Icons.pets_outlined,
-  'transfer_guest' => Icons.directions_bus_outlined,
-  'light_swarm' => Icons.auto_awesome,
-  _ => Icons.person_outline,
-};

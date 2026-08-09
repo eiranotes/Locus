@@ -33,3 +33,4 @@ flutter:
   assets:
     - assets/content/
     - assets/art/
+    - assets/art/generated/v1/

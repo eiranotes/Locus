@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:reality_diorama/src/app/app_controller.dart';
 import 'package:reality_diorama/src/app/app_scope.dart';
 import 'package:reality_diorama/src/app/theme.dart';
+import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/diorama/diorama_view.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
@@ -214,9 +215,13 @@ class _VisitorGoal extends StatelessWidget {
               color: PixelPalette.blue.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(
-              Icons.umbrella_outlined,
-              color: PixelPalette.blue,
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Image.asset(
+                GeneratedArtPaths.visitor(evaluation.visitor.id),
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.none,
+              ),
             ),
           ),
           const SizedBox(width: 12),

@@ -9,8 +9,9 @@
   1024 × 1024 and assigned the sRGB IEC61966-2.1 profile with macOS `sips`.
 - Status: owner-review candidate only. It is intentionally not copied into the
   generated iOS `AppIcon.appiconset` until the product owner approves it.
-- Scope: app icon only. It is not a production sprite atlas, launch image,
-  in-app illustration, or Weather attribution asset.
+- Scope: app icon only. Runtime sprites are maintained independently under
+  `assets/art/generated/v1`; this candidate is not a launch image, in-app
+  illustration, or Weather attribution asset.
 
 The candidate reads clearly as a nocturnal miniature place at medium sizes, but
 its two-building composition becomes detail-dense at 29 pt. Review it at actual
@@ -57,9 +58,10 @@ EXCLUDE
 - No copyrighted characters, recognizable brand styling, watermark, signature, outer border, pre-rounded mask, or transparent edge.
 ```
 
-## Deferred visual assets
+## Runtime visual assets
 
-Do not generate a production object/visitor atlas before the shared renderer,
-placement feedback, and G2 interaction geometry are stable. Launch should use a
-solid `#071522` native background rather than generated splash art. WeatherKit
-attribution must continue to use Apple's official mark and text fallback.
+The owner approved the first static runtime atlas after the shared renderer was
+introduced. Its independent provenance and processing contract live in
+`artifacts/imagegen/locus-art-v1`. Launch still uses a solid `#071522` native
+background rather than generated splash art. WeatherKit attribution continues
+to use Apple's official mark and text fallback.

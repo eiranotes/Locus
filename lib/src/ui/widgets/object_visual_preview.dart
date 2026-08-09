@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:reality_diorama/src/app/theme.dart';
+import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/diorama/object_renderer.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
+import 'package:reality_diorama/src/domain/enums.dart';
 
 /// A thin widget surface over the same renderer used by the home diorama.
 class ObjectVisualPreview extends StatelessWidget {
@@ -17,10 +20,37 @@ class ObjectVisualPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final preview = CustomPaint(
+    final fallback = CustomPaint(
       painter: ObjectVisualPainter(visual: visual, rotation: rotation),
       size: Size.zero,
     );
+    final preview = visual.completion < 1
+        ? fallback
+        : Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(2),
+                child: ColorFiltered(
+                  colorFilter: ColorFilter.mode(
+                    ObjectVisualPainter.renderer.spriteTint(visual),
+                    BlendMode.modulate,
+                  ),
+                  child: Image.asset(
+                    GeneratedArtPaths.object(visual.kind),
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.none,
+                    errorBuilder: (_, __, ___) => fallback,
+                  ),
+                ),
+              ),
+              if (visual.surroundingKind != null)
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: _ConnectorDots(kind: visual.surroundingKind!),
+                ),
+            ],
+          );
     if (semanticLabel == null) {
       return preview;
     }
@@ -36,7 +66,7 @@ class ObjectVisualPreview extends StatelessWidget {
 class ObjectVisualPainter extends CustomPainter {
   const ObjectVisualPainter({required this.visual, this.rotation = 0});
 
-  static const DeterministicObjectRenderer _renderer =
+  static const DeterministicObjectRenderer renderer =
       DeterministicObjectRenderer();
 
   final ObjectVisualDescriptor visual;
@@ -44,7 +74,7 @@ class ObjectVisualPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    _renderer.paintFitted(canvas, size, visual: visual, rotation: rotation);
+    renderer.paintFitted(canvas, size, visual: visual, rotation: rotation);
   }
 
   @override
@@ -57,5 +87,42 @@ class ObjectVisualPainter extends CustomPainter {
         oldDelegate.visual.visualSeed != visual.visualSeed ||
         oldDelegate.visual.generatorVersion != visual.generatorVersion ||
         oldDelegate.visual.completion != visual.completion;
+  }
+}
+
+class _ConnectorDots extends StatelessWidget {
+  const _ConnectorDots({required this.kind});
+
+  final SurroundingMaterialKind kind;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = switch (kind) {
+      SurroundingMaterialKind.dense => PixelPalette.mint,
+      SurroundingMaterialKind.dynamic => PixelPalette.blue,
+      SurroundingMaterialKind.stable => PixelPalette.amber,
+      SurroundingMaterialKind.sparse => PixelPalette.violet,
+    };
+    final count = switch (kind) {
+      SurroundingMaterialKind.dense => 3,
+      SurroundingMaterialKind.dynamic => 2,
+      SurroundingMaterialKind.stable => 1,
+      SurroundingMaterialKind.sparse => 2,
+    };
+    return Padding(
+      padding: const EdgeInsets.all(5),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List<Widget>.generate(
+          count,
+          (_) => Container(
+            width: 4,
+            height: 4,
+            margin: const EdgeInsets.only(left: 2),
+            color: color,
+          ),
+        ),
+      ),
+    );
   }
 }
