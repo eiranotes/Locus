@@ -2,6 +2,20 @@
 
 ## 2026-08-09
 
+### Night Cabinet replaces the universal outlined-card grammar
+
+The shell uses a quieter semantic palette so authored diorama art remains the
+most memorable surface. Canvas, scene, panel, raised, text, action, reward,
+weather, visitor, danger, and focus colors now have distinct roles. Mint is
+reserved for the primary action and current selection rather than also serving
+as success, progress, navigation, and decoration.
+
+Default panels are separated by tone rather than an outline. Scene, tray,
+card, tile, chip, and control radii are independently bounded; full pills are
+reserved for compact status. The foreground collection action moves out of the
+bottom navigation and into the home scene action layer. The bottom bar contains
+destinations only.
+
 ### Home is scene-first and the scene visitor is persisted
 
 The home header uses one compact resource strip and the visitor goal sits

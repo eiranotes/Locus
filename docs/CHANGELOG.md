@@ -20,6 +20,11 @@
 
 ### Changed
 
+- Replaced the universal 18 px outlined-card theme with the Night Cabinet
+  semantic palette, tonal surfaces, bounded role-specific radii, denser type,
+  and 48 dp controls.
+- Moved collection from the oversized center navigation button into the home
+  scene action layer; the bottom bar now contains destinations only.
 - User-visible app identity is Locus.
 - Capture uses a surroundings/sensor glyph instead of a camera glyph.
 - Home, crafting, inventory, and codex object visuals share deterministic

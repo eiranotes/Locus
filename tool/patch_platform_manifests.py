@@ -106,8 +106,8 @@ def patch_ios_launch_screen() -> None:
     text = path.read_text(encoding="utf-8")
     text, count = re.subn(
         r'<color key="backgroundColor"[^>]*/>',
-        '<color key="backgroundColor" red="0.027451" green="0.082353" '
-        'blue="0.133333" alpha="1" colorSpace="custom" '
+        '<color key="backgroundColor" red="0.023529" green="0.074510" '
+        'blue="0.113725" alpha="1" colorSpace="custom" '
         'customColorSpace="sRGB"/>',
         text,
         count=1,

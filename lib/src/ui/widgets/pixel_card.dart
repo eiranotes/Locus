@@ -9,6 +9,8 @@ class PixelCard extends StatelessWidget {
     this.highlighted = false,
     this.selected,
     this.semanticLabel,
+    this.radius = PixelRadii.card,
+    this.color,
     super.key,
   });
 
@@ -18,20 +20,22 @@ class PixelCard extends StatelessWidget {
   final bool highlighted;
   final bool? selected;
   final String? semanticLabel;
+  final double radius;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = BorderRadius.circular(18);
+    final borderRadius = BorderRadius.circular(radius);
     final shape = RoundedRectangleBorder(
       borderRadius: borderRadius,
-      side: BorderSide(
-        color: highlighted ? PixelPalette.mint : PixelPalette.line,
-        width: highlighted ? 1.4 : 1,
-      ),
+      side: highlighted
+          ? const BorderSide(color: PixelPalette.action, width: 1.5)
+          : BorderSide.none,
     );
     if (onTap == null) {
       return Material(
-        color: highlighted ? PixelPalette.surfaceRaised : PixelPalette.surface,
+        color:
+            color ?? (highlighted ? PixelPalette.raised : PixelPalette.panel),
         shape: shape,
         clipBehavior: Clip.antiAlias,
         child: Padding(padding: padding, child: child),
@@ -42,14 +46,15 @@ class PixelCard extends StatelessWidget {
       selected: selected,
       label: semanticLabel,
       child: Material(
-        color: highlighted ? PixelPalette.surfaceRaised : PixelPalette.surface,
+        color:
+            color ?? (highlighted ? PixelPalette.raised : PixelPalette.panel),
         shape: shape,
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
           borderRadius: borderRadius,
-          splashColor: PixelPalette.mint.withValues(alpha: 0.14),
-          highlightColor: PixelPalette.mint.withValues(alpha: 0.08),
+          splashColor: PixelPalette.action.withValues(alpha: 0.12),
+          highlightColor: PixelPalette.action.withValues(alpha: 0.07),
           child: Padding(padding: padding, child: child),
         ),
       ),

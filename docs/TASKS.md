@@ -21,6 +21,12 @@
 
 ## Next
 
+- [x] Establish Night Cabinet semantic tokens, tonal surfaces, role-specific
+      radii, and a destination-only bottom navigation.
+- [ ] Recompose capture, crafting, and placement as scene/workbench surfaces
+      instead of nested outlined cards.
+- [ ] Recompose inventory, codex, and settings as a drawer, field guide, and
+      native-density grouped list.
 - [x] Add selected-footprint highlighting, valid anchor markers, relevant
       connection emphasis, and disabled invalid move/rotation actions.
 - [x] Move placement directions and artwork variants into an exact recipe

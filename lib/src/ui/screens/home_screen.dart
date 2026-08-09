@@ -13,8 +13,13 @@ import 'package:reality_diorama/src/ui/screens/settings_screen.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({required this.demoMode, super.key});
+  const HomeScreen({
+    required this.demoMode,
+    required this.onCapture,
+    super.key,
+  });
   final bool demoMode;
+  final VoidCallback onCapture;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -79,6 +84,24 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: _VisitorGoal(evaluation: target),
                           ),
                         Positioned(
+                          left: 10,
+                          bottom: 10,
+                          child: Badge(
+                            isLabelVisible: controller.captureReadyCount > 0,
+                            label: Text('${controller.captureReadyCount}'),
+                            backgroundColor: PixelPalette.reward,
+                            textColor: PixelPalette.actionInk,
+                            child: FilledButton.icon(
+                              onPressed: widget.onCapture,
+                              icon: const Icon(
+                                Icons.sensors_outlined,
+                                size: 18,
+                              ),
+                              label: const Text('수집'),
+                            ),
+                          ),
+                        ),
+                        Positioned(
                           right: 10,
                           bottom: 10,
                           child: FilledButton.tonalIcon(
@@ -92,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icons.grid_view_outlined,
                               size: 18,
                             ),
-                            label: const Text('배치 편집'),
+                            label: const Text('배치'),
                           ),
                         ),
                       ],

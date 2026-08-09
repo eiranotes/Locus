@@ -67,7 +67,10 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
     }
 
     final screens = <Widget>[
-      HomeScreen(demoMode: widget.demoMode),
+      HomeScreen(
+        demoMode: widget.demoMode,
+        onCapture: () => _showCapture(context),
+      ),
       const InventoryScreen(),
       const CodexScreen(),
     ];
@@ -82,9 +85,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
       ),
       bottomNavigationBar: _BottomBar(
         currentIndex: controller.navigationIndex,
-        readyCount: controller.captureReadyCount,
         onDestination: controller.setNavigationIndex,
-        onCapture: () => _showCapture(context),
       ),
     );
   }
@@ -94,35 +95,29 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
       context: context,
       useSafeArea: true,
       isScrollControlled: true,
-      backgroundColor: PixelPalette.background,
+      backgroundColor: Colors.transparent,
+      barrierColor: PixelPalette.canvas.withValues(alpha: 0.72),
       builder: (BuildContext context) => const CaptureSheet(),
     );
   }
 }
 
 class _BottomBar extends StatelessWidget {
-  const _BottomBar({
-    required this.currentIndex,
-    required this.readyCount,
-    required this.onDestination,
-    required this.onCapture,
-  });
+  const _BottomBar({required this.currentIndex, required this.onDestination});
 
   final int currentIndex;
-  final int readyCount;
   final ValueChanged<int> onDestination;
-  final VoidCallback onCapture;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
       child: Container(
-        height: 82,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        height: 68,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         decoration: const BoxDecoration(
-          color: PixelPalette.surface,
-          border: Border(top: BorderSide(color: PixelPalette.line)),
+          color: PixelPalette.panel,
+          border: Border(top: BorderSide(color: PixelPalette.divider)),
         ),
         child: Row(
           children: <Widget>[
@@ -133,40 +128,6 @@ class _BottomBar extends StatelessWidget {
                 selectedIcon: Icons.home,
                 label: '내 공간',
                 onTap: () => onDestination(0),
-              ),
-            ),
-            Expanded(
-              child: Center(
-                child: Badge(
-                  isLabelVisible: readyCount > 0,
-                  label: Text('$readyCount'),
-                  backgroundColor: PixelPalette.danger,
-                  child: Semantics(
-                    button: true,
-                    label: '수집',
-                    child: InkResponse(
-                      onTap: onCapture,
-                      radius: 34,
-                      child: Container(
-                        width: 62,
-                        height: 62,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: PixelPalette.mint,
-                          border: Border.all(
-                            color: PixelPalette.cream.withValues(alpha: 0.55),
-                            width: 2,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.sensors_outlined,
-                          color: PixelPalette.background,
-                          size: 28,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
               ),
             ),
             Expanded(
@@ -211,10 +172,10 @@ class _Destination extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? PixelPalette.mint : PixelPalette.muted;
+    final color = selected ? PixelPalette.action : PixelPalette.textMuted;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(PixelRadii.control),
       child: SizedBox.expand(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

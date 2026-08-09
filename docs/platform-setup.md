@@ -58,7 +58,7 @@ The selected step source is stored. Changing between actual steps and the daily 
 - Android API 26 minimum and permission manifest;
 - iOS 18 minimum and usage descriptions;
 - WeatherKit entitlement and Xcode project attachment.
-- Locus bundle display/executable metadata and the `#071522` launch background.
+- Locus bundle display/executable metadata and the `#06131D` launch background.
 
 The command is intended for CI and wrapper recovery. Review its diff before committing in a developer checkout.
 

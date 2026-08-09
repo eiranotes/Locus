@@ -9,10 +9,18 @@ renderer, cataloged pixel-art packages, and a catalog-driven directional
 editor. The current working slice makes the home surface scene-first, keeps the
 latest persisted visitor visible after its one-time arrival dialog, adds a
 semantic scene summary, and establishes a repeatable iOS screenshot tour for
-the complete deterministic demo loop.
+the complete deterministic demo loop. The active UI migration now uses the
+Night Cabinet semantic palette and removes the global outlined-card treatment;
+collection is a scene action rather than an oversized navigation item.
 
 ## Completed in the current slice
 
+- Added semantic canvas, scene, panel, text, action, reward, weather, visitor,
+  danger, and focus tokens with verified text/action contrast.
+- Replaced the default 18 px outlined `PixelCard` with tonal 10 px surfaces;
+  selected cards retain an explicit mint outline.
+- Reduced the bottom bar to three destinations and moved the labeled,
+  ready-count-aware collection action into the home diorama.
 - Added missing iOS executable metadata and changed user-visible identity from
   Reality Diorama to Locus.
 - Changed the native launch background patch to `#071522` to avoid a white
