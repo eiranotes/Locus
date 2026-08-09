@@ -25,6 +25,9 @@
   and 48 dp controls.
 - Moved collection from the oversized center navigation button into the home
   scene action layer; the bottom bar now contains destinations only.
+- Reworked capture as a tonal sensor tray, crafting as a borderless workbench
+  list with an object stage, and placement as a scene plus one compact control
+  dock. Craft completion now presents the deterministic result artwork.
 - User-visible app identity is Locus.
 - Capture uses a surroundings/sensor glyph instead of a camera glyph.
 - Home, crafting, inventory, and codex object visuals share deterministic

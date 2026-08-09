@@ -89,9 +89,8 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
                   aspectRatio: 1,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: PixelPalette.surface,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: PixelPalette.line),
+                      color: PixelPalette.scene,
+                      borderRadius: BorderRadius.circular(PixelRadii.scene),
                     ),
                     child: DioramaView(snapshot: editorSnapshot),
                   ),
@@ -270,7 +269,7 @@ class _PlacementObjectCatalog extends StatelessWidget {
       for (final material in controller.weatherMaterials) material.id: material,
     };
     return SizedBox(
-      height: 92,
+      height: 88,
       child: ListView.separated(
         key: const ValueKey<String>('placement-object-catalog'),
         scrollDirection: Axis.horizontal,
@@ -291,8 +290,10 @@ class _PlacementObjectCatalog extends StatelessWidget {
           final direction = controller.catalog.placement.directionFor(rotation);
           final selected = object.id == selectedObjectId;
           return SizedBox(
-            width: 132,
+            width: 124,
             child: PixelCard(
+              radius: PixelRadii.tile,
+              color: selected ? PixelPalette.raised : PixelPalette.scene,
               highlighted: selected,
               selected: selected,
               semanticLabel:
@@ -396,6 +397,8 @@ class _StoredObjectPlacementControls extends StatelessWidget {
     final lifecycleLabel = object.isComplete ? '보관 중' : '공사 중';
 
     return PixelCard(
+      radius: PixelRadii.tray,
+      color: PixelPalette.raised,
       padding: const EdgeInsets.all(12),
       child: Column(
         children: <Widget>[
@@ -527,6 +530,8 @@ class _PlacementControls extends StatelessWidget {
     final nextRotation = _nextValidRotation();
 
     return PixelCard(
+      radius: PixelRadii.tray,
+      color: PixelPalette.raised,
       padding: const EdgeInsets.all(12),
       child: Column(
         children: <Widget>[

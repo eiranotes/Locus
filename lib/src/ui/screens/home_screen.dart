@@ -64,9 +64,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   aspectRatio: 0.88,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: PixelPalette.surface,
-                      borderRadius: BorderRadius.circular(22),
-                      border: Border.all(color: PixelPalette.line),
+                      color: PixelPalette.scene,
+                      borderRadius: BorderRadius.circular(PixelRadii.scene),
                     ),
                     child: Stack(
                       children: <Widget>[
@@ -115,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icons.grid_view_outlined,
                               size: 18,
                             ),
-                            label: const Text('배치'),
+                            label: const Text('배치 편집'),
                           ),
                         ),
                       ],
@@ -208,14 +207,8 @@ class _ResourceStrip extends StatelessWidget {
     return Semantics(
       label: '${_formatNumber(availableSteps)}걸음, 수집 준비 $readyCount개',
       container: true,
-      child: Container(
-        height: 44,
-        padding: const EdgeInsets.symmetric(horizontal: 11),
-        decoration: BoxDecoration(
-          color: PixelPalette.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: PixelPalette.line),
-        ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -271,12 +264,7 @@ class _VisitorGoal extends StatelessWidget {
     return Material(
       color: PixelPalette.surface.withValues(alpha: 0.94),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-        side: BorderSide(
-          color: evaluation.satisfiedCount > 0
-              ? PixelPalette.mint
-              : PixelPalette.line,
-        ),
+        borderRadius: BorderRadius.circular(PixelRadii.card),
       ),
       child: Padding(
         padding: const EdgeInsets.all(10),
@@ -334,7 +322,6 @@ class _VisitorGoal extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: PixelPalette.muted),
           ],
         ),
       ),

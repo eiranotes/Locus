@@ -21,6 +21,11 @@ collection is a scene action rather than an oversized navigation item.
   selected cards retain an explicit mint outline.
 - Reduced the bottom bar to three destinations and moved the labeled,
   ready-count-aware collection action into the home diorama.
+- Differentiated the core-loop surfaces: capture uses sensor readouts, recipes
+  use divider-based rows, crafting uses one object stage, and placement uses a
+  borderless scene with compact tile and control docks.
+- Added the crafted object preview to the completion confirmation so the reward
+  is recognizable without adding ornamental choreography.
 - Added missing iOS executable metadata and changed user-visible identity from
   Reality Diorama to Locus.
 - Changed the native launch background patch to `#071522` to avoid a white

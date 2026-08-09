@@ -23,7 +23,7 @@
 
 - [x] Establish Night Cabinet semantic tokens, tonal surfaces, role-specific
       radii, and a destination-only bottom navigation.
-- [ ] Recompose capture, crafting, and placement as scene/workbench surfaces
+- [x] Recompose capture, crafting, and placement as scene/workbench surfaces
       instead of nested outlined cards.
 - [ ] Recompose inventory, codex, and settings as a drawer, field guide, and
       native-density grouped list.

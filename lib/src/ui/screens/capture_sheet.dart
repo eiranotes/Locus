@@ -45,97 +45,105 @@ class _CaptureSheetState extends State<CaptureSheet> {
     final preparation = controller.capturePreparation;
     final screenHeight = MediaQuery.sizeOf(context).height;
 
-    return SizedBox(
-      height: screenHeight * 0.90,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 8, 18, 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Align(
-              child: Container(
-                width: 38,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: PixelPalette.line,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 18),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    _result == null ? '지금 수집' : '수집 완료',
-                    style: Theme.of(context).textTheme.headlineLarge,
+    return Material(
+      color: PixelPalette.panel,
+      borderRadius: const BorderRadius.vertical(
+        top: Radius.circular(PixelRadii.tray),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: SizedBox(
+        height: screenHeight * 0.90,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 8, 18, 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Align(
+                child: Container(
+                  width: 38,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: PixelPalette.line,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                IconButton(
-                  onPressed: _capturing
-                      ? null
-                      : () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close),
-                  tooltip: '닫기',
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: _loadingPreparation
-                  ? const Center(child: CircularProgressIndicator())
-                  : _capturing
-                  ? _CaptureProgress(
-                      scansSurroundings:
-                          _includeSurroundings &&
-                          preparation?.surroundingReadiness.isReady == true,
-                    )
-                  : _result == null
-                  ? _PreparationView(
-                      preparation: preparation,
-                      availableSteps: controller.availableSteps,
-                      includeSurroundings: _includeSurroundings,
-                      onSurroundingsChanged: (bool value) {
-                        setState(() => _includeSurroundings = value);
-                      },
-                    )
-                  : _ResultView(bundle: _result!),
-            ),
-            const SizedBox(height: 14),
-            if (!_capturing && _result == null)
-              FilledButton.icon(
-                onPressed:
-                    preparation == null ||
-                        (!preparation.weatherReadiness.isReady &&
-                            !preparation.surroundingReadiness.isReady)
-                    ? null
-                    : () => _capture(preparation),
-                icon: const Icon(Icons.sensors_outlined),
-                label: const Text('수집 시작'),
               ),
-            if (!_capturing && _result != null) ...<Widget>[
-              FilledButton.icon(
-                onPressed: _result!.weatherMaterial == null
-                    ? null
-                    : () => Navigator.of(context).push<void>(
-                        MaterialPageRoute<void>(
-                          builder: (BuildContext context) => RecipeListScreen(
-                            preselectedWeatherId: _result!.weatherMaterial?.id,
-                            preselectedSurroundingId:
-                                _result!.surroundingMaterial?.id,
-                          ),
-                        ),
-                      ),
-                icon: const Icon(Icons.handyman_outlined),
-                label: const Text('이 재료로 만들기'),
+              const SizedBox(height: 18),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      _result == null ? '지금 수집' : '수집 완료',
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _capturing
+                        ? null
+                        : () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close),
+                    tooltip: '닫기',
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
-              OutlinedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('보관하고 닫기'),
+              Expanded(
+                child: _loadingPreparation
+                    ? const Center(child: CircularProgressIndicator())
+                    : _capturing
+                    ? _CaptureProgress(
+                        scansSurroundings:
+                            _includeSurroundings &&
+                            preparation?.surroundingReadiness.isReady == true,
+                      )
+                    : _result == null
+                    ? _PreparationView(
+                        preparation: preparation,
+                        availableSteps: controller.availableSteps,
+                        includeSurroundings: _includeSurroundings,
+                        onSurroundingsChanged: (bool value) {
+                          setState(() => _includeSurroundings = value);
+                        },
+                      )
+                    : _ResultView(bundle: _result!),
               ),
+              const SizedBox(height: 14),
+              if (!_capturing && _result == null)
+                FilledButton.icon(
+                  onPressed:
+                      preparation == null ||
+                          (!preparation.weatherReadiness.isReady &&
+                              !preparation.surroundingReadiness.isReady)
+                      ? null
+                      : () => _capture(preparation),
+                  icon: const Icon(Icons.sensors_outlined),
+                  label: const Text('수집 시작'),
+                ),
+              if (!_capturing && _result != null) ...<Widget>[
+                FilledButton.icon(
+                  onPressed: _result!.weatherMaterial == null
+                      ? null
+                      : () => Navigator.of(context).push<void>(
+                          MaterialPageRoute<void>(
+                            builder: (BuildContext context) => RecipeListScreen(
+                              preselectedWeatherId:
+                                  _result!.weatherMaterial?.id,
+                              preselectedSurroundingId:
+                                  _result!.surroundingMaterial?.id,
+                            ),
+                          ),
+                        ),
+                  icon: const Icon(Icons.handyman_outlined),
+                  label: const Text('이 재료로 만들기'),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('보관하고 닫기'),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -200,8 +208,8 @@ class _PreparationView extends StatelessWidget {
     final traitCatalog = AppScope.of(context).catalog.atmosphericTraits;
     return ListView(
       children: <Widget>[
-        PixelCard(
-          highlighted: value.weatherReadiness.isReady,
+        _CaptureSection(
+          tone: PixelPalette.scene,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -235,8 +243,8 @@ class _PreparationView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        PixelCard(
-          highlighted: value.surroundingReadiness.isReady,
+        _CaptureSection(
+          tone: PixelPalette.raised,
           child: Column(
             children: <Widget>[
               _ReadinessRow(
@@ -260,7 +268,8 @@ class _PreparationView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        PixelCard(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
           child: Row(
             children: <Widget>[
               const Icon(Icons.directions_walk, color: PixelPalette.mint),
@@ -277,9 +286,12 @@ class _PreparationView extends StatelessWidget {
                     Text(
                       '$availableSteps걸음',
                       style: const TextStyle(
-                        color: PixelPalette.mint,
+                        color: PixelPalette.textStrong,
                         fontSize: 20,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
+                        fontFeatures: <FontFeature>[
+                          FontFeature.tabularFigures(),
+                        ],
                       ),
                     ),
                   ],
@@ -295,6 +307,24 @@ class _PreparationView extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
       ],
+    );
+  }
+}
+
+class _CaptureSection extends StatelessWidget {
+  const _CaptureSection({required this.child, required this.tone});
+
+  final Widget child;
+  final Color tone;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: tone,
+        borderRadius: BorderRadius.circular(PixelRadii.tray),
+      ),
+      child: Padding(padding: const EdgeInsets.all(16), child: child),
     );
   }
 }
@@ -395,8 +425,8 @@ class _ResultView extends StatelessWidget {
     return ListView(
       children: <Widget>[
         if (bundle.weatherMaterial != null)
-          PixelCard(
-            highlighted: true,
+          _CaptureSection(
+            tone: PixelPalette.scene,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -446,8 +476,8 @@ class _ResultView extends StatelessWidget {
             bundle.surroundingMaterial != null)
           const SizedBox(height: 10),
         if (bundle.surroundingMaterial != null)
-          PixelCard(
-            highlighted: true,
+          _CaptureSection(
+            tone: PixelPalette.raised,
             child: Row(
               children: <Widget>[
                 MaterialOrb.surroundings(bundle.surroundingMaterial!.kind),

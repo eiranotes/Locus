@@ -32,12 +32,13 @@ class RecipeListScreen extends StatelessWidget {
       body: controller.unlockedRecipes.isEmpty
           ? const Center(child: Text('열린 만드는 법이 없습니다.'))
           : ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
               itemCount: controller.unlockedRecipes.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, __) => const Divider(),
               itemBuilder: (BuildContext context, int index) {
                 final recipe = controller.unlockedRecipes[index];
-                return PixelCard(
+                return _RecipeRow(
+                  recipe: recipe,
                   onTap: () => Navigator.of(context).push<void>(
                     MaterialPageRoute<void>(
                       builder: (BuildContext context) => CraftingDetailScreen(
@@ -47,63 +48,79 @@ class RecipeListScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  child: Row(
-                    children: <Widget>[
-                      Container(
-                        width: 58,
-                        height: 58,
-                        decoration: BoxDecoration(
-                          color: PixelPalette.mint.withValues(alpha: 0.10),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: ObjectVisualPreview(
-                            visual: ObjectVisualDescriptor.forRecipe(recipe),
-                            semanticLabel: '${recipe.nameKo} 기본 형태',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              recipe.nameKo,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              recipe.descriptionKo,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                            const SizedBox(height: 7),
-                            Row(
-                              children: <Widget>[
-                                const Icon(
-                                  Icons.directions_walk,
-                                  size: 16,
-                                  color: PixelPalette.mint,
-                                ),
-                                const SizedBox(width: 4),
-                                Text('${recipe.stepCost}걸음'),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(
-                        Icons.chevron_right,
-                        color: PixelPalette.muted,
-                      ),
-                    ],
-                  ),
                 );
               },
             ),
+    );
+  }
+}
+
+class _RecipeRow extends StatelessWidget {
+  const _RecipeRow({required this.recipe, required this.onTap});
+
+  final RecipeDefinition recipe;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: '${recipe.nameKo}, ${recipe.stepCost}걸음',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(PixelRadii.control),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+            child: Row(
+              children: <Widget>[
+                Container(
+                  width: 68,
+                  height: 68,
+                  decoration: BoxDecoration(
+                    color: PixelPalette.scene,
+                    borderRadius: BorderRadius.circular(PixelRadii.tile),
+                  ),
+                  padding: const EdgeInsets.all(4),
+                  child: ObjectVisualPreview(
+                    visual: ObjectVisualDescriptor.forRecipe(recipe),
+                    semanticLabel: '${recipe.nameKo} 기본 형태',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        recipe.nameKo,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        recipe.descriptionKo,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '${recipe.stepCost}걸음',
+                        style: const TextStyle(
+                          color: PixelPalette.reward,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: PixelPalette.textMuted),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -260,7 +277,13 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
               }),
             ),
           const SizedBox(height: 18),
-          PixelCard(
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 14),
+            decoration: const BoxDecoration(
+              border: Border.symmetric(
+                horizontal: BorderSide(color: PixelPalette.divider),
+              ),
+            ),
             child: Row(
               children: <Widget>[
                 const Icon(Icons.directions_walk, color: PixelPalette.mint),
@@ -286,7 +309,7 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
                     color: controller.availableSteps >= widget.recipe.stepCost
                         ? PixelPalette.success
                         : PixelPalette.amber,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -357,10 +380,27 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
         context: context,
         builder: (BuildContext context) => AlertDialog(
           title: Text(object.isComplete ? '물건 완성' : '공사 시작'),
-          content: Text(
-            object.isComplete
-                ? '${widget.recipe.nameKo}을 내 공간에 놓았습니다.'
-                : '${object.remainingSteps}걸음을 더 모으면 완성됩니다.',
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              SizedBox(
+                width: 160,
+                height: 140,
+                child: ObjectVisualPreview(
+                  visual: ObjectVisualDescriptor.fromCraftedObject(object),
+                  visualLayerCatalog: controller.catalog.visualLayers,
+                  atmosphericTraitCatalog: controller.catalog.atmosphericTraits,
+                  semanticLabel: '${widget.recipe.nameKo} 제작 결과',
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                object.isComplete
+                    ? '${widget.recipe.nameKo}을 내 공간에 놓았습니다.'
+                    : '${object.remainingSteps}걸음을 더 모으면 완성됩니다.',
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
           actions: <Widget>[
             TextButton(
@@ -421,74 +461,72 @@ class _ObjectPreview extends StatelessWidget {
             focusTrait: focusTrait,
             completion: completion,
           );
-    return PixelCard(
-      child: Column(
-        children: <Widget>[
-          Container(
-            height: 180,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: PixelPalette.background,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(18),
-              child: ObjectVisualPreview(
-                visual: visual,
-                constructionAssetPath: constructionStage?.assetPath,
-                visualLayerCatalog: visualLayerCatalog,
-                atmosphericTraitCatalog: atmosphericTraitCatalog,
-                semanticLabel: '${recipe.nameKo} 제작 미리보기',
-              ),
+    return Column(
+      children: <Widget>[
+        Container(
+          height: 180,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: PixelPalette.scene,
+            borderRadius: BorderRadius.circular(PixelRadii.scene),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: ObjectVisualPreview(
+              visual: visual,
+              constructionAssetPath: constructionStage?.assetPath,
+              visualLayerCatalog: visualLayerCatalog,
+              atmosphericTraitCatalog: atmosphericTraitCatalog,
+              semanticLabel: '${recipe.nameKo} 제작 미리보기',
             ),
           ),
-          const SizedBox(height: 12),
-          Text(
-            focusTrait == null
-                ? recipe.nameKo
-                : '${atmosphericTraitCatalog.definitionFor(focusTrait!).namePrefixKo} ${recipe.nameKo}',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          if (focusTrait != null) ...<Widget>[
-            const SizedBox(height: 8),
-            AtmosphericTraitChips(
-              traits: <AtmosphericTrait>[focusTrait!],
-              catalog: atmosphericTraitCatalog,
-              showEffects: true,
-            ),
-          ],
-          if (constructionStage != null) ...<Widget>[
-            const SizedBox(height: 8),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: LinearProgressIndicator(
-                    value: completion,
-                    minHeight: 7,
-                    color: PixelPalette.amber,
-                    backgroundColor: PixelPalette.line,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  '예상 ${_constructionStageLabel(constructionStage!.stage)}',
-                  style: const TextStyle(
-                    color: PixelPalette.amber,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-          ],
-          const SizedBox(height: 5),
-          Text(
-            recipe.descriptionKo,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 12),
+        Text(
+          focusTrait == null
+              ? recipe.nameKo
+              : '${atmosphericTraitCatalog.definitionFor(focusTrait!).namePrefixKo} ${recipe.nameKo}',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        if (focusTrait != null) ...<Widget>[
+          const SizedBox(height: 8),
+          AtmosphericTraitChips(
+            traits: <AtmosphericTrait>[focusTrait!],
+            catalog: atmosphericTraitCatalog,
+            showEffects: true,
           ),
         ],
-      ),
+        if (constructionStage != null) ...<Widget>[
+          const SizedBox(height: 8),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: LinearProgressIndicator(
+                  value: completion,
+                  minHeight: 7,
+                  color: PixelPalette.amber,
+                  backgroundColor: PixelPalette.line,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                '예상 ${_constructionStageLabel(constructionStage!.stage)}',
+                style: const TextStyle(
+                  color: PixelPalette.amber,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ],
+        const SizedBox(height: 5),
+        Text(
+          recipe.descriptionKo,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      ],
     );
   }
 }

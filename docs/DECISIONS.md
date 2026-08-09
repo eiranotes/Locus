@@ -16,6 +16,15 @@ reserved for compact status. The foreground collection action moves out of the
 bottom navigation and into the home scene action layer. The bottom bar contains
 destinations only.
 
+### Core-loop surfaces use distinct physical metaphors
+
+Capture is a raised sensor tray with separate weather and optional-surroundings
+readouts. Crafting uses borderless recipe rows and one scene-like object stage;
+material pickers remain compact selectable tiles because comparison is their
+purpose. Placement keeps the board in one scene viewport and groups selected
+object controls in a single raised dock. Completion shows the deterministic
+crafted object rather than a text-only confirmation.
+
 ### Home is scene-first and the scene visitor is persisted
 
 The home header uses one compact resource strip and the visitor goal sits
