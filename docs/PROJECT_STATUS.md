@@ -25,6 +25,9 @@ collection is a scene action rather than an oversized navigation item.
 - Kept the 5×5 board and eight-active-object limit; retention comes from
   collecting, swapping, and recomposing a larger library rather than crowding
   the diorama or monetizing progression inputs.
+- Reworked all three codex tabs around a visible overall completion measure and
+  collection sections, so 18 visitors and 28 recipes remain scannable without
+  adding ornamental filters, badges, or dashboard cards.
 - Added semantic canvas, scene, panel, text, action, reward, weather, visitor,
   danger, and focus tokens with verified text/action contrast.
 - Replaced the default 18 px outlined `PixelCard` with tonal 10 px surfaces;
@@ -123,6 +126,8 @@ collection is a scene action rather than an oversized navigation item.
 - Added an iOS integration tour that resets only the isolated demo database,
   collects weather and surroundings, crafts and places one object, traverses
   every primary tab and settings screen, and exports named PNG evidence.
+- Extended the tour with deep-scroll captures for the expanded visitor,
+  crafted-object, and recipe collection sections.
 
 ## Simulator evidence
 

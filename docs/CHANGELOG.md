@@ -27,6 +27,8 @@
 - Added three named expansion sets with six immediately craftable objects and
   twelve visitor-reward recipes; every visitor still exposes at most three
   conditions.
+- Codex tabs now show overall completion and section the larger library by
+  collection, with local progress for visitors, crafted objects, and recipes.
 - Replaced the universal 18 px outlined-card theme with the Night Cabinet
   semantic palette, tonal surfaces, bounded role-specific radii, denser type,
   and 48 dp controls.
@@ -125,3 +127,5 @@
 - Refreshed the complete 14-screen iOS tour after the Night Cabinet redesign;
   the successful route logged no Flutter framework exception or overflow and
   the visual audit found no blocking defect at the tested simulator size.
+- Extended the simulator tour with deep-scroll evidence for all three expanded
+  codex tabs.

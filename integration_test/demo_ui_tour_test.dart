@@ -90,14 +90,32 @@ void main() {
     await _waitForUi(tester);
     expect(find.widgetWithText(Tab, '방문자'), findsOneWidget);
     await binding.takeScreenshot('11-codex-visitors');
+    await tester.drag(
+      find.byType(CustomScrollView).last,
+      const Offset(0, -1050),
+    );
+    await _waitForUi(tester);
+    await binding.takeScreenshot('11b-codex-visitors-expanded');
 
     await tester.tap(find.widgetWithText(Tab, '만든 것'));
     await _waitForUi(tester);
     await binding.takeScreenshot('12-codex-objects');
+    await tester.drag(
+      find.byType(CustomScrollView).last,
+      const Offset(0, -1050),
+    );
+    await _waitForUi(tester);
+    await binding.takeScreenshot('12b-codex-objects-expanded');
 
     await tester.tap(find.widgetWithText(Tab, '만드는 법'));
     await _waitForUi(tester);
     await binding.takeScreenshot('13-codex-recipes');
+    await tester.drag(
+      find.byType(CustomScrollView).last,
+      const Offset(0, -1050),
+    );
+    await _waitForUi(tester);
+    await binding.takeScreenshot('13b-codex-recipes-expanded');
 
     await tester.tap(find.text('내 공간').last);
     await _waitForUi(tester);

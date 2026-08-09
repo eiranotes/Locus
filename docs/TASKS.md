@@ -25,7 +25,7 @@
       without increasing the 5×5 board or eight-object active limit.
 - [x] Generate authored base, four-direction, construction-stage, and visitor
       sprites for the entire collection expansion with reproducible provenance.
-- [ ] Add collection-set progress and scalable browsing controls to the codex,
+- [x] Add collection-set progress and scalable browsing controls to the codex,
       then visually verify the expanded catalog on the iOS simulator.
 - [x] Establish Night Cabinet semantic tokens, tonal surfaces, role-specific
       radii, and a destination-only bottom navigation.

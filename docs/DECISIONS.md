@@ -106,6 +106,12 @@ Generated-art packs may coexist in the installed runtime directory. Each pack
 validator owns and hashes only its declared inventory, while the placement and
 crafting catalogs remain the exact cross-pack coverage gate.
 
+The codex presents one overall completion line per tab, then groups entries by
+collection with a small local count. This keeps the larger library legible while
+avoiding a second navigation system, dense filter chips, achievement badges, or
+generic dashboard cards. Undiscovered entries keep recognizable silhouettes;
+their exact identity remains hidden until the corresponding discovery.
+
 ### Generated static art is now the primary renderer input
 
 The owner explicitly approved moving beyond prototype geometry. A fixed v1
