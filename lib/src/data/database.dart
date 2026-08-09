@@ -7,15 +7,17 @@ class AppDatabase {
   final Database database;
 
   static const int schemaVersion = 1;
+  static const String productionDatabaseName = 'reality_diorama.sqlite3';
+  static const String demoDatabaseName = 'reality_diorama_demo.sqlite3';
 
-  static Future<AppDatabase> open() async {
+  static Future<AppDatabase> open({bool demoMode = false}) async {
     final root = await getDatabasesPath();
     final database = await openDatabase(
-      p.join(root, 'reality_diorama.sqlite3'),
+      p.join(root, demoMode ? demoDatabaseName : productionDatabaseName),
       version: schemaVersion,
       onConfigure: (Database db) async {
         await db.execute('PRAGMA foreign_keys = ON');
-        await db.execute('PRAGMA journal_mode = WAL');
+        await db.setJournalMode('WAL');
       },
       onCreate: _create,
     );

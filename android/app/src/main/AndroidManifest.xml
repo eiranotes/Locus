@@ -12,7 +12,7 @@
     <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false" />
 
     <application
-        android:label="Reality Diorama"
+        android:label="Locus"
         android:name="${applicationName}"
         android:allowBackup="true"
         android:usesCleartextTraffic="false"

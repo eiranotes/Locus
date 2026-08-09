@@ -146,7 +146,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 20),
           Text(
-            'Reality Diorama · Prototype 0.1.0',
+            'Locus · Prototype 0.1.0',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
@@ -161,6 +161,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     setState(() => _changingStepSource = true);
     try {
+      if (controller.demoMode) {
+        await controller.configureStepTracking(useRealSteps: true);
+        return;
+      }
       var status = await Permission.activityRecognition.status;
       if (!status.isGranted) {
         status = await Permission.activityRecognition.request();

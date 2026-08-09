@@ -217,6 +217,9 @@ extension AppControllerActions on AppController {
     final recipesById = <String, RecipeDefinition>{
       for (final recipe in catalog.recipes) recipe.id: recipe,
     };
+    final weatherMaterialsById = <String, WeatherMaterial>{
+      for (final material in _weatherMaterials) material.id: material,
+    };
     final grid =
         EnvironmentGridBuilder(
           columns: catalog.balance.gridColumns,
@@ -250,6 +253,7 @@ extension AppControllerActions on AppController {
       objects: _craftedObjects,
       placements: _placements,
       recipesById: recipesById,
+      weatherMaterialsById: weatherMaterialsById,
       environmentGrid: grid,
       connectionGraph: graph,
       timeBand: sceneTimeBand,

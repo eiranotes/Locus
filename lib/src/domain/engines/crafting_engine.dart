@@ -18,7 +18,7 @@ class CraftingResult {
 }
 
 class CraftingEngine {
-  const CraftingEngine({this.generatorVersion = 'object-v1'});
+  const CraftingEngine({this.generatorVersion = currentObjectGeneratorVersion});
 
   final String generatorVersion;
 
@@ -44,13 +44,12 @@ class CraftingEngine {
     final lifecycle = spend.unfilled == 0
         ? ObjectLifecycle.stored
         : ObjectLifecycle.building;
-    final visualSeed = stableSeed(<Object?>[
-      recipe.id,
-      weather.id,
-      surrounding?.id,
-      weather.capturedAt.millisecondsSinceEpoch ~/ 60000,
-      generatorVersion,
-    ]);
+    final visualSeed = objectVisualSeedForCraft(
+      recipe: recipe,
+      weather: weather,
+      surrounding: surrounding,
+      generatorVersion: generatorVersion,
+    );
 
     final object = CraftedObject(
       id: objectId,

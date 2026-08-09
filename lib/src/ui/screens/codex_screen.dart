@@ -3,7 +3,8 @@ import 'package:reality_diorama/src/app/app_controller.dart';
 import 'package:reality_diorama/src/app/app_scope.dart';
 import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
-import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
+import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
+import 'package:reality_diorama/src/ui/widgets/object_visual_preview.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 
 class CodexScreen extends StatelessWidget {
@@ -124,45 +125,80 @@ class _ObjectKindsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final madeKinds = controller.craftedObjects
-        .map((CraftedObject value) => value.kind)
-        .toSet();
-    return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 110),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 1.05,
-      ),
-      itemCount: controller.catalog.recipes.length,
-      itemBuilder: (BuildContext context, int index) {
-        final recipe = controller.catalog.recipes[index];
-        final made = madeKinds.contains(recipe.kind);
-        final count = controller.craftedObjects
-            .where((CraftedObject object) => object.kind == recipe.kind)
-            .length;
-        return PixelCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Icon(
-                made ? objectIcon(recipe.kind) : Icons.lock_outline,
-                color: made ? PixelPalette.mint : PixelPalette.muted,
-                size: 34,
-              ),
-              const Spacer(),
-              Text(
-                made ? recipe.nameKo : '미발견 물건',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                made ? '$count개 제작' : '만드는 법을 찾아보세요.',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
+    final weatherById = <String, WeatherMaterial>{
+      for (final material in controller.weatherMaterials) material.id: material,
+    };
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final largeText = MediaQuery.textScalerOf(context).scale(14) > 18;
+        final singleColumn = constraints.maxWidth < 360 || largeText;
+        return GridView.builder(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 110),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: singleColumn ? 1 : 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            mainAxisExtent: singleColumn ? 196 : 166,
           ),
+          itemCount: controller.catalog.recipes.length,
+          itemBuilder: (BuildContext context, int index) {
+            final recipe = controller.catalog.recipes[index];
+            final matchingObjects =
+                controller.craftedObjects
+                    .where((CraftedObject object) => object.kind == recipe.kind)
+                    .toList()
+                  ..sort((CraftedObject a, CraftedObject b) {
+                    final byCreatedAt = a.createdAt.compareTo(b.createdAt);
+                    return byCreatedAt != 0
+                        ? byCreatedAt
+                        : a.id.compareTo(b.id);
+                  });
+            final representative = matchingObjects.firstOrNull;
+            final made = representative != null;
+            final count = matchingObjects.length;
+            return PixelCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(
+                    height: 62,
+                    width: double.infinity,
+                    child: made
+                        ? ObjectVisualPreview(
+                            visual: ObjectVisualDescriptor.fromCraftedObject(
+                              representative,
+                              timeBand:
+                                  weatherById[representative.weatherMaterialId]
+                                      ?.timeBand,
+                            ),
+                            semanticLabel: '${recipe.nameKo} 대표 미리보기',
+                          )
+                        : const Center(
+                            child: Icon(
+                              Icons.lock_outline,
+                              color: PixelPalette.muted,
+                              size: 34,
+                            ),
+                          ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    made ? recipe.nameKo : '미발견 물건',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    made ? '$count개 제작' : '만드는 법을 찾아보세요.',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
@@ -195,10 +231,15 @@ class _RecipesTab extends StatelessWidget {
                       : PixelPalette.background,
                   borderRadius: BorderRadius.circular(13),
                 ),
-                child: Icon(
-                  unlocked ? objectIcon(recipe.kind) : Icons.lock_outline,
-                  color: unlocked ? PixelPalette.mint : PixelPalette.muted,
-                ),
+                child: unlocked
+                    ? Padding(
+                        padding: const EdgeInsets.all(3),
+                        child: ObjectVisualPreview(
+                          visual: ObjectVisualDescriptor.forRecipe(recipe),
+                          semanticLabel: '${recipe.nameKo} 기본 형태',
+                        ),
+                      )
+                    : const Icon(Icons.lock_outline, color: PixelPalette.muted),
               ),
               const SizedBox(width: 12),
               Expanded(

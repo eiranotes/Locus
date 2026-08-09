@@ -27,6 +27,7 @@ class AppController extends ChangeNotifier {
     required this.catalog,
     required this.captureCoordinator,
     required this.stepSyncService,
+    this.demoMode = false,
     this.uuid = const Uuid(),
   });
 
@@ -34,6 +35,7 @@ class AppController extends ChangeNotifier {
   final ContentCatalog catalog;
   final CaptureCoordinator captureCoordinator;
   final StepSyncService stepSyncService;
+  final bool demoMode;
   final Uuid uuid;
 
   bool _initialized = false;
@@ -154,6 +156,13 @@ class AppController extends ChangeNotifier {
         await repository.metadata('step_tracking_mode') ?? '',
         StepTrackingMode.undecided,
       );
+      if (demoMode && _stepTrackingMode == StepTrackingMode.undecided) {
+        _stepTrackingMode = StepTrackingMode.real;
+        await repository.setMetadata(
+          'step_tracking_mode',
+          _stepTrackingMode.name,
+        );
+      }
       if (_stepTrackingMode == StepTrackingMode.undecided &&
           _stepBuckets.isNotEmpty) {
         _stepBuckets = const <StepBucket>[];

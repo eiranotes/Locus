@@ -109,7 +109,7 @@ class _CaptureSheetState extends State<CaptureSheet> {
                             !preparation.surroundingReadiness.isReady)
                     ? null
                     : () => _capture(preparation),
-                icon: const Icon(Icons.add_a_photo_outlined),
+                icon: const Icon(Icons.sensors_outlined),
                 label: const Text('수집 시작'),
               ),
             if (!_capturing && _result != null) ...<Widget>[
@@ -141,18 +141,19 @@ class _CaptureSheetState extends State<CaptureSheet> {
   }
 
   Future<void> _capture(CapturePreparation preparation) async {
+    final controller = AppScope.read(context);
     var include =
         _includeSurroundings && preparation.surroundingReadiness.isReady;
-    if (include) {
+    if (include && !controller.demoMode) {
       include = await _requestBluetoothPermission();
     }
     if (!mounted) {
       return;
     }
     setState(() => _capturing = true);
-    final bundle = await AppScope.read(
-      context,
-    ).performCapture(includeSurroundings: include);
+    final bundle = await controller.performCapture(
+      includeSurroundings: include,
+    );
     if (!mounted) {
       return;
     }

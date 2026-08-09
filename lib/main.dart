@@ -18,7 +18,7 @@ Future<void> main() async {
 
   const demoMode = bool.fromEnvironment('DEMO_MODE');
   final catalog = await ContentCatalog.load(rootBundle);
-  final database = await AppDatabase.open();
+  final database = await AppDatabase.open(demoMode: demoMode);
   final repository = GameRepository(database);
 
   final WeatherGateway weatherGateway = demoMode
@@ -38,6 +38,7 @@ Future<void> main() async {
   final controller = AppController(
     repository: repository,
     catalog: catalog,
+    demoMode: demoMode,
     captureCoordinator: CaptureCoordinator(
       locationGateway: locationGateway,
       weatherGateway: weatherGateway,

@@ -9,7 +9,7 @@ class RealityDioramaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Reality Diorama',
+      title: 'Locus',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
       home: AppShell(demoMode: demoMode),

@@ -258,6 +258,9 @@ def check_product_contracts() -> None:
     controller = (ROOT / "lib/src/app/app_controller.dart").read_text(encoding="utf-8")
     service = (ROOT / "lib/src/services/step_sync_service.dart").read_text(encoding="utf-8")
     crafting = (ROOT / "lib/src/ui/screens/crafting_screen.dart").read_text(encoding="utf-8")
+    database = (ROOT / "lib/src/data/database.dart").read_text(encoding="utf-8")
+    info_plist = (ROOT / "ios/Runner/Info.plist").read_text(encoding="utf-8")
+    android_manifest = (ROOT / "android/app/src/main/AndroidManifest.xml").read_text(encoding="utf-8")
     for fragment in ("StepTrackingMode.undecided", "configureStepTracking", "step_tracking_mode"):
         if fragment not in controller:
             fail(f"app_controller.dart: missing step contract {fragment}")
@@ -265,6 +268,42 @@ def check_product_contracts() -> None:
         fail("step source boundaries are incomplete")
     if "Permission.activityRecognition.request()" not in crafting:
         fail("motion permission must be requested in crafting context")
+    if "db.setJournalMode('WAL')" not in database:
+        fail("database must enable WAL through the cross-platform sqflite helper")
+    if "demoMode ? demoDatabaseName : productionDatabaseName" not in database:
+        fail("deterministic demo data must use a database isolated from production")
+    for fragment in ("CFBundleExecutable", "$(EXECUTABLE_NAME)", "<string>Locus</string>"):
+        if fragment not in info_plist:
+            fail(f"ios/Runner/Info.plist: missing launch contract {fragment}")
+    if 'android:label="Locus"' not in android_manifest:
+        fail("Android application label must match the Locus product identity")
+    capture = (ROOT / "lib/src/ui/screens/capture_sheet.dart").read_text(encoding="utf-8")
+    if "include && !controller.demoMode" not in capture:
+        fail("demo capture must not request a real Bluetooth permission")
+    renderer = (ROOT / "lib/src/diorama/object_renderer.dart").read_text(encoding="utf-8")
+    seeded_visuals = (ROOT / "lib/src/domain/engines/seeded_visuals.dart").read_text(encoding="utf-8")
+    scene = (ROOT / "lib/src/diorama/diorama_game.dart").read_text(encoding="utf-8")
+    if "stableSeed" not in renderer or "ObjectVisualDescriptor" not in renderer:
+        fail("object renderer must consume the deterministic visual contract")
+    if "ObjectVisualDescriptor.fromCraftedObject(" not in scene:
+        fail("home diorama must use the shared crafted-object renderer")
+    for fragment in (
+        "legacyObjectGeneratorVersion = 'object-v1'",
+        "currentObjectGeneratorVersion = 'object-v2'",
+        "timeBand: weather.timeBand",
+    ):
+        if fragment not in seeded_visuals:
+            fail(f"seeded_visuals.dart: missing versioned visual contract {fragment}")
+    for relative in (
+        "lib/src/ui/screens/crafting_screen.dart",
+        "lib/src/ui/screens/inventory_screen.dart",
+        "lib/src/ui/screens/codex_screen.dart",
+    ):
+        surface = (ROOT / relative).read_text(encoding="utf-8")
+        if "ObjectVisualPreview" not in surface:
+            fail(f"{relative}: missing shared object preview")
+        if "objectIcon(" in surface:
+            fail(f"{relative}: must not substitute a Material icon for an object")
     if "com.apple.developer.weatherkit" not in (ROOT / "ios/Runner/Runner.entitlements").read_text(encoding="utf-8"):
         fail("WeatherKit entitlement is missing")
 

@@ -6,7 +6,7 @@ The checkout is a normal git repository after the initial local commit. To creat
 ./tool/publish_github.sh private
 ```
 
-Use `public` instead of `private` when the source should be visible publicly. The helper requires GitHub CLI authentication and defaults to `eiranotes/reality-diorama-flutter`. Override the target with `GITHUB_OWNER` and `GITHUB_REPOSITORY_NAME`.
+Use `public` instead of `private` when the source should be visible publicly. The helper requires GitHub CLI authentication and defaults to `eiranotes/Locus`. Override the target with `GITHUB_OWNER` and `GITHUB_REPOSITORY_NAME`.
 
 When the checkout was cloned from the supplied bundle, the helper preserves that local remote as `source-bundle` and assigns the GitHub repository to `origin`.
 

@@ -4,8 +4,10 @@ import 'package:reality_diorama/src/app/app_controller.dart';
 import 'package:reality_diorama/src/app/app_scope.dart';
 import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
+import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
+import 'package:reality_diorama/src/ui/widgets/object_visual_preview.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 
 class RecipeListScreen extends StatelessWidget {
@@ -50,10 +52,12 @@ class RecipeListScreen extends StatelessWidget {
                           color: PixelPalette.mint.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: Icon(
-                          objectIcon(recipe.kind),
-                          color: PixelPalette.mint,
-                          size: 30,
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: ObjectVisualPreview(
+                            visual: ObjectVisualDescriptor.forRecipe(recipe),
+                            semanticLabel: '${recipe.nameKo} 기본 형태',
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -158,8 +162,8 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
         children: <Widget>[
           _ObjectPreview(
             recipe: widget.recipe,
-            weather: weather?.kind,
-            surroundings: surroundings?.kind,
+            weather: weather,
+            surroundings: surroundings,
           ),
           const SizedBox(height: 14),
           Text('날씨 재료', style: Theme.of(context).textTheme.titleMedium),
@@ -271,8 +275,14 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
     setState(() => _submitting = true);
     try {
       if (!controller.stepTrackingConfigured) {
-        final status = await Permission.activityRecognition.request();
-        await controller.configureStepTracking(useRealSteps: status.isGranted);
+        if (controller.demoMode) {
+          await controller.configureStepTracking(useRealSteps: true);
+        } else {
+          final status = await Permission.activityRecognition.request();
+          await controller.configureStepTracking(
+            useRealSteps: status.isGranted,
+          );
+        }
       } else if (controller.usesRealSteps) {
         await controller.refreshSteps();
       }
@@ -320,44 +330,33 @@ class _ObjectPreview extends StatelessWidget {
   });
 
   final RecipeDefinition recipe;
-  final WeatherMaterialKind? weather;
-  final SurroundingMaterialKind? surroundings;
+  final WeatherMaterial? weather;
+  final SurroundingMaterial? surroundings;
 
   @override
   Widget build(BuildContext context) {
-    final accent = weather == null
-        ? PixelPalette.muted
-        : weatherColor(weather!);
+    final visual = weather == null
+        ? ObjectVisualDescriptor.forRecipe(recipe)
+        : ObjectVisualDescriptor.forCraftingPreview(
+            recipe: recipe,
+            weather: weather!,
+            surrounding: surroundings,
+          );
     return PixelCard(
       child: Column(
         children: <Widget>[
           Container(
             height: 180,
+            width: double.infinity,
             decoration: BoxDecoration(
               color: PixelPalette.background,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: <Widget>[
-                  Container(
-                    width: 112,
-                    height: 112,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: accent.withValues(alpha: 0.10),
-                      border: Border.all(color: accent.withValues(alpha: 0.45)),
-                    ),
-                  ),
-                  Icon(objectIcon(recipe.kind), color: accent, size: 68),
-                  if (surroundings != null)
-                    Positioned(
-                      right: 62,
-                      bottom: 40,
-                      child: MaterialOrb.surroundings(surroundings!),
-                    ),
-                ],
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: ObjectVisualPreview(
+                visual: visual,
+                semanticLabel: '${recipe.nameKo} 제작 미리보기',
               ),
             ),
           ),

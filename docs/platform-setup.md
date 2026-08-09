@@ -34,6 +34,12 @@ Current weather comes from native WeatherKit through `com.eiranotes.reality_dior
 
 Settings request WeatherKit attribution and expose the returned provider mark, notice, and legal page. Production weather errors are fail-closed; demo weather is available only through `--dart-define=DEMO_MODE=true`.
 
+The deterministic demo path is also the supported iOS simulator product loop.
+It supplies demo steps and aggregate surroundings without requesting real Motion
+or Bluetooth permissions, and writes to `reality_diorama_demo.sqlite3` rather
+than the production database. This does not count as native gateway or physical-
+device permission proof.
+
 ## Permission timing
 
 Permissions are requested in context rather than during onboarding:
@@ -52,6 +58,7 @@ The selected step source is stored. Changing between actual steps and the daily 
 - Android API 26 minimum and permission manifest;
 - iOS 18 minimum and usage descriptions;
 - WeatherKit entitlement and Xcode project attachment.
+- Locus bundle display/executable metadata and the `#071522` launch background.
 
 The command is intended for CI and wrapper recovery. Review its diff before committing in a developer checkout.
 

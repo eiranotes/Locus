@@ -1,6 +1,6 @@
-# Reality Diorama (Flutter)
+# Locus (Flutter)
 
-A local-first iOS and Android prototype based on the **Reality Collection Diorama v6** product specification.
+A local-first iOS and Android game prototype based on the **Reality Collection Diorama v6** product specification.
 
 > Collect a brief snapshot of the current weather and optional surroundings, use recent steps as crafting work, build miniature neighborhood objects, and arrange them in a soft pixel-art diorama to discover visitors and new recipes.
 
@@ -15,7 +15,9 @@ A local-first iOS and Android prototype based on the **Reality Collection Dioram
   - Explicit fallback: 2,000 work units per day only after the user chooses it or real step access is unavailable.
 - Optional foreground BLE scan through a native method channel. The native layer returns aggregate session features only; no peripheral identifier, name, MAC address, or raw advertisement is persisted.
 - Recipe-driven crafting with FIFO step spending, construction progress, and transactional material/step/object/placement persistence.
-- Deterministic 5×5 isometric diorama renderer implemented with Flame and Flutter canvas primitives.
+- Deterministic 5×5 isometric diorama renderer implemented with Flame and
+  Flutter canvas primitives and shared across home, crafting, inventory, and
+  codex previews.
 - Environment grid, connection graph, deterministic visitor rules, transactional visitor rewards, and codex hints.
 - Platform weather split:
   - iOS 18+: native WeatherKit through a method channel and WeatherKit attribution.
@@ -91,7 +93,9 @@ After cloning the supplied git bundle or source archive, authenticate GitHub CLI
 ./tool/publish_github.sh private
 ```
 
-Replace `private` with `public` when appropriate. The default target is `eiranotes/reality-diorama-flutter`; environment variables can override the owner and repository name. See `docs/repository-publishing.md`.
+Replace `private` with `public` when appropriate. The current repository is
+`eiranotes/Locus`; environment variables can override the owner and repository
+name for archive publishing. See `docs/repository-publishing.md`.
 
 ## Weather providers
 
@@ -101,7 +105,12 @@ Replace `private` with `public` when appropriate. The default target is `eiranot
 
 ## Art status
 
-The app renders a coherent placeholder diorama from code. Images under `docs/references` are mood and composition references only, not production assets. Production art must use a fixed 2:1 isometric grid, one pixel scale, one light direction, shared atlases, and integer scaling.
+The app renders a coherent placeholder diorama from code. Images under
+`docs/references` are mood and composition references only, not production
+assets. One owner-review AppIcon candidate is stored under `assets/branding`.
+Production object/visitor art remains deferred and must use a fixed 2:1
+isometric grid, one pixel scale, one light direction, shared atlases, and integer
+scaling.
 
 ## License
 

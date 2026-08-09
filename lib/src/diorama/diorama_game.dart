@@ -4,7 +4,9 @@ import 'dart:ui';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart' show Colors, RadialGradient;
 import 'package:reality_diorama/src/app/theme.dart';
+import 'package:reality_diorama/src/diorama/object_renderer.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
+import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/domain/game_snapshot.dart';
 
@@ -34,6 +36,8 @@ class DioramaScenePainter {
   static const double tileWidth = 52;
   static const double tileHeight = 26;
   static const Offset origin = Offset(180, 128);
+  static const DeterministicObjectRenderer _objectRenderer =
+      DeterministicObjectRenderer();
 
   final DioramaSnapshot snapshot;
 
@@ -207,8 +211,12 @@ class DioramaScenePainter {
     }
 
     final backTree = _tileTop(0.4, 0.4).translate(-6, -6);
-    _drawTreeShape(canvas, backTree, const Color(0xFF536D47), fixed: true);
-    _drawBenchShape(canvas, _tileTop(0.4, 1.5), const Color(0xFF6E4C2E));
+    _objectRenderer.paintFixedTree(canvas, backTree, const Color(0xFF536D47));
+    _objectRenderer.paintFixedBench(
+      canvas,
+      _tileTop(0.4, 1.5),
+      const Color(0xFF6E4C2E),
+    );
   }
 
   void _drawConnections(Canvas canvas) {
@@ -280,319 +288,15 @@ class DioramaScenePainter {
         placement.column.toDouble(),
         placement.row.toDouble(),
       );
-      if (!object.isComplete) {
-        _drawConstruction(canvas, anchor, object);
-        continue;
-      }
-      final accent = _weatherAccent(object.weatherKind);
-      switch (object.kind) {
-        case ObjectKind.alleyLamp:
-          _drawLampShape(canvas, anchor, accent);
-          break;
-        case ObjectKind.signpost:
-          _drawSignShape(canvas, anchor, accent, placement.rotation);
-          break;
-        case ObjectKind.planter:
-          _drawPlanterShape(canvas, anchor, accent);
-          break;
-        case ObjectKind.bench:
-          _drawBenchShape(canvas, anchor, accent);
-          break;
-        case ObjectKind.stairs:
-          _drawStairsShape(canvas, anchor, accent, placement.rotation);
-          break;
-        case ObjectKind.tree:
-          _drawTreeShape(canvas, anchor, accent);
-          break;
-        case ObjectKind.busStop:
-          _drawBusStopShape(canvas, anchor, accent);
-          break;
-        case ObjectKind.pond:
-          _drawPondShape(canvas, anchor, accent);
-          break;
-        case ObjectKind.bridge:
-          _drawBridgeShape(canvas, anchor, accent, placement.rotation);
-          break;
-        case ObjectKind.tower:
-          _drawTowerShape(canvas, anchor, accent);
-          break;
-      }
-      _drawConnectorMark(canvas, anchor, object.surroundingKind);
-    }
-  }
-
-  void _drawConstruction(Canvas canvas, Offset anchor, CraftedObject object) {
-    final progress = object.requiredSteps == 0
-        ? 0.0
-        : object.appliedSteps / object.requiredSteps;
-    final wood = Paint()
-      ..isAntiAlias = false
-      ..color = const Color(0xFF8A603B);
-    canvas.drawRect(Rect.fromLTWH(anchor.dx - 17, anchor.dy - 17, 34, 7), wood);
-    canvas.drawRect(Rect.fromLTWH(anchor.dx - 13, anchor.dy - 29, 4, 20), wood);
-    canvas.drawRect(Rect.fromLTWH(anchor.dx + 9, anchor.dy - 29, 4, 20), wood);
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 15, anchor.dy - 34, 30 * progress, 3),
-      Paint()..color = PixelPalette.mint,
-    );
-  }
-
-  void _drawLampShape(Canvas canvas, Offset anchor, Color accent) {
-    _drawShadow(canvas, anchor, 18, 7);
-    final metal = Paint()
-      ..isAntiAlias = false
-      ..color = const Color(0xFF2C3237);
-    canvas.drawRect(Rect.fromLTWH(anchor.dx - 3, anchor.dy - 43, 6, 36), metal);
-    canvas.drawRect(Rect.fromLTWH(anchor.dx - 8, anchor.dy - 47, 16, 5), metal);
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 7, anchor.dy - 61, 14, 15),
-      Paint()
-        ..isAntiAlias = false
-        ..color = accent,
-    );
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 4, anchor.dy - 58, 8, 9),
-      Paint()
-        ..isAntiAlias = false
-        ..color = PixelPalette.cream,
-    );
-    canvas.drawCircle(
-      anchor.translate(0, -53),
-      15,
-      Paint()
-        ..shader =
-            RadialGradient(
-              colors: <Color>[
-                accent.withValues(alpha: 0.28),
-                Colors.transparent,
-              ],
-            ).createShader(
-              Rect.fromCircle(center: anchor.translate(0, -53), radius: 15),
-            ),
-    );
-  }
-
-  void _drawBenchShape(Canvas canvas, Offset anchor, Color accent) {
-    _drawShadow(canvas, anchor, 28, 8);
-    final wood = Paint()
-      ..isAntiAlias = false
-      ..color = Color.lerp(const Color(0xFF6F4A2F), accent, 0.18)!;
-    canvas.drawRect(Rect.fromLTWH(anchor.dx - 22, anchor.dy - 18, 44, 7), wood);
-    canvas.drawRect(Rect.fromLTWH(anchor.dx - 22, anchor.dy - 31, 44, 7), wood);
-    canvas.drawRect(Rect.fromLTWH(anchor.dx - 18, anchor.dy - 12, 4, 12), wood);
-    canvas.drawRect(Rect.fromLTWH(anchor.dx + 14, anchor.dy - 12, 4, 12), wood);
-  }
-
-  void _drawTreeShape(
-    Canvas canvas,
-    Offset anchor,
-    Color accent, {
-    bool fixed = false,
-  }) {
-    _drawShadow(canvas, anchor, 33, 12);
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 5, anchor.dy - 45, 10, 38),
-      Paint()
-        ..isAntiAlias = false
-        ..color = const Color(0xFF5B3B26),
-    );
-    final leaves = Color.lerp(
-      const Color(0xFF4E7148),
-      accent,
-      fixed ? 0.05 : 0.24,
-    )!;
-    final paint = Paint()
-      ..isAntiAlias = false
-      ..color = leaves;
-    for (final data in <(double, double, double)>[
-      (-12, -50, 17),
-      (9, -49, 18),
-      (-2, -66, 21),
-      (-20, -66, 13),
-      (17, -65, 13),
-    ]) {
-      canvas.drawCircle(anchor.translate(data.$1, data.$2), data.$3, paint);
-    }
-  }
-
-  void _drawPlanterShape(Canvas canvas, Offset anchor, Color accent) {
-    _drawShadow(canvas, anchor, 22, 8);
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 16, anchor.dy - 17, 32, 12),
-      Paint()..color = const Color(0xFF77513B),
-    );
-    final green = Color.lerp(const Color(0xFF628558), accent, 0.25)!;
-    for (final dx in <double>[-10, -3, 5, 11]) {
-      canvas.drawRect(
-        Rect.fromLTWH(anchor.dx + dx - 2, anchor.dy - 29, 5, 14),
-        Paint()..color = green,
-      );
-    }
-  }
-
-  void _drawStairsShape(
-    Canvas canvas,
-    Offset anchor,
-    Color accent,
-    int rotation,
-  ) {
-    _drawShadow(canvas, anchor, 28, 10);
-    final direction = rotation == 1 || rotation == 2 ? -1.0 : 1.0;
-    for (var index = 0; index < 4; index += 1) {
-      final width = 34 - index * 5;
-      canvas.drawRect(
-        Rect.fromLTWH(
-          anchor.dx - width / 2 + direction * index * 2,
-          anchor.dy - 8 - index * 7,
-          width.toDouble(),
-          7,
+      _objectRenderer.paintAt(
+        canvas,
+        anchor: anchor,
+        visual: ObjectVisualDescriptor.fromCraftedObject(
+          object,
+          timeBand:
+              snapshot.weatherMaterialsById[object.weatherMaterialId]?.timeBand,
         ),
-        Paint()
-          ..isAntiAlias = false
-          ..color = Color.lerp(
-            const Color(0xFF515A5C),
-            accent,
-            0.10 + index * 0.04,
-          )!,
-      );
-    }
-  }
-
-  void _drawBusStopShape(Canvas canvas, Offset anchor, Color accent) {
-    _drawShadow(canvas, anchor, 33, 11);
-    final frame = Paint()..color = const Color(0xFF29373B);
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 24, anchor.dy - 48, 5, 42),
-      frame,
-    );
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx + 19, anchor.dy - 48, 5, 42),
-      frame,
-    );
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 27, anchor.dy - 51, 54, 6),
-      frame,
-    );
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 18, anchor.dy - 43, 36, 25),
-      Paint()..color = accent.withValues(alpha: 0.45),
-    );
-    _drawBenchShape(canvas, anchor.translate(0, 1), const Color(0xFF6E4C2E));
-  }
-
-  void _drawPondShape(Canvas canvas, Offset anchor, Color accent) {
-    final water = Color.lerp(const Color(0xFF3D6F84), accent, 0.25)!;
-    canvas.drawOval(
-      Rect.fromCenter(center: anchor.translate(0, -4), width: 48, height: 20),
-      Paint()
-        ..isAntiAlias = false
-        ..color = const Color(0xFF253038),
-    );
-    canvas.drawOval(
-      Rect.fromCenter(center: anchor.translate(0, -6), width: 40, height: 14),
-      Paint()
-        ..isAntiAlias = false
-        ..color = water,
-    );
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 8, anchor.dy - 8, 16, 2),
-      Paint()..color = PixelPalette.cream.withValues(alpha: 0.45),
-    );
-  }
-
-  void _drawSignShape(
-    Canvas canvas,
-    Offset anchor,
-    Color accent,
-    int rotation,
-  ) {
-    _drawShadow(canvas, anchor, 18, 7);
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 2, anchor.dy - 35, 4, 30),
-      Paint()..color = const Color(0xFF4B3426),
-    );
-    final direction = rotation == 1 || rotation == 2 ? -1.0 : 1.0;
-    canvas.drawRect(
-      Rect.fromLTWH(
-        direction > 0 ? anchor.dx - 3 : anchor.dx - 22,
-        anchor.dy - 35,
-        25,
-        10,
-      ),
-      Paint()..color = accent,
-    );
-  }
-
-  void _drawBridgeShape(
-    Canvas canvas,
-    Offset anchor,
-    Color accent,
-    int rotation,
-  ) {
-    _drawShadow(canvas, anchor, 44, 12);
-    final vertical = rotation.isOdd;
-    final rect = vertical
-        ? Rect.fromLTWH(anchor.dx - 14, anchor.dy - 42, 28, 48)
-        : Rect.fromLTWH(anchor.dx - 35, anchor.dy - 24, 70, 20);
-    canvas.drawRect(rect, Paint()..color = const Color(0xFF6A4930));
-    final line = Paint()
-      ..color = accent
-      ..strokeWidth = 2;
-    if (vertical) {
-      for (var y = rect.top + 6; y < rect.bottom; y += 8) {
-        canvas.drawLine(Offset(rect.left, y), Offset(rect.right, y), line);
-      }
-    } else {
-      for (var x = rect.left + 8; x < rect.right; x += 10) {
-        canvas.drawLine(Offset(x, rect.top), Offset(x, rect.bottom), line);
-      }
-    }
-  }
-
-  void _drawTowerShape(Canvas canvas, Offset anchor, Color accent) {
-    _drawShadow(canvas, anchor, 30, 10);
-    final stone = Paint()..color = const Color(0xFF4A5558);
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 15, anchor.dy - 65, 30, 58),
-      stone,
-    );
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 20, anchor.dy - 70, 40, 8),
-      stone,
-    );
-    canvas.drawRect(
-      Rect.fromLTWH(anchor.dx - 5, anchor.dy - 55, 10, 13),
-      Paint()..color = accent,
-    );
-  }
-
-  void _drawConnectorMark(
-    Canvas canvas,
-    Offset anchor,
-    SurroundingMaterialKind? kind,
-  ) {
-    if (kind == null) {
-      return;
-    }
-    final color = switch (kind) {
-      SurroundingMaterialKind.dense => PixelPalette.mint,
-      SurroundingMaterialKind.dynamic => PixelPalette.blue,
-      SurroundingMaterialKind.stable => PixelPalette.amber,
-      SurroundingMaterialKind.sparse => PixelPalette.violet,
-    };
-    final paint = Paint()
-      ..isAntiAlias = false
-      ..color = color;
-    final count = switch (kind) {
-      SurroundingMaterialKind.dense => 3,
-      SurroundingMaterialKind.dynamic => 2,
-      SurroundingMaterialKind.stable => 1,
-      SurroundingMaterialKind.sparse => 2,
-    };
-    for (var index = 0; index < count; index += 1) {
-      canvas.drawRect(
-        Rect.fromLTWH(anchor.dx - 8 + index * 7, anchor.dy - 7, 3, 3),
-        paint,
+        rotation: placement.rotation,
       );
     }
   }
@@ -697,13 +401,4 @@ class DioramaScenePainter {
       Paint()..color = Colors.black.withValues(alpha: 0.27),
     );
   }
-
-  Color _weatherAccent(WeatherMaterialKind kind) => switch (kind) {
-    WeatherMaterialKind.clear => const Color(0xFFE2B85F),
-    WeatherMaterialKind.rain => const Color(0xFF6FA9C8),
-    WeatherMaterialKind.cloudy => const Color(0xFF9EADB0),
-    WeatherMaterialKind.windy => const Color(0xFF82B8A0),
-    WeatherMaterialKind.cold => const Color(0xFFB8D8E8),
-    WeatherMaterialKind.warm => const Color(0xFFD98855),
-  };
 }

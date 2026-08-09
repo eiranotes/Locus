@@ -37,6 +37,14 @@ def patch_android_manifest() -> None:
             "    " + marker,
             1,
         )
+    text, count = re.subn(
+        r'android:label="[^"]*"',
+        'android:label="Locus"',
+        text,
+        count=1,
+    )
+    if count == 0:
+        raise RuntimeError("Could not locate the Android application label")
     path.write_text(text, encoding="utf-8")
 
 
@@ -71,6 +79,41 @@ def patch_ios_plist() -> None:
 """
     if "NSMotionUsageDescription" not in text:
         text = text.replace("</dict>", keys + "</dict>", 1)
+    if "CFBundleExecutable" not in text:
+        executable = """\t<key>CFBundleExecutable</key>
+\t<string>$(EXECUTABLE_NAME)</string>
+"""
+        text = text.replace("<dict>\n", "<dict>\n" + executable, 1)
+    for key, value in (
+        ("CFBundleDisplayName", "Locus"),
+        ("CFBundleName", "Locus"),
+    ):
+        text, count = re.subn(
+            rf"(<key>{key}</key>\s*<string>)[^<]*(</string>)",
+            rf"\g<1>{value}\g<2>",
+            text,
+            count=1,
+        )
+        if count == 0:
+            raise RuntimeError(f"Could not locate {key} in the iOS Info.plist")
+    path.write_text(text, encoding="utf-8")
+
+
+def patch_ios_launch_screen() -> None:
+    path = ROOT / "ios/Runner/Base.lproj/LaunchScreen.storyboard"
+    if not path.exists():
+        return
+    text = path.read_text(encoding="utf-8")
+    text, count = re.subn(
+        r'<color key="backgroundColor"[^>]*/>',
+        '<color key="backgroundColor" red="0.027451" green="0.082353" '
+        'blue="0.133333" alpha="1" colorSpace="custom" '
+        'customColorSpace="sRGB"/>',
+        text,
+        count=1,
+    )
+    if count == 0:
+        raise RuntimeError("Could not locate the iOS launch background color")
     path.write_text(text, encoding="utf-8")
 
 
@@ -145,6 +188,7 @@ def main() -> None:
     patch_android_manifest()
     patch_android_min_sdk()
     patch_ios_plist()
+    patch_ios_launch_screen()
     patch_ios_minimum_version()
     patch_ios_weatherkit_entitlement()
 

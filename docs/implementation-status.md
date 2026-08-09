@@ -11,7 +11,8 @@
 - Android and iOS foreground BLE aggregation bridges;
 - crafting/construction flow;
 - 5×5 placement and visitor rules;
-- pixel-style isometric prototype renderer;
+- pixel-style isometric prototype renderer shared by the home scene, crafting,
+  inventory, and codex with persisted `visualSeed` details;
 - inventory, settings, and codex;
 - tests, repository contracts, Android/iOS compile CI, and reproducible publish/archive helpers.
 
@@ -47,6 +48,12 @@ These are post-core-loop tasks in the v6 roadmap, not silent omissions.
 - Android: Open-Meteo prototype gateway with visible attribution; replaceable behind `WeatherGateway`.
 - Demo: deterministic weather/location/steps/BLE only when `DEMO_MODE=true`.
 
+Demo gateways do not request real Bluetooth or Motion permissions. The iOS demo
+path stores its state in a database separate from production. The audited
+simulator loop collected deterministic rain/surroundings, crafted and moved an
+alley lamp, and restored the object, placement, and remaining steps after a
+process restart.
+
 ## Import and validation status
 
 The staged archive import has been replaced by the tracked Flutter source tree. `IMPORT_COMPLETE.md` defines the main-branch completion contract, and `IMPORT_STATUS.md` records `Conclusion: success` together with the validated gates and their release boundary.
@@ -56,3 +63,7 @@ GitHub Actions pins Flutter 3.44.9, regenerates the platform wrappers, resolves 
 The normal Flutter workflow is read-only. A separate `workflow_run` reporter may write only to GitHub Issues: a non-successful `main` run creates or updates `Flutter import requires follow-up`, and a later successful `main` run closes it automatically.
 
 Distribution signing, store configuration, WeatherKit provisioning, production Android weather-provider selection, and physical-device accessibility/battery/thermal testing remain release gates rather than import gates.
+
+The current image-asset scope is one owner-review AppIcon candidate under
+`assets/branding/candidates`. Production sprite atlases remain deferred until
+the G2 renderer and placement geometry are stable.

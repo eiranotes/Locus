@@ -9,6 +9,7 @@ class DioramaSnapshot {
     required this.objects,
     required this.placements,
     required this.recipesById,
+    required this.weatherMaterialsById,
     required this.environmentGrid,
     required this.connectionGraph,
     required this.timeBand,
@@ -20,6 +21,7 @@ class DioramaSnapshot {
   final List<CraftedObject> objects;
   final List<Placement> placements;
   final Map<String, RecipeDefinition> recipesById;
+  final Map<String, WeatherMaterial> weatherMaterialsById;
   final EnvironmentGrid environmentGrid;
   final ConnectionGraph connectionGraph;
   final TimeBand timeBand;
@@ -32,6 +34,7 @@ class DioramaSnapshot {
       objects: const <CraftedObject>[],
       placements: const <Placement>[],
       recipesById: const <String, RecipeDefinition>{},
+      weatherMaterialsById: const <String, WeatherMaterial>{},
       environmentGrid: EnvironmentGrid(columns: 5, rows: 5),
       connectionGraph: const ConnectionGraph(edges: <ConnectionEdge>[]),
       timeBand: TimeBand.evening,

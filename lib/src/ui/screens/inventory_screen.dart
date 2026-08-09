@@ -3,10 +3,12 @@ import 'package:reality_diorama/src/app/app_controller.dart';
 import 'package:reality_diorama/src/app/app_scope.dart';
 import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
+import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/ui/screens/crafting_screen.dart';
 import 'package:reality_diorama/src/ui/screens/placement_editor_screen.dart';
 import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
+import 'package:reality_diorama/src/ui/widgets/object_visual_preview.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 
 class InventoryScreen extends StatelessWidget {
@@ -325,6 +327,9 @@ class _ObjectsTab extends StatelessWidget {
         body: '날씨 재료와 걸음을 사용해 첫 물건을 만들어 보세요.',
       );
     }
+    final weatherById = <String, WeatherMaterial>{
+      for (final material in controller.weatherMaterials) material.id: material,
+    };
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 110),
       itemCount: controller.craftedObjects.length,
@@ -344,10 +349,16 @@ class _ObjectsTab extends StatelessWidget {
                   ).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(
-                  objectIcon(object.kind),
-                  color: weatherColor(object.weatherKind),
-                  size: 30,
+                child: Padding(
+                  padding: const EdgeInsets.all(3),
+                  child: ObjectVisualPreview(
+                    key: ValueKey<String>(object.id),
+                    visual: ObjectVisualDescriptor.fromCraftedObject(
+                      object,
+                      timeBand: weatherById[object.weatherMaterialId]?.timeBand,
+                    ),
+                    semanticLabel: '${recipe.nameKo} 미리보기',
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
