@@ -126,6 +126,38 @@ final class DeterministicObjectRenderer {
       case ObjectKind.tower:
         _drawTowerShape(canvas, anchor, accent, visual);
         break;
+      case ObjectKind.mailbox:
+      case ObjectKind.clockPost:
+      case ObjectKind.windChime:
+      case ObjectKind.stoneLantern:
+        _drawLampShape(canvas, anchor, accent, visual);
+        break;
+      case ObjectKind.rainShelter:
+      case ObjectKind.bookKiosk:
+      case ObjectKind.greenhouse:
+      case ObjectKind.marketStall:
+        _drawBusStopShape(canvas, anchor, accent, visual);
+        break;
+      case ObjectKind.stoneGate:
+      case ObjectKind.flowerArch:
+      case ObjectKind.laundryLine:
+      case ObjectKind.lanternString:
+        _drawBridgeShape(canvas, anchor, accent, rotation, visual);
+        break;
+      case ObjectKind.birdBath:
+      case ObjectKind.fountain:
+        _drawPondShape(canvas, anchor, accent, visual);
+        break;
+      case ObjectKind.picnicTable:
+      case ObjectKind.teaTable:
+        _drawBenchShape(canvas, anchor, accent, visual: visual);
+        break;
+      case ObjectKind.willow:
+        _drawTreeShape(canvas, anchor, accent, visual: visual);
+        break;
+      case ObjectKind.observatory:
+        _drawTowerShape(canvas, anchor, accent, visual);
+        break;
     }
     _drawConnectorMark(canvas, anchor, visual.surroundingKind);
   }
@@ -250,6 +282,24 @@ final class DeterministicObjectRenderer {
     ObjectKind.pond => const Size(92, 68),
     ObjectKind.bridge => const Size(96, 76),
     ObjectKind.tower => const Size(84, 104),
+    ObjectKind.mailbox => const Size(82, 78),
+    ObjectKind.rainShelter => const Size(96, 88),
+    ObjectKind.stoneGate => const Size(92, 94),
+    ObjectKind.clockPost => const Size(78, 102),
+    ObjectKind.bookKiosk => const Size(92, 88),
+    ObjectKind.laundryLine => const Size(98, 86),
+    ObjectKind.flowerArch => const Size(94, 96),
+    ObjectKind.birdBath => const Size(82, 80),
+    ObjectKind.greenhouse => const Size(98, 98),
+    ObjectKind.fountain => const Size(92, 76),
+    ObjectKind.picnicTable => const Size(96, 76),
+    ObjectKind.willow => const Size(102, 106),
+    ObjectKind.lanternString => const Size(102, 92),
+    ObjectKind.windChime => const Size(80, 98),
+    ObjectKind.teaTable => const Size(90, 78),
+    ObjectKind.marketStall => const Size(96, 94),
+    ObjectKind.stoneLantern => const Size(78, 94),
+    ObjectKind.observatory => const Size(102, 106),
   };
 
   void _drawFootprintEffect(

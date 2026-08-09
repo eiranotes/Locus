@@ -98,9 +98,8 @@ def process() -> None:
     if shutil.which("magick") is None:
         raise SystemExit("ImageMagick is required to process construction art")
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    for stale in OUTPUT.glob("*.png"):
-        if stale.stem not in expected_names():
-            stale.unlink()
+    # Additional content packs share the construction output directory. This
+    # processor owns only SHEETS and must not remove their outputs.
 
     assets: list[dict[str, object]] = []
     sources: list[dict[str, object]] = []
@@ -268,8 +267,8 @@ def validate() -> None:
     if any(len(hashes) != 3 for hashes in hashes_by_object.values()):
         raise SystemExit("Every construction stage must have a distinct image")
     installed = {path.stem for path in OUTPUT.glob("*.png")}
-    if installed != expected:
-        raise SystemExit("Installed construction-art inventory is not exact")
+    if not expected.issubset(installed):
+        raise SystemExit("Installed construction-art inventory is missing v1 assets")
     if not CONTACT_SHEET.exists():
         raise SystemExit(f"Missing construction contact sheet: {CONTACT_SHEET}")
     print(f"construction art validation passed ({len(expected)} assets)")

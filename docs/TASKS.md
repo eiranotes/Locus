@@ -21,6 +21,12 @@
 
 ## Next
 
+- [x] Expand the object catalog to 28 recipes and visitor codex to 18 entries
+      without increasing the 5×5 board or eight-object active limit.
+- [x] Generate authored base, four-direction, construction-stage, and visitor
+      sprites for the entire collection expansion with reproducible provenance.
+- [ ] Add collection-set progress and scalable browsing controls to the codex,
+      then visually verify the expanded catalog on the iOS simulator.
 - [x] Establish Night Cabinet semantic tokens, tonal surfaces, role-specific
       radii, and a destination-only bottom navigation.
 - [x] Recompose capture, crafting, and placement as scene/workbench surfaces

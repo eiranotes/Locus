@@ -47,6 +47,8 @@ class VisitorDefinition {
     required this.hintsKo,
     required this.requirements,
     required this.reward,
+    this.collectionId = 'first-neighborhood',
+    this.collectionNameKo = '첫 골목',
   });
 
   final String id;
@@ -55,6 +57,8 @@ class VisitorDefinition {
   final List<String> hintsKo;
   final List<VisitorRequirement> requirements;
   final VisitorReward reward;
+  final String collectionId;
+  final String collectionNameKo;
 
   factory VisitorDefinition.fromJson(Map<String, Object?> json) =>
       VisitorDefinition(
@@ -67,6 +71,8 @@ class VisitorDefinition {
             .map(VisitorRequirement.fromJson)
             .toList(growable: false),
         reward: VisitorReward.fromJson(json['reward']! as Map<String, Object?>),
+        collectionId: json['collectionId'] as String? ?? 'first-neighborhood',
+        collectionNameKo: json['collectionNameKo'] as String? ?? '첫 골목',
       );
 }
 

@@ -66,6 +66,8 @@ class RecipeDefinition {
     required this.tags,
     required this.baseEffects,
     this.traitAffinities = const <AtmosphericTrait>{},
+    this.collectionId = 'first-neighborhood',
+    this.collectionNameKo = '첫 골목',
   });
 
   final String id;
@@ -79,6 +81,8 @@ class RecipeDefinition {
   final Set<String> tags;
   final Map<String, int> baseEffects;
   final Set<AtmosphericTrait> traitAffinities;
+  final String collectionId;
+  final String collectionNameKo;
 
   factory RecipeDefinition.fromJson(Map<String, Object?> json) {
     final rawEffects = json['baseEffects']! as Map<String, Object?>;
@@ -109,6 +113,8 @@ class RecipeDefinition {
               .whereType<String>()
               .map(AtmosphericTrait.values.byName)
               .toSet(),
+      collectionId: json['collectionId'] as String? ?? 'first-neighborhood',
+      collectionNameKo: json['collectionNameKo'] as String? ?? '첫 골목',
     );
   }
 }

@@ -87,6 +87,25 @@ crafting preview and the created object share one seed function. New objects use
 `object-v2`, while `object-v1` bypasses new detail channels to preserve existing
 collectibles.
 
+### Collection depth expands the library, not the active board
+
+The retention-facing catalog now contains 28 deterministic recipes and 18
+visitors, organized as the original first neighborhood plus `골목 생활`,
+`정원 생태`, and `밤의 장터`. The 5×5 board and eight-active-object ceiling stay
+fixed. Players build variety by collecting, storing, swapping, and recomposing
+objects; the scene does not become a dense inventory dump.
+
+Six expansion recipes are initially available and twelve are deterministic
+visitor rewards. Every visitor exposes no more than three visible conditions,
+and an iterative content test must prove that explicit object/tag dependencies
+can be reached from the initial catalog. The same generated object identity is
+used for base preview, construction stages, all four placement directions, and
+the shared renderer fallback contract.
+
+Generated-art packs may coexist in the installed runtime directory. Each pack
+validator owns and hashes only its declared inventory, while the placement and
+crafting catalogs remain the exact cross-pack coverage gate.
+
 ### Generated static art is now the primary renderer input
 
 The owner explicitly approved moving beyond prototype geometry. A fixed v1

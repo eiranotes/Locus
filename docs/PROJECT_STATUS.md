@@ -1,6 +1,6 @@
 # Project status
 
-Last updated: 2026-08-09
+Last updated: 2026-08-10
 
 ## Current state
 
@@ -15,6 +15,16 @@ collection is a scene action rather than an oversized navigation item.
 
 ## Completed in the current slice
 
+- Expanded the collectible catalog from 10 to 28 placeable objects and from 6
+  to 18 visitors across `골목 생활`, `정원 생태`, and `밤의 장터` sets.
+- Added six immediately craftable expansion recipes and twelve visitor-reward
+  recipes, with an automated progression check proving that every locked
+  recipe remains reachable from the initial catalog.
+- Generated and installed 156 production runtime sprites: 18 object bases, 72
+  authored quarter-turns, 54 construction stages, and 12 visitor portraits.
+- Kept the 5×5 board and eight-active-object limit; retention comes from
+  collecting, swapping, and recomposing a larger library rather than crowding
+  the diorama or monetizing progression inputs.
 - Added semantic canvas, scene, panel, text, action, reward, weather, visitor,
   danger, and focus tokens with verified text/action contrast.
 - Replaced the default 18 px outlined `PixelCard` with tonal 10 px surfaces;

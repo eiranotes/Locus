@@ -96,6 +96,168 @@
         {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_tower_r2.png"},
         {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_tower_r3.png"}
       ]
+    },
+    {
+      "recipeId": "mailbox",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_mailbox_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_mailbox_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_mailbox_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_mailbox_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "rain_shelter",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_rain_shelter_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_rain_shelter_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_rain_shelter_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_rain_shelter_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "stone_gate",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_stone_gate_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_stone_gate_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_stone_gate_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_stone_gate_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "clock_post",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_clock_post_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_clock_post_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_clock_post_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_clock_post_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "book_kiosk",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_book_kiosk_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_book_kiosk_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_book_kiosk_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_book_kiosk_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "laundry_line",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_laundry_line_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_laundry_line_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_laundry_line_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_laundry_line_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "flower_arch",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_flower_arch_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_flower_arch_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_flower_arch_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_flower_arch_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "bird_bath",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_bird_bath_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_bird_bath_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_bird_bath_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_bird_bath_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "greenhouse",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_greenhouse_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_greenhouse_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_greenhouse_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_greenhouse_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "fountain",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_fountain_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_fountain_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_fountain_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_fountain_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "picnic_table",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_picnic_table_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_picnic_table_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_picnic_table_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_picnic_table_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "willow",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_willow_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_willow_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_willow_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_willow_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "lantern_string",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_lantern_string_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_lantern_string_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_lantern_string_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_lantern_string_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "wind_chime",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_wind_chime_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_wind_chime_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_wind_chime_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_wind_chime_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "tea_table",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_tea_table_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_tea_table_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_tea_table_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_tea_table_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "market_stall",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_market_stall_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_market_stall_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_market_stall_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_market_stall_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "stone_lantern",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_stone_lantern_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_stone_lantern_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_stone_lantern_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_stone_lantern_r3.png"}
+      ]
+    },
+    {
+      "recipeId": "observatory",
+      "visuals": [
+        {"rotation": 0, "assetPath": "assets/art/generated/v1/directional/object_observatory_r0.png"},
+        {"rotation": 1, "assetPath": "assets/art/generated/v1/directional/object_observatory_r1.png"},
+        {"rotation": 2, "assetPath": "assets/art/generated/v1/directional/object_observatory_r2.png"},
+        {"rotation": 3, "assetPath": "assets/art/generated/v1/directional/object_observatory_r3.png"}
+      ]
     }
   ]
 }

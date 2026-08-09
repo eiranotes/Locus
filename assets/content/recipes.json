@@ -130,6 +130,132 @@
       "tags": ["light", "height", "hub"],
       "traitAffinities": ["deepCloud", "strongWind", "sharpCold", "intenseHeat"],
       "baseEffects": {"light": 2}
+    },
+    {
+      "id": "mailbox", "kind": "mailbox", "nameKo": "우편함",
+      "descriptionKo": "소식이 오가는 골목의 작은 표식을 세웁니다.", "stepCost": 1300,
+      "footprint": {"width": 1, "height": 1}, "height": "low", "initiallyUnlocked": true,
+      "collectionId": "street-life", "collectionNameKo": "골목 생활",
+      "tags": ["street", "message", "path"], "traitAffinities": ["activePrecipitation", "strongWind"], "baseEffects": {}
+    },
+    {
+      "id": "rain_shelter", "kind": "rainShelter", "nameKo": "비 가림막",
+      "descriptionKo": "비 오는 날 잠시 머무를 수 있는 마른 자리를 만듭니다.", "stepCost": 3600,
+      "footprint": {"width": 1, "height": 2}, "height": "medium", "initiallyUnlocked": false,
+      "collectionId": "street-life", "collectionNameKo": "골목 생활",
+      "tags": ["street", "stay", "shade"], "traitAffinities": ["activePrecipitation", "deepCloud"], "baseEffects": {"cool": 1}
+    },
+    {
+      "id": "stone_gate", "kind": "stoneGate", "nameKo": "돌문",
+      "descriptionKo": "두 구역의 경계를 오래된 돌 아치로 잇습니다.", "stepCost": 4700,
+      "footprint": {"width": 1, "height": 1}, "height": "high", "initiallyUnlocked": false,
+      "collectionId": "street-life", "collectionNameKo": "골목 생활",
+      "tags": ["street", "path", "height"], "traitAffinities": ["lowVisibility", "sharpCold"], "baseEffects": {}
+    },
+    {
+      "id": "clock_post", "kind": "clockPost", "nameKo": "골목 시계",
+      "descriptionKo": "골목의 시간대를 알려 주는 높은 시계 기둥입니다.", "stepCost": 4200,
+      "footprint": {"width": 1, "height": 1}, "height": "high", "initiallyUnlocked": false,
+      "collectionId": "street-life", "collectionNameKo": "골목 생활",
+      "tags": ["street", "time", "height"], "traitAffinities": ["lowVisibility", "strongWind"], "baseEffects": {"light": 1}
+    },
+    {
+      "id": "book_kiosk", "kind": "bookKiosk", "nameKo": "책 가판대",
+      "descriptionKo": "작은 책과 이야기가 모이는 골목 가판대입니다.", "stepCost": 3900,
+      "footprint": {"width": 1, "height": 1}, "height": "medium", "initiallyUnlocked": false,
+      "collectionId": "street-life", "collectionNameKo": "골목 생활",
+      "tags": ["street", "message", "stay"], "traitAffinities": ["deepCloud", "intenseHeat"], "baseEffects": {}
+    },
+    {
+      "id": "laundry_line", "kind": "laundryLine", "nameKo": "빨랫줄",
+      "descriptionKo": "바람의 방향을 보여 주는 생활 풍경을 만듭니다.", "stepCost": 2800,
+      "footprint": {"width": 1, "height": 2}, "height": "medium", "initiallyUnlocked": false,
+      "collectionId": "street-life", "collectionNameKo": "골목 생활",
+      "tags": ["street", "wind", "home"], "traitAffinities": ["strongWind", "intenseHeat"], "baseEffects": {}
+    },
+    {
+      "id": "flower_arch", "kind": "flowerArch", "nameKo": "꽃 아치",
+      "descriptionKo": "정원으로 들어가는 길에 꽃이 핀 문을 세웁니다.", "stepCost": 1900,
+      "footprint": {"width": 1, "height": 1}, "height": "high", "initiallyUnlocked": true,
+      "collectionId": "garden-life", "collectionNameKo": "정원 생태",
+      "tags": ["nature", "path", "flower"], "traitAffinities": ["activePrecipitation", "intenseHeat"], "baseEffects": {"nature": 1}
+    },
+    {
+      "id": "bird_bath", "kind": "birdBath", "nameKo": "새 목욕대",
+      "descriptionKo": "작은 새가 쉬어 갈 얕은 물자리를 만듭니다.", "stepCost": 1700,
+      "footprint": {"width": 1, "height": 1}, "height": "low", "initiallyUnlocked": true,
+      "collectionId": "garden-life", "collectionNameKo": "정원 생태",
+      "tags": ["nature", "wet", "bird"], "traitAffinities": ["activePrecipitation", "sharpCold"], "baseEffects": {"wet": 1, "nature": 1}
+    },
+    {
+      "id": "greenhouse", "kind": "greenhouse", "nameKo": "온실",
+      "descriptionKo": "날씨와 상관없이 온기와 식물을 품는 유리 온실입니다.", "stepCost": 6200,
+      "footprint": {"width": 1, "height": 2}, "height": "high", "initiallyUnlocked": false,
+      "collectionId": "garden-life", "collectionNameKo": "정원 생태",
+      "tags": ["nature", "warm", "home"], "traitAffinities": ["sharpCold", "deepCloud"], "baseEffects": {"warm": 2, "nature": 2}
+    },
+    {
+      "id": "fountain", "kind": "fountain", "nameKo": "작은 분수",
+      "descriptionKo": "흐르는 물소리와 젖은 칸을 정원에 더합니다.", "stepCost": 4400,
+      "footprint": {"width": 1, "height": 1}, "height": "low", "initiallyUnlocked": false,
+      "collectionId": "garden-life", "collectionNameKo": "정원 생태",
+      "tags": ["nature", "wet", "stay"], "traitAffinities": ["activePrecipitation", "intenseHeat"], "baseEffects": {"wet": 2, "cool": 1}
+    },
+    {
+      "id": "picnic_table", "kind": "picnicTable", "nameKo": "피크닉 탁자",
+      "descriptionKo": "여럿이 머물 수 있는 넓은 정원 자리를 만듭니다.", "stepCost": 3300,
+      "footprint": {"width": 1, "height": 2}, "height": "low", "initiallyUnlocked": false,
+      "collectionId": "garden-life", "collectionNameKo": "정원 생태",
+      "tags": ["nature", "stay", "table"], "traitAffinities": ["intenseHeat", "deepCloud"], "baseEffects": {}
+    },
+    {
+      "id": "willow", "kind": "willow", "nameKo": "버드나무",
+      "descriptionKo": "물가에 긴 그늘과 서늘한 정적을 드리웁니다.", "stepCost": 5800,
+      "footprint": {"width": 1, "height": 1}, "height": "high", "initiallyUnlocked": false,
+      "collectionId": "garden-life", "collectionNameKo": "정원 생태",
+      "tags": ["nature", "shade", "wet"], "traitAffinities": ["activePrecipitation", "strongWind"], "baseEffects": {"nature": 2, "cool": 2}
+    },
+    {
+      "id": "lantern_string", "kind": "lanternString", "nameKo": "전구 줄",
+      "descriptionKo": "두 기둥 사이에 따뜻한 밤빛을 이어 겁니다.", "stepCost": 2200,
+      "footprint": {"width": 1, "height": 2}, "height": "medium", "initiallyUnlocked": true,
+      "collectionId": "night-market", "collectionNameKo": "밤의 장터",
+      "tags": ["light", "night", "market"], "traitAffinities": ["lowVisibility", "deepCloud"], "baseEffects": {"light": 2, "warm": 1}
+    },
+    {
+      "id": "wind_chime", "kind": "windChime", "nameKo": "풍경",
+      "descriptionKo": "바람이 불면 골목 끝에서 작은 소리를 냅니다.", "stepCost": 1600,
+      "footprint": {"width": 1, "height": 1}, "height": "medium", "initiallyUnlocked": true,
+      "collectionId": "night-market", "collectionNameKo": "밤의 장터",
+      "tags": ["wind", "night", "sound"], "traitAffinities": ["strongWind", "sharpCold"], "baseEffects": {}
+    },
+    {
+      "id": "tea_table", "kind": "teaTable", "nameKo": "찻상",
+      "descriptionKo": "따뜻한 차를 올려 둘 작은 밤 자리를 만듭니다.", "stepCost": 2100,
+      "footprint": {"width": 1, "height": 1}, "height": "low", "initiallyUnlocked": true,
+      "collectionId": "night-market", "collectionNameKo": "밤의 장터",
+      "tags": ["warm", "stay", "table"], "traitAffinities": ["sharpCold", "deepCloud"], "baseEffects": {"warm": 2}
+    },
+    {
+      "id": "market_stall", "kind": "marketStall", "nameKo": "밤 장터",
+      "descriptionKo": "빛과 온기가 모이는 작은 밤 가게를 엽니다.", "stepCost": 5200,
+      "footprint": {"width": 1, "height": 2}, "height": "medium", "initiallyUnlocked": false,
+      "collectionId": "night-market", "collectionNameKo": "밤의 장터",
+      "tags": ["market", "light", "stay"], "traitAffinities": ["lowVisibility", "sharpCold"], "baseEffects": {"light": 2, "warm": 1}
+    },
+    {
+      "id": "stone_lantern", "kind": "stoneLantern", "nameKo": "석등",
+      "descriptionKo": "낮고 안정적인 빛으로 밤길의 모서리를 밝힙니다.", "stepCost": 3700,
+      "footprint": {"width": 1, "height": 1}, "height": "medium", "initiallyUnlocked": false,
+      "collectionId": "night-market", "collectionNameKo": "밤의 장터",
+      "tags": ["light", "night", "stable"], "traitAffinities": ["lowVisibility", "activePrecipitation"], "baseEffects": {"light": 1}
+    },
+    {
+      "id": "observatory", "kind": "observatory", "nameKo": "별 관측대",
+      "descriptionKo": "마을의 가장 높은 곳에서 밤하늘을 바라봅니다.", "stepCost": 7200,
+      "footprint": {"width": 1, "height": 1}, "height": "high", "initiallyUnlocked": false,
+      "collectionId": "night-market", "collectionNameKo": "밤의 장터",
+      "tags": ["night", "height", "far"], "traitAffinities": ["lowVisibility", "strongWind", "sharpCold"], "baseEffects": {"light": 1}
     }
   ]
 }

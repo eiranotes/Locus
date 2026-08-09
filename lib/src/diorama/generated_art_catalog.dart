@@ -20,6 +20,24 @@ abstract final class GeneratedArtPaths {
         ObjectKind.pond => 'object_pond',
         ObjectKind.bridge => 'object_bridge',
         ObjectKind.tower => 'object_tower',
+        ObjectKind.mailbox => 'object_mailbox',
+        ObjectKind.rainShelter => 'object_rain_shelter',
+        ObjectKind.stoneGate => 'object_stone_gate',
+        ObjectKind.clockPost => 'object_clock_post',
+        ObjectKind.bookKiosk => 'object_book_kiosk',
+        ObjectKind.laundryLine => 'object_laundry_line',
+        ObjectKind.flowerArch => 'object_flower_arch',
+        ObjectKind.birdBath => 'object_bird_bath',
+        ObjectKind.greenhouse => 'object_greenhouse',
+        ObjectKind.fountain => 'object_fountain',
+        ObjectKind.picnicTable => 'object_picnic_table',
+        ObjectKind.willow => 'object_willow',
+        ObjectKind.lanternString => 'object_lantern_string',
+        ObjectKind.windChime => 'object_wind_chime',
+        ObjectKind.teaTable => 'object_tea_table',
+        ObjectKind.marketStall => 'object_market_stall',
+        ObjectKind.stoneLantern => 'object_stone_lantern',
+        ObjectKind.observatory => 'object_observatory',
       }}.png';
 
   static String visitor(String id) => '$root/visitor_$id.png';
@@ -73,8 +91,9 @@ final class DioramaArtImages {
 
   static Future<DioramaArtImages> load(
     PlacementCatalog placementCatalog,
-    VisualLayerCatalog visualLayerCatalog,
-  ) async {
+    VisualLayerCatalog visualLayerCatalog, {
+    required Iterable<String> visitorIds,
+  }) async {
     final catalogPaths = <String>{
       for (final entry in placementCatalog.entries)
         for (final visual in entry.visuals) visual.assetPath,
@@ -90,15 +109,7 @@ final class DioramaArtImages {
         path: path,
     };
     final visitorPaths = <String, String>{
-      for (final id in const <String>[
-        'umbrella_walker',
-        'night_moth',
-        'roof_bird',
-        'fog_cat',
-        'transfer_guest',
-        'light_swarm',
-      ])
-        id: GeneratedArtPaths.visitor(id),
+      for (final id in visitorIds) id: GeneratedArtPaths.visitor(id),
     };
     final sceneryPaths = <String, String>{
       for (final name in const <String>[

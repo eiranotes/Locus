@@ -72,6 +72,90 @@
         {"kind": "timeBand", "anyOf": ["evening", "night"]}
       ],
       "reward": {"kind": "recipe", "value": "tower"}
+    },
+    {
+      "id": "sparrow_pair", "nameKo": "참새 둘", "descriptionKo": "얕은 물과 아침 볕이 있는 정원에 나란히 내려앉습니다.",
+      "collectionId": "garden-life", "collectionNameKo": "정원 생태",
+      "hintsKo": ["새 목욕대를 찾아요", "아침을 좋아해요", "맑은 날 잘 보여요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["birdBath"]}, {"kind": "timeBand", "anyOf": ["morning"]}, {"kind": "weatherKind", "anyOf": ["clear"]}],
+      "reward": {"kind": "recipe", "value": "picnic_table"}
+    },
+    {
+      "id": "rain_frog", "nameKo": "빗잎 개구리", "descriptionKo": "비가 고인 정원의 넓은 잎 아래서 쉬어 갑니다.",
+      "collectionId": "garden-life", "collectionNameKo": "정원 생태",
+      "hintsKo": ["젖은 칸이 필요해요", "비 오는 날 찾아와요", "새 목욕대가 있으면 좋아요"],
+      "requirements": [{"kind": "wetCells", "min": 2}, {"kind": "weatherKind", "anyOf": ["rain"]}, {"kind": "objectKind", "anyOf": ["birdBath"]}],
+      "reward": {"kind": "recipe", "value": "fountain"}
+    },
+    {
+      "id": "letter_carrier", "nameKo": "편지 배달새", "descriptionKo": "우편함이 있는 골목에 작은 편지를 전하러 옵니다.",
+      "collectionId": "street-life", "collectionNameKo": "골목 생활",
+      "hintsKo": ["우편함을 찾아요", "길 물건이 둘 이상 필요해요", "낮에 움직여요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["mailbox"]}, {"kind": "taggedObjects", "tag": "path", "min": 2}, {"kind": "timeBand", "anyOf": ["afternoon"]}],
+      "reward": {"kind": "recipe", "value": "book_kiosk"}
+    },
+    {
+      "id": "window_fox", "nameKo": "창가 여우", "descriptionKo": "따뜻한 찻상 곁에서 밤 골목을 오래 바라봅니다.",
+      "collectionId": "night-market", "collectionNameKo": "밤의 장터",
+      "hintsKo": ["찻상을 좋아해요", "따뜻한 칸을 원해요", "밤에 찾아와요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["teaTable"]}, {"kind": "warmCells", "min": 2}, {"kind": "timeBand", "anyOf": ["night"]}],
+      "reward": {"kind": "recipe", "value": "stone_lantern"}
+    },
+    {
+      "id": "tea_mouse", "nameKo": "찻잔 생쥐", "descriptionKo": "따뜻한 차 냄새와 이어진 전구 아래에 조심스레 나타납니다.",
+      "collectionId": "night-market", "collectionNameKo": "밤의 장터",
+      "hintsKo": ["찻상이 필요해요", "전구 줄을 좋아해요", "저녁이나 밤에 보여요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["teaTable"]}, {"kind": "objectKind", "anyOf": ["lanternString"]}, {"kind": "timeBand", "anyOf": ["evening", "night"]}],
+      "reward": {"kind": "recipe", "value": "market_stall"}
+    },
+    {
+      "id": "wind_sprite", "nameKo": "바람 정령", "descriptionKo": "풍경 소리를 타고 골목 사이를 가볍게 맴돕니다.",
+      "collectionId": "night-market", "collectionNameKo": "밤의 장터",
+      "hintsKo": ["풍경을 찾아요", "바람 부는 날 좋아해요", "먼 연결이 있으면 머물러요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["windChime"]}, {"kind": "weatherKind", "anyOf": ["windy"]}, {"kind": "farConnections", "min": 1}],
+      "reward": {"kind": "recipe", "value": "stone_gate"}
+    },
+    {
+      "id": "garden_keeper", "nameKo": "정원지기", "descriptionKo": "꽃길과 여러 식물이 잘 이어진 정원을 돌봅니다.",
+      "collectionId": "garden-life", "collectionNameKo": "정원 생태",
+      "hintsKo": ["꽃 아치가 필요해요", "자연 물건이 둘 이상 필요해요", "따뜻한 칸을 좋아해요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["flowerArch"]}, {"kind": "taggedObjects", "tag": "nature", "min": 2}, {"kind": "warmCells", "min": 1}],
+      "reward": {"kind": "recipe", "value": "greenhouse"}
+    },
+    {
+      "id": "brook_heron", "nameKo": "개울 왜가리", "descriptionKo": "물이 흐르는 조용한 새벽 정원에 한 발로 섭니다.",
+      "collectionId": "garden-life", "collectionNameKo": "정원 생태",
+      "hintsKo": ["작은 분수를 찾아요", "젖은 칸이 많아야 해요", "새벽을 기다려요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["fountain"]}, {"kind": "wetCells", "min": 3}, {"kind": "timeBand", "anyOf": ["dawn"]}],
+      "reward": {"kind": "recipe", "value": "willow"}
+    },
+    {
+      "id": "book_collector", "nameKo": "책 수집 부엉이", "descriptionKo": "가판대의 오래된 책을 살펴보며 시간을 잊습니다.",
+      "collectionId": "street-life", "collectionNameKo": "골목 생활",
+      "hintsKo": ["책 가판대를 찾아요", "머무는 물건이 둘 필요해요", "저녁에 나타나요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["bookKiosk"]}, {"kind": "taggedObjects", "tag": "stay", "min": 2}, {"kind": "timeBand", "anyOf": ["evening"]}],
+      "reward": {"kind": "recipe", "value": "clock_post"}
+    },
+    {
+      "id": "night_watcher", "nameKo": "밤 관측자", "descriptionKo": "높은 구조물과 안정된 불빛 사이에서 별을 관찰합니다.",
+      "collectionId": "night-market", "collectionNameKo": "밤의 장터",
+      "hintsKo": ["석등을 찾아요", "높은 물건이 둘 필요해요", "밤에만 보여요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["stoneLantern"]}, {"kind": "highObjects", "min": 2}, {"kind": "timeBand", "anyOf": ["night"]}],
+      "reward": {"kind": "recipe", "value": "observatory"}
+    },
+    {
+      "id": "shelter_dog", "nameKo": "비 피하는 개", "descriptionKo": "빗속에서도 마른 머무름 자리를 찾아 골목을 돕니다.",
+      "collectionId": "street-life", "collectionNameKo": "골목 생활",
+      "hintsKo": ["우편함 근처를 서성이어요", "비 오는 날 찾아와요", "머무는 자리가 필요해요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["mailbox"]}, {"kind": "weatherKind", "anyOf": ["rain"]}, {"kind": "objectTag", "anyOf": ["stay"]}],
+      "reward": {"kind": "recipe", "value": "rain_shelter"}
+    },
+    {
+      "id": "rooftop_swallow", "nameKo": "지붕 제비", "descriptionKo": "바람을 타고 높은 골목과 빨랫줄 사이를 오갑니다.",
+      "collectionId": "street-life", "collectionNameKo": "골목 생활",
+      "hintsKo": ["풍경 소리를 따라와요", "높은 물건을 좋아해요", "바람 부는 날 나타나요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["windChime"]}, {"kind": "highObjects", "min": 1}, {"kind": "weatherKind", "anyOf": ["windy"]}],
+      "reward": {"kind": "recipe", "value": "laundry_line"}
     }
   ]
 }

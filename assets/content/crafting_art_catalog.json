@@ -80,6 +80,150 @@
         {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_tower_frame.png"},
         {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_tower_finish.png"}
       ]
+    },
+    {
+      "recipeId": "mailbox",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_mailbox_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_mailbox_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_mailbox_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "rain_shelter",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_rain_shelter_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_rain_shelter_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_rain_shelter_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "stone_gate",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_stone_gate_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_stone_gate_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_stone_gate_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "clock_post",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_clock_post_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_clock_post_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_clock_post_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "book_kiosk",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_book_kiosk_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_book_kiosk_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_book_kiosk_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "laundry_line",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_laundry_line_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_laundry_line_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_laundry_line_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "flower_arch",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_flower_arch_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_flower_arch_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_flower_arch_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "bird_bath",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_bird_bath_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_bird_bath_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_bird_bath_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "greenhouse",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_greenhouse_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_greenhouse_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_greenhouse_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "fountain",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_fountain_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_fountain_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_fountain_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "picnic_table",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_picnic_table_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_picnic_table_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_picnic_table_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "willow",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_willow_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_willow_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_willow_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "lantern_string",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_lantern_string_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_lantern_string_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_lantern_string_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "wind_chime",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_wind_chime_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_wind_chime_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_wind_chime_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "tea_table",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_tea_table_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_tea_table_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_tea_table_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "market_stall",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_market_stall_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_market_stall_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_market_stall_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "stone_lantern",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_stone_lantern_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_stone_lantern_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_stone_lantern_finish.png"}
+      ]
+    },
+    {
+      "recipeId": "observatory",
+      "construction": [
+        {"stage": "foundation", "maxCompletion": 0.34, "representativeCompletion": 0.25, "assetPath": "assets/art/generated/v1/construction/construction_observatory_foundation.png"},
+        {"stage": "frame", "maxCompletion": 0.72, "representativeCompletion": 0.60, "assetPath": "assets/art/generated/v1/construction/construction_observatory_frame.png"},
+        {"stage": "finish", "maxCompletion": 0.999, "representativeCompletion": 0.85, "assetPath": "assets/art/generated/v1/construction/construction_observatory_finish.png"}
+      ]
     }
   ]
 }

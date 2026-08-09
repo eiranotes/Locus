@@ -34,6 +34,8 @@ def check_content() -> None:
     visitors = visitors_doc.get("visitors", [])
     recipe_ids = [item["id"] for item in recipes]
     visitor_ids = [item["id"] for item in visitors]
+    if len(recipe_ids) < 28 or len(visitor_ids) < 18:
+        fail("collection expansion must keep at least 28 recipes and 18 visitors")
     if len(recipe_ids) != len(set(recipe_ids)):
         fail("duplicate recipe id")
     if len(visitor_ids) != len(set(visitor_ids)):
@@ -61,7 +63,10 @@ def check_content() -> None:
     }
     reward_recipe_ids: set[str] = set()
     for visitor in visitors:
-        for requirement in visitor.get("requirements", []):
+        requirements = visitor.get("requirements", [])
+        if not 1 <= len(requirements) <= 3:
+            fail(f"visitor {visitor['id']} must expose one to three requirements")
+        for requirement in requirements:
             if requirement.get("kind") not in known_requirements:
                 fail(f"visitor {visitor['id']} uses unsupported requirement {requirement.get('kind')}")
         reward = visitor["reward"]
@@ -368,6 +373,7 @@ def check_generated_art() -> None:
         "process_directional_art.py",
         "process_construction_art.py",
         "process_weather_art.py",
+        "process_collection_expansion.py",
     ):
         result = subprocess.run(
             [sys.executable, str(ROOT / f"tool/{script}"), "--validate-only"],
@@ -408,10 +414,12 @@ def check_required_files() -> None:
         "tool/process_directional_art.py",
         "tool/process_construction_art.py",
         "tool/process_weather_art.py",
+        "tool/process_collection_expansion.py",
         "artifacts/imagegen/locus-art-v1/manifest.json",
         "artifacts/imagegen/locus-directional-art-v1/manifest.json",
         "artifacts/imagegen/locus-construction-art-v1/manifest.json",
         "artifacts/imagegen/locus-weather-treatments-v1/manifest.json",
+        "artifacts/imagegen/locus-collection-expansion-v1/manifest.json",
         "assets/content/placement_catalog.json",
         "assets/content/crafting_art_catalog.json",
         "assets/content/visual_layer_catalog.json",

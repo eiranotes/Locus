@@ -88,9 +88,8 @@ def process() -> None:
     if shutil.which("magick") is None:
         raise SystemExit("ImageMagick is required to process directional art")
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    for stale in OUTPUT.glob("*.png"):
-        if stale.stem not in expected_names():
-            stale.unlink()
+    # Additional content packs share the directional output directory. This
+    # processor owns only SHEETS and must not remove their outputs.
 
     assets: list[dict[str, object]] = []
     sources: list[dict[str, object]] = []
@@ -252,8 +251,8 @@ def validate() -> None:
     if any(len(hashes) != 4 for hashes in hashes_by_object.values()):
         raise SystemExit("Every directional object must have four distinct images")
     installed = {path.stem for path in OUTPUT.glob("*.png")}
-    if installed != expected:
-        raise SystemExit("Installed directional-art inventory is not exact")
+    if not expected.issubset(installed):
+        raise SystemExit("Installed directional-art inventory is missing v1 assets")
     if not CONTACT_SHEET.exists():
         raise SystemExit(f"Missing directional contact sheet: {CONTACT_SHEET}")
     print(f"directional art validation passed ({len(expected)} assets)")

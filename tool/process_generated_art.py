@@ -173,10 +173,8 @@ def process() -> None:
     if shutil.which("magick") is None:
         raise SystemExit("ImageMagick is required to process generated art")
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    expected_names = {name for pack in PACKS for name in pack.names}
-    for stale in OUTPUT.glob("*.png"):
-        if stale.stem not in expected_names:
-            stale.unlink()
+    # Other versioned authoring packs may install additional root sprites.
+    # This processor owns only PACKS and must not remove their outputs.
 
     assets: list[dict[str, object]] = []
     sources: list[dict[str, object]] = []
@@ -286,8 +284,8 @@ def validate() -> None:
         if sha256(path) != item["sha256"]:
             raise SystemExit(f"Hash mismatch: {path}")
     installed = {path.stem for path in OUTPUT.glob("*.png")}
-    if installed != expected:
-        raise SystemExit("Installed generated-art inventory is not exact")
+    if not expected.issubset(installed):
+        raise SystemExit("Installed generated-art inventory is missing v1 assets")
     print(f"generated art validation passed ({len(expected)} assets)")
 
 

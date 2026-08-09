@@ -30,6 +30,9 @@ class DioramaGame extends FlameGame {
       _art = await DioramaArtImages.load(
         _snapshot.placementCatalog,
         _snapshot.visualLayerCatalog,
+        visitorIds: _snapshot.visitorEvaluations.map(
+          (evaluation) => evaluation.visitor.id,
+        ),
       );
     } catch (error, stackTrace) {
       debugPrint('Generated diorama art failed to load: $error\n$stackTrace');

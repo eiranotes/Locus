@@ -21,6 +21,12 @@
 
 ### Changed
 
+- Expanded the deterministic collection to 28 recipes and 18 visitors while
+  preserving the 5×5 board, eight-active-object limit, offline loop, and
+  non-monetized steps/weather/visitor progression.
+- Added three named expansion sets with six immediately craftable objects and
+  twelve visitor-reward recipes; every visitor still exposes at most three
+  conditions.
 - Replaced the universal 18 px outlined-card theme with the Night Cabinet
   semantic palette, tonal surfaces, bounded role-specific radii, denser type,
   and 48 dp controls.
@@ -72,6 +78,10 @@
 
 ### Assets
 
+- Added 156 collection-expansion runtime sprites covering 18 base objects, 72
+  true directional views, 54 construction stages, and 12 visitor portraits,
+  plus source atlases, prompts, contact sheet, hashes, and a reproducible
+  processor.
 - Added one normalized Pro-generated AppIcon candidate and its complete prompt.
   It is intentionally not selected as the shipping icon yet.
 - Added 42 production-bound pixel-art assets covering every MVP object and
@@ -98,6 +108,8 @@
 
 ### Tests
 
+- Added a deterministic progression test for the complete 28-recipe graph and
+  dynamic generated-art coverage for all 18 visitor IDs.
 - Added exhaustive placement-catalog tests across every recipe, four rotations,
   all board edges, collision rejection, unsupported directions, art files, and
   iOS-sized movement targets.
