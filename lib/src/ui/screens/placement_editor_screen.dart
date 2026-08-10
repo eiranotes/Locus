@@ -875,28 +875,45 @@ class _PlacementControls extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Expanded(
-                child: PlacementDirectionPad(
-                  canLeft: _canMove(-1, 0),
-                  canUp: _canMove(0, -1),
-                  canDown: _canMove(0, 1),
-                  canRight: _canMove(1, 0),
-                  onMove: onMove,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text('미세 조정', style: Theme.of(context).textTheme.bodySmall),
+                    const SizedBox(height: 5),
+                    PlacementDirectionPad(
+                      canLeft: _canMove(-1, 0),
+                      canUp: _canMove(0, -1),
+                      canDown: _canMove(0, 1),
+                      canRight: _canMove(1, 0),
+                      onMove: onMove,
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 10),
-              PixelButton(
-                key: const ValueKey<String>('placement-rotate'),
-                onPressed: nextRotation == null
-                    ? null
-                    : () => onRotate(nextRotation),
-                assetPath: GeneratedArtPaths.editorMarker('rotate'),
-                fallbackIcon: Icons.rotate_right,
-                tone: PixelButtonTone.secondary,
-                label: nextRotation == null
-                    ? '회전 공간 필요'
-                    : placementCatalog.directionFor(nextRotation).shortLabelKo,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text('방향 바꾸기', style: Theme.of(context).textTheme.bodySmall),
+                  const SizedBox(height: 5),
+                  PixelButton(
+                    key: const ValueKey<String>('placement-rotate'),
+                    onPressed: nextRotation == null
+                        ? null
+                        : () => onRotate(nextRotation),
+                    assetPath: GeneratedArtPaths.editorMarker('rotate'),
+                    fallbackIcon: Icons.rotate_right,
+                    tone: PixelButtonTone.secondary,
+                    label: nextRotation == null
+                        ? '회전 공간 필요'
+                        : placementCatalog
+                              .directionFor(nextRotation)
+                              .shortLabelKo,
+                  ),
+                ],
               ),
             ],
           ),
@@ -956,7 +973,7 @@ class _PlacementFeedback extends StatelessWidget {
     if (!dragging) {
       return const _SceneInstruction(
         icon: 'grab_hand',
-        label: '물건을 끌어 옮기거나 아래 목록을 길게 눌러 배치',
+        label: '놓인 물건은 직접 끌기 · 보관함 물건은 길게 눌러 배치',
         color: PixelPalette.textBody,
       );
     }

@@ -7,6 +7,7 @@ import 'package:reality_diorama/src/diorama/diorama_view.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/domain/engines/visitor_engine.dart';
+import 'package:reality_diorama/src/ui/number_format.dart';
 import 'package:reality_diorama/src/ui/screens/crafting_screen.dart';
 import 'package:reality_diorama/src/ui/screens/placement_editor_screen.dart';
 import 'package:reality_diorama/src/ui/screens/settings_screen.dart';
@@ -213,7 +214,7 @@ class _ResourceStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: '${_formatNumber(availableSteps)}걸음, 수집 준비 $readyCount개',
+      label: '${formatNumber(availableSteps)}걸음, 수집 준비 $readyCount개',
       container: true,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
@@ -227,7 +228,7 @@ class _ResourceStrip extends StatelessWidget {
             ),
             const SizedBox(width: 5),
             Text(
-              _formatNumber(availableSteps),
+              formatNumber(availableSteps),
               style: const TextStyle(
                 color: PixelPalette.cream,
                 fontWeight: FontWeight.w800,
@@ -367,7 +368,7 @@ class _ConstructionCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '${object.remainingSteps}걸음 남음',
+                '${formatNumber(object.remainingSteps)}걸음 남음',
                 style: const TextStyle(color: PixelPalette.amber),
               ),
             ],
@@ -417,8 +418,8 @@ class _CraftPrompt extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   canCraft
-                      ? '보관한 재료와 걸음으로 동네 물건을 만듭니다.'
-                      : '준비된 날씨는 수집할 때까지 사라지지 않습니다.',
+                      ? '수집한 재료와 걸음으로 물건을 만들면 내 공간에 놓입니다.'
+                      : '날씨를 모아 걸음으로 물건을 만듭니다. 주변 흔적은 선택입니다.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -546,19 +547,6 @@ String _sceneSemanticLabel(AppController controller) {
       : '머무는 방문자 $visitorName';
   return '5 곱하기 5 동네 디오라마, ${snapshot.timeBand.labelKo}, '
       '${snapshot.weatherKind.labelKo}, $objectSummary, $visitorSummary';
-}
-
-String _formatNumber(int value) {
-  final text = value.toString();
-  final buffer = StringBuffer();
-  for (var index = 0; index < text.length; index += 1) {
-    final remaining = text.length - index;
-    buffer.write(text[index]);
-    if (remaining > 1 && remaining % 3 == 1) {
-      buffer.write(',');
-    }
-  }
-  return buffer.toString();
 }
 
 extension _FirstOrNull<T> on Iterable<T> {

@@ -2,6 +2,23 @@
 
 ## 2026-08-10
 
+### Core-loop refinement changes hierarchy without adding visual tokens
+
+The existing Night Cabinet palette, system font, cut-corner `PixelButton`, and
+48 dp control size remain unchanged. Capture-selected weather and optional
+surroundings stay visible on the recipe list, while the craft cost and action
+occupy a safe-area-aware bottom region on standard-height screens. Compact
+screens and text scales above 130% keep the same action inline in the scroll
+flow so content is never covered.
+
+Direct board dragging remains the primary placement interaction. The direction
+pad is retained for accessibility and exact cell movement but is labeled
+`미세 조정`; rotation is separated as `방향 바꾸기`. Inventory counts describe
+the active tab, generic completion and deferral labels are replaced with their
+actual outcomes, and prototype version text is compiled into debug UI only.
+No new color, spacing, radius, typography token, font, asset, or dependency is
+introduced by this refinement.
+
 ### Pixel-game UI polish changes components, not the token inventory
 
 The existing Night Cabinet colors remain the source of truth. This slice adds

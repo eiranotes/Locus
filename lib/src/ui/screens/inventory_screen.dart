@@ -5,6 +5,7 @@ import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
+import 'package:reality_diorama/src/ui/number_format.dart';
 import 'package:reality_diorama/src/ui/screens/crafting_screen.dart';
 import 'package:reality_diorama/src/ui/screens/placement_editor_screen.dart';
 import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
@@ -22,22 +23,31 @@ class InventoryScreen extends StatelessWidget {
       length: 3,
       child: Column(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    '보관함',
-                    style: Theme.of(context).textTheme.headlineLarge,
+          Builder(
+            builder: (BuildContext context) {
+              final tabController = DefaultTabController.of(context);
+              return AnimatedBuilder(
+                animation: tabController,
+                builder: (BuildContext context, _) => Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          '보관함',
+                          style: Theme.of(context).textTheme.headlineLarge,
+                        ),
+                      ),
+                      Text(
+                        _countLabel(controller, tabController.index),
+                        key: const ValueKey<String>('inventory-tab-count'),
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
                   ),
                 ),
-                Text(
-                  '${controller.captures.length}개 기록',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
-            ),
+              );
+            },
           ),
           const TabBar(
             tabs: <Widget>[
@@ -405,7 +415,7 @@ class _ObjectsTab extends StatelessWidget {
                           ? object.lifecycle == ObjectLifecycle.placed
                                 ? '내 공간에 배치됨'
                                 : '보관 중'
-                          : '${object.remainingSteps}걸음 남음',
+                          : '${formatNumber(object.remainingSteps)}걸음 남음',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     if (object.focusTrait != null) ...<Widget>[
@@ -531,3 +541,13 @@ String _time(DateTime date) {
   return '${local.hour.toString().padLeft(2, '0')}:'
       '${local.minute.toString().padLeft(2, '0')}';
 }
+
+String _countLabel(
+  AppController controller,
+  int tabIndex,
+) => switch (tabIndex) {
+  1 =>
+    '${formatNumber(controller.weatherMaterials.length + controller.surroundingMaterials.length)}개 재료',
+  2 => '${formatNumber(controller.craftedObjects.length)}개 물건',
+  _ => '${formatNumber(controller.captures.length)}개 기록',
+};

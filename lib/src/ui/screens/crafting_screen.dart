@@ -9,6 +9,7 @@ import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/domain/visual_layer_catalog.dart';
+import 'package:reality_diorama/src/ui/number_format.dart';
 import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
 import 'package:reality_diorama/src/ui/widgets/atmospheric_trait_chips.dart';
 import 'package:reality_diorama/src/ui/widgets/object_visual_preview.dart';
@@ -28,30 +29,145 @@ class RecipeListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = AppScope.of(context);
+    final selectedWeather = controller.availableWeatherMaterials
+        .where((WeatherMaterial value) => value.id == preselectedWeatherId)
+        .firstOrNull;
+    final selectedSurroundings = controller.availableSurroundingMaterials
+        .where(
+          (SurroundingMaterial value) => value.id == preselectedSurroundingId,
+        )
+        .firstOrNull;
     return Scaffold(
       appBar: AppBar(title: const Text('만들기')),
       body: controller.unlockedRecipes.isEmpty
           ? const Center(child: Text('열린 만드는 법이 없습니다.'))
-          : ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
-              itemCount: controller.unlockedRecipes.length,
-              separatorBuilder: (_, __) => const Divider(),
-              itemBuilder: (BuildContext context, int index) {
-                final recipe = controller.unlockedRecipes[index];
-                return _RecipeRow(
-                  recipe: recipe,
-                  onTap: () => Navigator.of(context).push<void>(
-                    MaterialPageRoute<void>(
-                      builder: (BuildContext context) => CraftingDetailScreen(
+          : Column(
+              children: <Widget>[
+                _CraftingContextStrip(
+                  availableSteps: controller.availableSteps,
+                  weather: selectedWeather,
+                  surroundings: selectedSurroundings,
+                  weatherCount: controller.availableWeatherMaterials.length,
+                  surroundingCount:
+                      controller.availableSurroundingMaterials.length,
+                ),
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
+                    itemCount: controller.unlockedRecipes.length,
+                    separatorBuilder: (_, __) => const Divider(),
+                    itemBuilder: (BuildContext context, int index) {
+                      final recipe = controller.unlockedRecipes[index];
+                      return _RecipeRow(
                         recipe: recipe,
-                        preselectedWeatherId: preselectedWeatherId,
-                        preselectedSurroundingId: preselectedSurroundingId,
-                      ),
-                    ),
+                        onTap: () => Navigator.of(context).push<void>(
+                          MaterialPageRoute<void>(
+                            builder: (BuildContext context) =>
+                                CraftingDetailScreen(
+                                  recipe: recipe,
+                                  preselectedWeatherId: preselectedWeatherId,
+                                  preselectedSurroundingId:
+                                      preselectedSurroundingId,
+                                ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+              ],
             ),
+    );
+  }
+}
+
+class _CraftingContextStrip extends StatelessWidget {
+  const _CraftingContextStrip({
+    required this.availableSteps,
+    required this.weather,
+    required this.surroundings,
+    required this.weatherCount,
+    required this.surroundingCount,
+  });
+
+  final int availableSteps;
+  final WeatherMaterial? weather;
+  final SurroundingMaterial? surroundings;
+  final int weatherCount;
+  final int surroundingCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final weatherLabel = weather == null
+        ? '날씨 재료 ${formatNumber(weatherCount)}개'
+        : '날씨 ${weather!.kind.labelKo}';
+    final surroundingsLabel = surroundings == null
+        ? '주변 재료 ${formatNumber(surroundingCount)}개'
+        : '주변 ${surroundings!.kind.shortLabelKo}';
+    return Semantics(
+      container: true,
+      label:
+          '보유 ${formatNumber(availableSteps)}걸음, $weatherLabel, $surroundingsLabel',
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          color: PixelPalette.scene,
+          border: Border(bottom: BorderSide(color: PixelPalette.divider)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 8,
+            children: <Widget>[
+              _CraftingContextItem(
+                icon: Icons.directions_walk,
+                label: '보유 ${formatNumber(availableSteps)}걸음',
+                color: PixelPalette.mint,
+              ),
+              _CraftingContextItem(
+                icon: weather == null
+                    ? Icons.cloud_outlined
+                    : weatherIcon(weather!.kind),
+                label: weatherLabel,
+                color: weather == null
+                    ? PixelPalette.muted
+                    : weatherColor(weather!.kind),
+              ),
+              _CraftingContextItem(
+                icon: Icons.radar,
+                label: surroundingsLabel,
+                color: surroundings == null
+                    ? PixelPalette.muted
+                    : PixelPalette.violet,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CraftingContextItem extends StatelessWidget {
+  const _CraftingContextItem({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Icon(icon, size: 18, color: color),
+        const SizedBox(width: 6),
+        Text(label, style: Theme.of(context).textTheme.bodyMedium),
+      ],
     );
   }
 }
@@ -66,7 +182,7 @@ class _RecipeRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: '${recipe.nameKo}, ${recipe.stepCost}걸음',
+      label: '${recipe.nameKo}, ${formatNumber(recipe.stepCost)}걸음',
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -107,7 +223,7 @@ class _RecipeRow extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        '${recipe.stepCost}걸음',
+                        '${formatNumber(recipe.stepCost)}걸음',
                         style: const TextStyle(
                           color: PixelPalette.reward,
                           fontWeight: FontWeight.w600,
@@ -191,9 +307,22 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
         : null;
     final canSubmit =
         weather != null && !_submitting && controller.construction == null;
+    final textScale = MediaQuery.textScalerOf(context).scale(14) / 14;
+    final pinAction =
+        MediaQuery.sizeOf(context).height >= 700 && textScale <= 1.3;
+    final actionPanel = _CraftingActionPanel(
+      requiredSteps: widget.recipe.stepCost,
+      availableSteps: controller.availableSteps,
+      constructionInProgress: controller.construction != null,
+      pinned: pinAction,
+      onPressed: canSubmit
+          ? () => _craft(controller, weather, surroundings, focusTrait)
+          : null,
+    );
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.recipe.nameKo)),
+      bottomNavigationBar: pinAction ? actionPanel : null,
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: <Widget>[
@@ -277,72 +406,7 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
                 _focusTrait = null;
               }),
             ),
-          const SizedBox(height: 18),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 14),
-            decoration: const BoxDecoration(
-              border: Border.symmetric(
-                horizontal: BorderSide(color: PixelPalette.divider),
-              ),
-            ),
-            child: Row(
-              children: <Widget>[
-                const Icon(Icons.directions_walk, color: PixelPalette.mint),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        '필요한 걸음',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      Text(
-                        '${widget.recipe.stepCost}걸음',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  '보유 ${controller.availableSteps}',
-                  style: TextStyle(
-                    color: controller.availableSteps >= widget.recipe.stepCost
-                        ? PixelPalette.success
-                        : PixelPalette.amber,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (controller.construction != null) ...<Widget>[
-            const SizedBox(height: 12),
-            const Text(
-              '진행 중인 공사가 있어 새 물건을 시작할 수 없습니다.',
-              style: TextStyle(color: PixelPalette.amber),
-            ),
-          ],
-          const SizedBox(height: 22),
-          PixelButton(
-            onPressed: canSubmit
-                ? () => _craft(controller, weather, surroundings, focusTrait)
-                : null,
-            actionAsset: 'craft',
-            fallbackIcon: Icons.handyman_outlined,
-            expand: true,
-            label: controller.availableSteps >= widget.recipe.stepCost
-                ? '만들기'
-                : '공사 시작',
-          ),
-          const SizedBox(height: 10),
-          Text(
-            controller.availableSteps >= widget.recipe.stepCost
-                ? '완성된 물건은 빈 칸에 자동으로 놓이며 언제든 이동할 수 있습니다.'
-                : '현재 걸음을 먼저 쓰고, 남은 걸음은 이후 동기화될 때 채워집니다.',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          if (!pinAction) ...<Widget>[const SizedBox(height: 18), actionPanel],
         ],
       ),
     );
@@ -398,7 +462,7 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
               Text(
                 object.isComplete
                     ? '${widget.recipe.nameKo}을 내 공간에 놓았습니다.'
-                    : '${object.remainingSteps}걸음을 더 모으면 완성됩니다.',
+                    : '${formatNumber(object.remainingSteps)}걸음을 더 모으면 완성됩니다.',
                 textAlign: TextAlign.center,
               ),
             ],
@@ -406,7 +470,7 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('확인'),
+              child: const Text('내 공간 보기'),
             ),
           ],
         ),
@@ -424,6 +488,102 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
   double _projectedCompletion(int availableSteps) {
     if (widget.recipe.stepCost <= 0) return 1;
     return (availableSteps / widget.recipe.stepCost).clamp(0, 1).toDouble();
+  }
+}
+
+class _CraftingActionPanel extends StatelessWidget {
+  const _CraftingActionPanel({
+    required this.requiredSteps,
+    required this.availableSteps,
+    required this.constructionInProgress,
+    required this.pinned,
+    required this.onPressed,
+  });
+
+  final int requiredSteps;
+  final int availableSteps;
+  final bool constructionInProgress;
+  final bool pinned;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final canComplete = availableSteps >= requiredSteps;
+    final content = Padding(
+      padding: EdgeInsets.fromLTRB(pinned ? 16 : 4, 12, pinned ? 16 : 4, 12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const Icon(Icons.directions_walk, color: PixelPalette.mint),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  spacing: 12,
+                  runSpacing: 4,
+                  children: <Widget>[
+                    Text(
+                      '필요 ${formatNumber(requiredSteps)}걸음',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Text(
+                      '보유 ${formatNumber(availableSteps)}걸음',
+                      style: TextStyle(
+                        color: canComplete
+                            ? PixelPalette.success
+                            : PixelPalette.amber,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (constructionInProgress) ...<Widget>[
+            const SizedBox(height: 8),
+            const Text(
+              '진행 중인 공사가 있어 새 물건을 시작할 수 없습니다.',
+              style: TextStyle(color: PixelPalette.amber),
+            ),
+          ],
+          const SizedBox(height: 10),
+          PixelButton(
+            onPressed: onPressed,
+            actionAsset: 'craft',
+            fallbackIcon: Icons.handyman_outlined,
+            expand: true,
+            label: canComplete ? '만들기' : '공사 시작',
+          ),
+          const SizedBox(height: 8),
+          Text(
+            canComplete
+                ? '완성되면 빈 칸에 놓이며 언제든 직접 옮길 수 있습니다.'
+                : '현재 걸음을 먼저 쓰고, 남은 걸음은 이후 동기화할 때 채웁니다.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
+      ),
+    );
+    final panel = DecoratedBox(
+      decoration: BoxDecoration(
+        color: pinned ? PixelPalette.raised : Colors.transparent,
+        border: const Border(top: BorderSide(color: PixelPalette.divider)),
+      ),
+      child: content,
+    );
+    return pinned
+        ? SafeArea(
+            top: false,
+            minimum: const EdgeInsets.only(bottom: 4),
+            child: panel,
+          )
+        : panel;
   }
 }
 

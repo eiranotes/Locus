@@ -47,18 +47,15 @@ void main() {
     expect(find.text('날씨 재료'), findsOneWidget);
     await binding.takeScreenshot('05-crafting-detail');
 
-    final detailList = find.byType(ListView).last;
-    await tester.drag(detailList, const Offset(0, -1200));
-    await _waitForUi(tester);
-    await tester.drag(detailList, const Offset(0, -1200));
-    await _waitForUi(tester);
     final makeButton = find.textContaining(RegExp(r'^(만들기|공사 시작)$'));
     expect(makeButton, findsOneWidget);
+    await tester.ensureVisible(makeButton);
+    await _waitForUi(tester);
     await tester.tap(makeButton);
     await _waitForUi(tester, seconds: 2);
     expect(find.text('물건 완성'), findsOneWidget);
     await binding.takeScreenshot('06-crafting-complete');
-    await tester.tap(find.text('확인'));
+    await tester.tap(find.text('내 공간 보기'));
     await _waitForUi(tester);
 
     if (find.text('새 방문자').evaluate().isNotEmpty) {

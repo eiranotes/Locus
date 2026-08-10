@@ -8,6 +8,7 @@ import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/services/capture_coordinator.dart';
+import 'package:reality_diorama/src/ui/number_format.dart';
 import 'package:reality_diorama/src/ui/screens/crafting_screen.dart';
 import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
 import 'package:reality_diorama/src/ui/widgets/atmospheric_trait_chips.dart';
@@ -150,7 +151,7 @@ class _CaptureSheetState extends State<CaptureSheet> {
                   fallbackIcon: Icons.inventory_2_outlined,
                   tone: PixelButtonTone.quiet,
                   expand: true,
-                  label: '보관하고 닫기',
+                  label: '나중에 만들기',
                 ),
               ],
             ],
@@ -311,7 +312,7 @@ class _PreparationView extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      '$availableSteps걸음',
+                      '${formatNumber(availableSteps)}걸음',
                       style: const TextStyle(
                         color: PixelPalette.textStrong,
                         fontSize: 20,

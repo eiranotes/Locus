@@ -5,6 +5,7 @@ import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
+import 'package:reality_diorama/src/ui/number_format.dart';
 import 'package:reality_diorama/src/ui/widgets/object_visual_preview.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 
@@ -76,15 +77,15 @@ class _VisitorsTab extends StatelessWidget {
           ),
         ),
         for (final group in groups) ...<Widget>[
-            SliverToBoxAdapter(
-              child: _CollectionHeading(
-                label: group.label,
-                completed: group.items
-                    .where((visitor) => seenIds.contains(visitor.id))
-                    .length,
-                total: group.items.length,
-              ),
+          SliverToBoxAdapter(
+            child: _CollectionHeading(
+              label: group.label,
+              completed: group.items
+                  .where((visitor) => seenIds.contains(visitor.id))
+                  .length,
+              total: group.items.length,
             ),
+          ),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
             sliver: SliverGrid.builder(
@@ -454,7 +455,7 @@ class _RecipesTab extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${recipe.stepCost}걸음 · 날씨 1개 · 주변 선택',
+                              '${formatNumber(recipe.stepCost)}걸음 · 날씨 1개 · 주변 선택',
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ],

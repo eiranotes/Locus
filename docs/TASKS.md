@@ -22,6 +22,9 @@
       prompt, contact-sheet, alpha, inventory, and hash provenance.
 - [x] Replace high-frequency rounded Material controls with cut-corner pixel
       controls using the existing design palette and token inventory.
+- [x] Refine the capture → craft → placement UI loop with carried material/step
+      context, a safe-area-aware primary craft action, tab-aware inventory
+      counts, explicit fine-adjustment controls, and release-safe build labels.
 
 ## Next
 

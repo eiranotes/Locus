@@ -9,12 +9,28 @@ renderer, cataloged pixel-art packages, and a catalog-driven directional
 editor. The current working slice replaces generic rounded controls with
 cut-corner pixel-game surfaces without adding design tokens, adds direct
 drag-to-cell placement and target-visitor deltas, and installs 50 new generated
-scene/UI assets. The home surface remains scene-first, the latest persisted
-visitor remains visible after its one-time arrival dialog, and collection stays
-a scene action rather than an oversized navigation item.
+scene/UI assets. It now also keeps selected capture materials and available
+steps visible through the crafting list, promotes the craft action into a
+safe-area-aware bottom region, and makes direction buttons an explicitly
+labeled fine-adjustment fallback to direct dragging. The home surface remains
+scene-first, the latest persisted visitor remains visible after its one-time
+arrival dialog, and collection stays a scene action rather than an oversized
+navigation item.
 
 ## Completed in the current slice
 
+- Kept the capture-to-craft context visible in the recipe list, made the craft
+  action persistently reachable on standard-height screens, and retained an
+  inline scrolling fallback for compact or large-text layouts.
+- Changed craft completion from a generic confirmation into `내 공간 보기`,
+  changed capture deferral to `나중에 만들기`, and clarified the optional
+  status of surroundings in the home loop copy.
+- Made the inventory header count follow its active tab and standardized
+  thousands separators for visible step quantities without a new dependency.
+- Labeled direction controls as `미세 조정`, preserved 48 dp targets, and kept
+  direct object dragging as the primary placement interaction.
+- Restricted the prototype version footer to debug builds while preserving the
+  explicit demo/production data-mode status block.
 - Added direct manipulation for placed objects with grab-offset preservation,
   live valid/invalid cell previews, commit-on-release persistence, and cancel
   behavior that leaves the saved placement unchanged.
@@ -240,6 +256,19 @@ inspected surfaces. `./tool/validate.sh` passed repository/content/Swift checks,
 analyzer, and all 66 tests. The required demo Android debug APK also built
 successfully after correcting the launch background's invalid direct hex
 drawable reference.
+
+The core-loop UI refinement was verified on the same `LocusPlacementQA`
+simulator from a temporary platform-wrapper recovery copy. The deterministic
+tour passed and exported 17 full-resolution 1206×2622 PNGs plus an inspected
+contact sheet under
+`artifacts/ui-screenshots/2026-08-10-ui-loop-refinement/`. The pass confirmed
+capture-selected material context in the recipe list, an unobscured bottom
+craft action, the outcome-specific completion action, labeled placement fine
+adjustment, and active-tab inventory counts. `./tool/validate.sh` passed
+repository/content/manifest/Swift checks, analyzer, and all 67 tests. The first
+Android build attempt exposed one missing file in the host's global Gradle
+transform cache; the identical required demo APK build then passed with a fresh
+isolated `GRADLE_USER_HOME`, producing `build/app/outputs/flutter-apk/app-debug.apk`.
 
 ## Known risks and gates
 

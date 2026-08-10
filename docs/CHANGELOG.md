@@ -27,6 +27,11 @@
 - Adaptive list controls inside cards and tonal capture sections now paint
   their Material selection and ink response without a hidden-splash framework
   assertion.
+- Inventory header counts now follow the active 기록, 재료, or 만든 것 tab
+  instead of always reporting capture records.
+- Visible step quantities now use consistent thousands separators across home,
+  capture, crafting, inventory, codex, and settings.
+- Prototype version text is now debug-only and cannot appear in a release UI.
 
 ### Changed
 
@@ -38,6 +43,15 @@
   long-pressed from the catalog and dropped onto a chosen valid cell.
 - Placement previews now show the target visitor's before/after condition
   count while reusing the production rule engines.
+- Recipe browsing now retains available steps and the selected capture
+  materials; the craft cost and primary action remain visible in a
+  safe-area-aware bottom region on standard screens and fall back inline for
+  compact or large-text layouts.
+- Craft completion now offers `내 공간 보기`, capture deferral says
+  `나중에 만들기`, and home copy states that surroundings are optional.
+- Placement direction controls are labeled `미세 조정` and rotation is
+  separated as `방향 바꾸기`, making direct object dragging the clear primary
+  interaction without removing accessible 48 dp alternatives.
 
 - Expanded the deterministic collection to 28 recipes and 18 visitors while
   preserving the 5×5 board, eight-active-object limit, offline loop, and

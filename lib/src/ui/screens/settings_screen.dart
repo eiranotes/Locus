@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:reality_diorama/src/app/app_controller.dart';
@@ -5,6 +6,7 @@ import 'package:reality_diorama/src/app/app_scope.dart';
 import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/services/weather_gateway.dart';
+import 'package:reality_diorama/src/ui/number_format.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_button.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -153,12 +155,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          Text(
-            'Locus · Prototype 0.1.0',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          if (kDebugMode) ...<Widget>[
+            const SizedBox(height: 20),
+            Text(
+              'Locus · Prototype 0.1.0',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
         ],
       ),
     );
@@ -237,12 +241,12 @@ class _StepSourceCard extends StatelessWidget {
     final (title, description, icon) = switch (mode) {
       StepTrackingMode.real => (
         '기기 걸음 사용 중',
-        '최근 걸음을 물건 제작에 사용합니다. 현재 ${controller.availableSteps}걸음을 쓸 수 있습니다.',
+        '최근 걸음을 물건 제작에 사용합니다. 현재 ${formatNumber(controller.availableSteps)}걸음을 쓸 수 있습니다.',
         Icons.directions_walk,
       ),
       StepTrackingMode.fallback => (
         '기본 작업량 사용 중',
-        '걸음 권한 없이 하루 ${controller.fallbackDailySteps}의 작업량을 사용합니다.',
+        '걸음 권한 없이 하루 ${formatNumber(controller.fallbackDailySteps)}의 작업량을 사용합니다.',
         Icons.construction_outlined,
       ),
       StepTrackingMode.undecided => (
