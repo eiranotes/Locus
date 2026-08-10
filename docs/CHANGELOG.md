@@ -4,6 +4,11 @@
 
 ### Fixed
 
+- Capture-history records no longer display placement scenery as if it were the
+  collected result; linked surroundings effects now remain visually distinct
+  from objects that can be placed in the diorama.
+- Static full-screen weather/time textures no longer appear as unexplained
+  falling streaks or translucent blocks over the neighborhood.
 - Capture history no longer silently stops at the latest 100 records; older
   entries can be loaded in stable 24-record pages with an exact total.
 - Temporarily unreachable later-layer visitors no longer appear as active home
@@ -49,9 +54,11 @@
 
 ### Changed
 
-- Capture-history cards now show one deterministic authored scenery element on
-  a quiet two-tone pixel backdrop instead of either a generic stamp or stacked
-  pink time/weather/atmosphere effects.
+- Capture-history cards now show the record's linked surroundings material as a
+  framed effect sample. Weather-only records use their weather material and
+  unlinked legacy records use a neutral trace without fabricating context.
+- Rain now moves through an eight-frame 8 fps pixel cycle. Reduced-motion mode
+  omits falling drops, and no new token, bitmap, or dependency was added.
 - Home, capture, crafting, inventory, codex, placement, and settings copy is
   shorter and avoids repeating visible state or the same next action. Privacy,
   regional-weather-model, provider, recovery, and accessibility wording stays

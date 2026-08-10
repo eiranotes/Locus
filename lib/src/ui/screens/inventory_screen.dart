@@ -94,6 +94,10 @@ class _RecordsTab extends StatelessWidget {
     final weatherById = <String, WeatherMaterial>{
       for (final material in controller.weatherMaterials) material.id: material,
     };
+    final surroundingsById = <String, SurroundingMaterial>{
+      for (final material in controller.surroundingMaterials)
+        material.id: material,
+    };
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final largeText = MediaQuery.textScalerOf(context).scale(14) > 18;
@@ -117,6 +121,9 @@ class _RecordsTab extends StatelessWidget {
                     weather: record.weatherMaterialId == null
                         ? null
                         : weatherById[record.weatherMaterialId],
+                    surroundings: record.surroundingMaterialId == null
+                        ? null
+                        : surroundingsById[record.surroundingMaterialId],
                   );
                 },
               ),
@@ -159,14 +166,21 @@ class _RecordsTab extends StatelessWidget {
 }
 
 class _RecordCard extends StatelessWidget {
-  const _RecordCard({required this.record, required this.weather});
+  const _RecordCard({
+    required this.record,
+    required this.weather,
+    required this.surroundings,
+  });
 
   final CaptureRecord record;
   final WeatherMaterial? weather;
+  final SurroundingMaterial? surroundings;
 
   @override
   Widget build(BuildContext context) {
-    final accent = weather == null
+    final accent = surroundings != null
+        ? _surroundingColor(surroundings!.kind)
+        : weather == null
         ? PixelPalette.textMuted
         : weatherColor(weather!.kind);
     return PixelCard(
@@ -179,7 +193,11 @@ class _RecordCard extends StatelessWidget {
           Expanded(
             child: SizedBox(
               width: double.infinity,
-              child: RecordScenePreview(record: record, weather: weather),
+              child: RecordScenePreview(
+                record: record,
+                weather: weather,
+                surroundings: surroundings,
+              ),
             ),
           ),
           const SizedBox(height: 9),
@@ -196,7 +214,11 @@ class _RecordCard extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           Text(
-            weather?.kind.labelKo ?? '날씨 없음',
+            surroundings == null
+                ? weather == null
+                      ? '주변 기록'
+                      : '날씨 표본 · ${weather!.kind.labelKo}'
+                : '주변 효과 · ${surroundings!.kind.shortLabelKo}',
             style: TextStyle(color: accent, fontWeight: FontWeight.w700),
           ),
         ],
@@ -204,6 +226,13 @@ class _RecordCard extends StatelessWidget {
     );
   }
 }
+
+Color _surroundingColor(SurroundingMaterialKind kind) => switch (kind) {
+  SurroundingMaterialKind.dense => PixelPalette.amber,
+  SurroundingMaterialKind.dynamic => PixelPalette.violet,
+  SurroundingMaterialKind.stable => PixelPalette.mint,
+  SurroundingMaterialKind.sparse => PixelPalette.blue,
+};
 
 class _MaterialsTab extends StatelessWidget {
   const _MaterialsTab({required this.controller});

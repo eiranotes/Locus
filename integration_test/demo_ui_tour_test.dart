@@ -281,15 +281,29 @@ Future<void> _seedCaptureHistory() async {
   final repository = GameRepository(database);
   final baseTime = DateTime.utc(2026, 7, 1, 12);
   for (var index = 0; index < 30; index += 1) {
+    final recordId = 'history-$index';
+    final surroundingsId = 'history-surroundings-$index';
+    final capturedAt = baseTime.add(Duration(minutes: index));
+    final surroundingsKind = SurroundingMaterialKind
+        .values[index % SurroundingMaterialKind.values.length];
     await repository.saveCapture(
       record: CaptureRecord(
-        id: 'history-$index',
-        capturedAt: baseTime.add(Duration(minutes: index)),
+        id: recordId,
+        capturedAt: capturedAt,
         timeBand: TimeBand.afternoon,
         season: Season.summer,
         weatherBasis: WeatherBasis.providerCurrentModel,
         sourceVersion: 'pagination-fixture-v1',
         userPlaceLabel: '지난 기록 ${index + 1}',
+        surroundingMaterialId: surroundingsId,
+      ),
+      surroundings: SurroundingMaterial(
+        id: surroundingsId,
+        kind: surroundingsKind,
+        confidence: 0.72,
+        capturedAt: capturedAt,
+        sourceRecordId: recordId,
+        featureSchemaVersion: 'pagination-fixture-v1',
       ),
     );
   }

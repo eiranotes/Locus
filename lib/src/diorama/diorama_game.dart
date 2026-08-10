@@ -19,9 +19,23 @@ class DioramaGame extends FlameGame {
 
   DioramaSnapshot _snapshot;
   DioramaArtImages? _art;
+  double _weatherElapsed = 0;
+  bool _reduceMotion = false;
 
   void updateSnapshot(DioramaSnapshot snapshot) {
     _snapshot = snapshot;
+  }
+
+  void updateReduceMotion(bool reduceMotion) {
+    _reduceMotion = reduceMotion;
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    if (_snapshot.weatherKind == WeatherMaterialKind.rain && !_reduceMotion) {
+      _weatherElapsed = (_weatherElapsed + dt) % 60;
+    }
   }
 
   @override
@@ -50,12 +64,19 @@ class DioramaGame extends FlameGame {
     DioramaScenePainter(
       _snapshot,
       art: _art,
+      weatherElapsed: _weatherElapsed,
+      reduceMotion: _reduceMotion,
     ).paint(canvas, Size(size.x, size.y));
   }
 }
 
 class DioramaScenePainter {
-  DioramaScenePainter(this.snapshot, {this.art});
+  DioramaScenePainter(
+    this.snapshot, {
+    this.art,
+    this.weatherElapsed = 0,
+    this.reduceMotion = false,
+  });
 
   static const double logicalSize = DioramaGeometry.logicalSize;
   static const double tileWidth = DioramaGeometry.tileWidth;
@@ -66,6 +87,8 @@ class DioramaScenePainter {
 
   final DioramaSnapshot snapshot;
   final DioramaArtImages? art;
+  final double weatherElapsed;
+  final bool reduceMotion;
 
   void paint(Canvas canvas, Size outputSize) {
     final scale = math.min(
@@ -554,50 +577,16 @@ class DioramaScenePainter {
   void _drawWeather(Canvas canvas) {
     final generatedArt = art;
     if (generatedArt != null) {
-      final timeOpacity = switch (snapshot.timeBand) {
-        TimeBand.dawn => 0.14,
-        TimeBand.morning => 0.0,
-        TimeBand.afternoon => 0.0,
-        TimeBand.evening => 0.12,
-        TimeBand.night => 0.14,
-      };
-      if (timeOpacity > 0) {
-        _drawOverlay(
-          canvas,
-          generatedArt.timeOverlays[snapshot.timeBand],
-          opacity: timeOpacity,
-        );
-      }
-      final weatherOpacity = switch (snapshot.weatherKind) {
-        WeatherMaterialKind.rain => 0.24,
-        WeatherMaterialKind.cloudy => 0.14,
-        WeatherMaterialKind.windy => 0.18,
-        WeatherMaterialKind.cold => 0.22,
-        WeatherMaterialKind.clear => 0.0,
-        WeatherMaterialKind.warm => 0.10,
-      };
-      if (weatherOpacity > 0) {
-        _drawOverlay(
-          canvas,
-          generatedArt.weatherOverlays[snapshot.weatherKind],
-          opacity: weatherOpacity,
-        );
+      if (snapshot.weatherKind == WeatherMaterialKind.rain) {
+        _drawPixelRain(canvas);
+        return;
       }
       _drawAtmosphereDetails(canvas, generatedArt);
       return;
     }
     switch (snapshot.weatherKind) {
       case WeatherMaterialKind.rain:
-        final paint = Paint()
-          ..isAntiAlias = false
-          ..color = PixelPalette.blue.withValues(alpha: 0.42)
-          ..strokeWidth = 1;
-        for (var index = 0; index < 28; index += 1) {
-          final x = ((index * 47 + snapshot.objects.length * 19) % 360)
-              .toDouble();
-          final y = ((index * 83 + 11) % 300).toDouble();
-          canvas.drawLine(Offset(x, y), Offset(x - 3, y + 9), paint);
-        }
+        _drawPixelRain(canvas);
         break;
       case WeatherMaterialKind.cloudy:
         canvas.drawRect(
@@ -637,10 +626,7 @@ class DioramaScenePainter {
 
   void _drawAtmosphereDetails(Canvas canvas, DioramaArtImages generatedArt) {
     final weatherNames = switch (snapshot.weatherKind) {
-      WeatherMaterialKind.rain => const <String>[
-        'rain_ripples',
-        'falling_raindrops',
-      ],
+      WeatherMaterialKind.rain => const <String>[],
       WeatherMaterialKind.cloudy => const <String>['mist_wisp'],
       WeatherMaterialKind.windy => const <String>['wind_leaves'],
       WeatherMaterialKind.cold => const <String>['frost_sparkles'],
@@ -665,6 +651,29 @@ class DioramaScenePainter {
         anchor: anchor.translate(0, index * 26),
         size: const Size(48, 48),
       );
+    }
+  }
+
+  void _drawPixelRain(Canvas canvas) {
+    if (reduceMotion) return;
+    final frame = rainAnimationFrame(
+      weatherElapsed,
+      reduceMotion: reduceMotion,
+    );
+    for (var index = 0; index < 22; index += 1) {
+      final x = ((index * 53 + snapshot.objects.length * 17) % 354).toDouble();
+      final baseY = ((index * 71 + 13) % 346).toDouble();
+      final y = (baseY + frame * 11) % 352;
+      final alpha = switch (index % 3) {
+        0 => 0.48,
+        1 => 0.34,
+        _ => 0.26,
+      };
+      final paint = Paint()
+        ..isAntiAlias = false
+        ..color = PixelPalette.blue.withValues(alpha: alpha);
+      canvas.drawRect(Rect.fromLTWH(x, y, 2, 6), paint);
+      canvas.drawRect(Rect.fromLTWH(x - 2, y + 6, 2, 3), paint);
     }
   }
 
@@ -706,20 +715,6 @@ class DioramaScenePainter {
     );
   }
 
-  void _drawOverlay(Canvas canvas, Image? image, {required double opacity}) {
-    if (image == null || opacity <= 0) {
-      return;
-    }
-    canvas.drawImageRect(
-      image,
-      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
-      const Rect.fromLTWH(0, 0, logicalSize, logicalSize),
-      Paint()
-        ..filterQuality = FilterQuality.none
-        ..color = Colors.white.withValues(alpha: opacity),
-    );
-  }
-
   void _drawShadow(Canvas canvas, Offset anchor, double width, double height) {
     canvas.drawOval(
       Rect.fromCenter(
@@ -730,4 +725,9 @@ class DioramaScenePainter {
       Paint()..color = Colors.black.withValues(alpha: 0.27),
     );
   }
+}
+
+int rainAnimationFrame(double elapsedSeconds, {required bool reduceMotion}) {
+  if (reduceMotion || elapsedSeconds <= 0) return 0;
+  return (elapsedSeconds * 8).floor() % 8;
 }

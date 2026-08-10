@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/ui/widgets/record_scene_preview.dart';
@@ -25,44 +26,41 @@ void main() {
     visualSeed: 1,
     providerName: 'Test',
   );
+  final dynamic = SurroundingMaterial(
+    id: 'surroundings-dynamic',
+    kind: SurroundingMaterialKind.dynamic,
+    confidence: 0.82,
+    capturedAt: capturedAt,
+    sourceRecordId: record.id,
+    featureSchemaVersion: 'test-v1',
+  );
 
-  test('record scene selection is stable and varies by record', () {
-    final first = recordSceneVisualFor(record);
-    final second = recordSceneVisualFor(record);
-    final other = recordSceneVisualFor(
-      CaptureRecord(
-        id: 'record-scene-2',
-        capturedAt: capturedAt,
-        timeBand: TimeBand.night,
-        season: Season.winter,
-        weatherBasis: WeatherBasis.providerCurrentModel,
-        sourceVersion: 'test-v1',
-      ),
+  test('surroundings effect takes precedence over weather material', () {
+    final visual = recordEffectVisualFor(
+      record: record,
+      weather: rain,
+      surroundings: dynamic,
     );
 
-    expect(second.sceneryName, first.sceneryName);
-    expect(other.sceneryName, isNot(first.sceneryName));
+    expect(visual.source, RecordEffectSource.surroundings);
+    expect(
+      visual.assetPath,
+      GeneratedArtPaths.surroundingMaterial(SurroundingMaterialKind.dynamic),
+    );
+    expect(visual.label, '유동적 주변 효과');
   });
 
-  test('paged history records produce varied scenery', () {
-    final scenery = <String>{
-      for (var index = 0; index < 12; index += 1)
-        recordSceneVisualFor(
-          CaptureRecord(
-            id: 'history-$index',
-            capturedAt: capturedAt.subtract(Duration(minutes: index)),
-            timeBand: TimeBand.afternoon,
-            season: Season.summer,
-            weatherBasis: WeatherBasis.demo,
-            sourceVersion: 'test-v1',
-          ),
-        ).sceneryName,
-    };
+  test('weather-only and unlinked records use honest fallbacks', () {
+    final weatherOnly = recordEffectVisualFor(record: record, weather: rain);
+    final unlinked = recordEffectVisualFor(record: record);
 
-    expect(scenery.length, greaterThanOrEqualTo(4));
+    expect(weatherOnly.source, RecordEffectSource.weather);
+    expect(weatherOnly.assetPath, GeneratedArtPaths.weatherMaterial(rain.kind));
+    expect(unlinked.source, RecordEffectSource.trace);
+    expect(unlinked.assetPath, isNull);
   });
 
-  testWidgets('record scene composes shipping pixel assets without overflow', (
+  testWidgets('record effect sample uses no scenery or placement art', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
@@ -71,7 +69,11 @@ void main() {
           body: SizedBox(
             width: 180,
             height: 140,
-            child: RecordScenePreview(record: record, weather: rain),
+            child: RecordScenePreview(
+              record: record,
+              weather: rain,
+              surroundings: dynamic,
+            ),
           ),
         ),
       ),
@@ -79,6 +81,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(Image), findsOneWidget);
+    final image = tester.widget<Image>(find.byType(Image));
+    expect(
+      (image.image as AssetImage).assetName,
+      GeneratedArtPaths.surroundingMaterial(SurroundingMaterialKind.dynamic),
+    );
     expect(tester.takeException(), isNull);
   });
 }

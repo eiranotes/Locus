@@ -101,17 +101,24 @@ when timestamps match. Weather materials, surroundings materials, and collected
 patterns keep their existing complete domain queries because they are active
 crafting/collection state rather than the visual history ledger.
 
-`RecordScenePreview` turns each loaded ledger row into a stable visual summary.
-Its selector hashes the capture ID to choose exactly one existing scenery asset
-from `GeneratedArtPaths`. A non-antialiased painter uses the persisted time band
-and season for a quiet two-tone backdrop. Weather, atmosphere, terrain, time,
-and surroundings artwork is intentionally not composed into the thumbnail;
-those states remain in record text and semantics. The preview is
-presentation-only and adds no persisted visual state.
+`RecordScenePreview` turns each loaded ledger row into a collected-effect
+sample. Inventory resolves stored material IDs against the complete weather and
+surroundings queries, including consumed materials. A linked surroundings asset
+is shown first; weather-only records use their linked weather asset, and legacy
+rows with neither link use a neutral code-drawn trace. A non-antialiased sample
+chamber and record-seeded waveform provide variation without selecting scenery,
+crafted objects, or an inferred material kind. The preview is presentation-only
+and adds no persisted visual state.
 
 ## Diorama renderer
 
 The renderer uses a fixed logical 360×360 scene and 5×5 2:1 isometric tiles.
+Generated full-screen time and weather overlays are loaded for catalog
+compatibility but are not composited into the scene. Rain uses a code-drawn
+eight-frame cycle at 8 fps, driven by the Flame update clock; `DioramaView`
+forwards the platform reduced-motion setting and suppresses falling drops when
+requested. Tile effects and background color still carry persistent environment
+and time state.
 Production sprites are resolved through `placement_catalog.json`; each recipe
 declares four independent directional PNGs. The directional package is built
 from tracked source atlases and validated for exact recipe/rotation coverage,

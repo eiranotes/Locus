@@ -32,6 +32,14 @@ class _DioramaViewState extends State<DioramaView> {
   late final DioramaGame _game = DioramaGame(widget.snapshot);
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _game.updateReduceMotion(
+      MediaQuery.maybeOf(context)?.disableAnimations ?? false,
+    );
+  }
+
+  @override
   void didUpdateWidget(DioramaView oldWidget) {
     super.didUpdateWidget(oldWidget);
     _game.updateSnapshot(widget.snapshot);

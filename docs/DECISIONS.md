@@ -2,16 +2,23 @@
 
 ## 2026-08-10
 
-### Capture history is a visual ledger, not a generic status list
+### Capture history is an ambient-effect ledger, not a placement catalog
 
-Each capture card selects exactly one shipping scenery element from its stable
-record ID and places it over a restrained two-tone backdrop derived from time
-and season. The thumbnail does not layer time, weather, atmosphere, terrain, or
-material artwork and does not show a surroundings badge. Those layers compete
-with the main element and produce noisy color at compact card size. The record
-row still carries its textual weather state and accessible semantic summary.
-This presentation adds no renderer contract, token, or bitmap file, and the
-same record always resolves to the same scenery element.
+Each capture card resolves its stored `surroundingMaterialId` and presents that
+actual dense, dynamic, stable, or sparse material as a framed effect sample.
+Surroundings take precedence when both channels were collected; a weather-only
+capture may show its linked weather material, while an unlinked legacy record
+uses a neutral trace without inventing a surroundings classification. Placement
+scenery and crafted-object art never appear in capture history. The record row
+keeps its place, time, and compact source label, and semantics describe the same
+sample. This presentation adds no renderer contract, token, or bitmap file.
+
+The diorama no longer composites generated full-screen time or weather PNGs.
+They produced vague translucent blocks and made a still image read as falling
+weather. Rain alone uses a deterministic eight-frame, 8 fps pixel animation;
+its short drops move as one environmental layer over the existing wet-tile
+state. When the platform requests reduced motion, the falling layer is omitted
+and the persistent environment state carries the weather instead.
 
 Visible product copy follows a state-first rule: show the current state, the
 next action, or a required boundary once, rather than narrating the interface.

@@ -28,18 +28,23 @@ repeat visits as coarse scene memories rather than overwriting the only record.
 The follow-up retention slice now unfolds the 28-recipe library across three
 post-initial progression layers and pages the permanent capture ledger instead
 of silently hiding everything older than the latest 100 records. Capture
-history now presents each row as a deterministic pixel postcard with one
-authored scenery element selected from the stable record ID over a restrained
-time/season backdrop. Visible copy
+history now presents linked surroundings as framed ambient-effect samples,
+falls back honestly for weather-only or legacy records, and never uses scenery
+or crafted objects as a capture image. Ambiguous full-screen time/weather PNG
+overlays are removed from the diorama; rain is a stepped pixel animation with a
+reduced-motion fallback. Visible copy
 across home, capture, crafting, inventory, codex, placement, and settings has
 also been distilled so state and next action are not explained twice.
 
 ## Completed in the current slice
 
-- Replaced the repeated generic record stamp with a deterministic scene preview
-  containing one existing scenery element over a two-tone pixel backdrop. Time,
-  weather, atmosphere, terrain overlays, decorative markers, and surroundings
-  badges are deliberately excluded. No new token or bitmap asset was added.
+- Replaced capture-history scenery postcards with framed effect samples linked
+  to the record's actual surroundings material. Weather-only records use their
+  weather material and unlinked legacy records use a neutral trace; no placement
+  or crafted-object asset is substituted. No new token or bitmap was added.
+- Removed generated full-screen time and weather overlays from the diorama.
+  Rain now advances through eight hard-edged pixel frames at 8 fps, while
+  platform reduced-motion settings suppress the falling layer.
 - Removed repeated instructional prose from primary loop surfaces while keeping
   provider attribution, regional-model limits, sensor non-identification,
   recoverable error copy, and accessibility semantics explicit.
@@ -397,19 +402,18 @@ load-more states and deeper visitor cards found no clipped text or overflow.
 The temporary wrapper copy was deleted after export; tracked wrapper policy was
 unchanged.
 
-The first record-postcard pass passed automated gates but its stacked time,
-weather, terrain, and atmosphere layers were rejected in visual review because
-the pink effects obscured the authored element at card size. The follow-up
-single-element pass was verified on 2026-08-10 with Flutter 3.44.1:
+The prior scenery-postcard pass was superseded after visual review showed that
+placement objects misrepresented what the record stored. The ambient-effect and
+weather-motion pass was verified on 2026-08-10 with Flutter 3.44.1:
 `./tool/validate.sh` passed repository/content/manifest checks, Swift parse,
-formatting, analyzer, and all 92 unit/widget tests, and the required Android
-demo debug APK built successfully. A temporary iOS wrapper-recovery copy passed
-the schema-v2-to-v4 migration and complete deterministic tour, exporting 23
-full-resolution screenshots plus an inspected contact sheet under
-`artifacts/ui-screenshots/2026-08-10-clean-record-images/`. Every record preview
-contains exactly one authored image, paged history remains visually varied, and
-the full tour shows no clipped text or overflow. The temporary wrapper copy was
-deleted; the repository's intentionally omitted iOS project remained unchanged.
+formatting, analyzer, and all 94 unit/widget tests, and the required Android
+demo debug APK built successfully. The deterministic iOS tour passed its three
+integration checks and covered all 23 named UI surfaces. The inspected contact
+sheet, record view, and separate eight-frame rain preview are under
+`artifacts/ui-screenshots/2026-08-10-ambient-effects-final/`. The record view
+contains only collected-effect samples, and the home view contains no vague
+full-screen weather texture. Wrapper recovery files used for local simulator
+evidence remain untracked and are excluded from the commit.
 
 ## Known risks and gates
 
