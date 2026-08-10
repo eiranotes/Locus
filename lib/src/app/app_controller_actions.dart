@@ -174,6 +174,7 @@ extension AppControllerActions on AppController {
         record: bundle.record,
         weather: bundle.weatherMaterial,
         surroundings: bundle.surroundingMaterial,
+        patterns: bundle.patterns,
       );
       if (bundle.surroundingMaterial != null &&
           !preparation.location.isFallback) {
@@ -621,6 +622,7 @@ extension AppControllerActions on AppController {
     _captures = await repository.loadCaptures();
     _weatherMaterials = await repository.loadWeatherMaterials();
     _surroundingMaterials = await repository.loadSurroundingMaterials();
+    _collectedPatterns = await repository.loadCollectedPatterns();
     _stepBuckets = await repository.loadStepBuckets();
     _craftedObjects = await repository.loadCraftedObjects();
     _placements = await repository.loadPlacements();

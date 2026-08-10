@@ -6,6 +6,7 @@
 recent steps accumulate
 → weather / optional surroundings become ready
 → capture now or keep the ready state
+→ retain individual information patterns and bounded simultaneous combinations
 → spend a weather material, optional surroundings material, and steps
 → craft or continue constructing a miniature object
 → place and rotate it on a 5×5 isometric board
@@ -35,6 +36,7 @@ The domain engines are deterministic and independently testable:
 - weather classifier;
 - cataloged atmospheric-trait classifier;
 - surroundings classifier;
+- collection-pattern engine;
 - step ledger;
 - recipe/crafting engine;
 - placement validator;
@@ -42,6 +44,29 @@ The domain engines are deterministic and independently testable:
 - connection graph;
 - visitor evaluator;
 - seeded visual descriptor.
+
+## Collection patterns
+
+`CollectionPatternEngine` receives only normalized weather data and aggregated
+surroundings features after a channel has successfully produced a material. It
+emits individually collectible context patterns and at most six combination
+patterns for inputs collected in the same capture. Combination rows retain
+derived component keys so their origin is inspectable without retaining raw
+sensor observations.
+
+SQLite schema v3 adds `collected_patterns`. `GameRepository.saveCapture`
+inserts the capture, optional materials, and all pattern occurrences in one
+transaction, and deleting a capture cascades to its pattern rows. The inventory
+aggregates rows by stable `pattern_key` for unique-pattern and repeat-count UI;
+the underlying occurrences remain available for future progression rules.
+
+`pattern_presentation.dart` resolves each combination into a short title,
+summary, component count, and normalized visual-family list. Capture and
+inventory pass that same descriptor to `PixelWeaveMark`, whose non-antialiased
+10×10-grid painter uses fixed time, weather, and surroundings source slots.
+Same-family component lists deliberately retain duplicates, allowing a channel
+weave to paint differently from a mixed scene without adding bitmap assets or
+duplicating key parsing in screen widgets.
 
 ## Diorama renderer
 

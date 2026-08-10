@@ -25,6 +25,14 @@
 - [x] Refine the capture → craft → placement UI loop with carried material/step
       context, a safe-area-aware primary craft action, tab-aware inventory
       counts, explicit fine-adjustment controls, and release-safe build labels.
+- [x] Persist information-specific time, season, weather, and aggregate
+      surroundings patterns plus bounded simultaneous-input combination
+      patterns, then expose both groups in capture results and inventory.
+- [x] Reduce pattern UI noise with progressive disclosure, representative
+      capture results, fixed combination titles, and compact component summaries.
+- [x] Replace generic pattern and combination glyphs with shared state-derived
+      pixel marks, stepped disclosure carets, ledger dividers, and simulator
+      evidence for collapsed, expanded, and combination states.
 
 ## Next
 

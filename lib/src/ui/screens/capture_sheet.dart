@@ -9,11 +9,13 @@ import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/services/capture_coordinator.dart';
 import 'package:reality_diorama/src/ui/number_format.dart';
+import 'package:reality_diorama/src/ui/pattern_presentation.dart';
 import 'package:reality_diorama/src/ui/screens/crafting_screen.dart';
 import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
 import 'package:reality_diorama/src/ui/widgets/atmospheric_trait_chips.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_button.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_pattern_mark.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_surface.dart';
 
 class CaptureSheet extends StatefulWidget {
@@ -546,6 +548,10 @@ class _ResultView extends StatelessWidget {
         if (bundle.weatherMaterial == null &&
             bundle.surroundingMaterial == null)
           const PixelCard(child: Text('새로 준비된 재료가 없어 기록만 확인했습니다.')),
+        if (bundle.patterns.isNotEmpty) ...<Widget>[
+          const SizedBox(height: 14),
+          _CollectedPatternsSection(patterns: bundle.patterns),
+        ],
         const SizedBox(height: 14),
         Text(
           '${bundle.record.userPlaceLabel ?? '현재 지역'} · '
@@ -554,6 +560,212 @@ class _ResultView extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
+    );
+  }
+}
+
+class _CollectedPatternsSection extends StatelessWidget {
+  const _CollectedPatternsSection({required this.patterns});
+
+  final List<CollectedPattern> patterns;
+
+  @override
+  Widget build(BuildContext context) {
+    final individual = patterns
+        .where((CollectedPattern value) => !value.isCombination)
+        .toList(growable: false);
+    final combinations = patterns
+        .where((CollectedPattern value) => value.isCombination)
+        .toList(growable: false);
+    final patternsByKey = <String, CollectedPattern>{
+      for (final pattern in patterns) pattern.patternKey: pattern,
+    };
+    final representatives = representativeCombinationPatterns(patterns);
+    final timeAndSeasonCount = individual
+        .where(
+          (CollectedPattern value) =>
+              value.family == CapturePatternFamily.time ||
+              value.family == CapturePatternFamily.season,
+        )
+        .length;
+    final weatherCount = individual
+        .where(
+          (CollectedPattern value) =>
+              value.family == CapturePatternFamily.weather,
+        )
+        .length;
+    final surroundingsCount = individual
+        .where(
+          (CollectedPattern value) =>
+              value.family == CapturePatternFamily.surroundings,
+        )
+        .length;
+    return _CaptureSection(
+      tone: PixelPalette.scene,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              const PixelPatternStamp(size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '이번에 수집한 패턴',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              Text(
+                '${patterns.length}개',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          _PatternResultSummary(
+            title: '개별 패턴',
+            count: individual.length,
+            summary:
+                '시간·계절 $timeAndSeasonCount · 날씨 $weatherCount · 주변 $surroundingsCount',
+          ),
+          if (combinations.isNotEmpty) ...<Widget>[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: PixelRule(),
+            ),
+            _PatternResultSummary(
+              title: '동시 조합',
+              count: combinations.length,
+              summary: '같은 순간의 정보 조합도 별도 수집물로 저장',
+            ),
+            const SizedBox(height: 11),
+            for (
+              var index = 0;
+              index < representatives.length;
+              index += 1
+            ) ...<Widget>[
+              _CombinationPatternRow(
+                pattern: representatives[index],
+                patternsByKey: patternsByKey,
+              ),
+              if (index != representatives.length - 1)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 5),
+                  child: PixelRule(),
+                ),
+            ],
+            if (combinations.length > representatives.length) ...<Widget>[
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  '외 ${combinations.length - representatives.length}개 · 보관함 패턴에서 확인',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _PatternResultSummary extends StatelessWidget {
+  const _PatternResultSummary({
+    required this.title,
+    required this.count,
+    required this.summary,
+  });
+
+  final String title;
+  final int count;
+  final String summary;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(title, style: Theme.of(context).textTheme.labelLarge),
+              const SizedBox(height: 3),
+              Text(summary, style: Theme.of(context).textTheme.bodySmall),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          '$count',
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            color: PixelPalette.textBody,
+            fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CombinationPatternRow extends StatelessWidget {
+  const _CombinationPatternRow({
+    required this.pattern,
+    required this.patternsByKey,
+  });
+
+  final CollectedPattern pattern;
+  final Map<String, CollectedPattern> patternsByKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final visual = combinationPatternVisualDescriptor(pattern, patternsByKey);
+    return Semantics(
+      container: true,
+      label: '${visual.title}, ${visual.summary}, ${visual.componentCount}개 정보',
+      child: ExcludeSemantics(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 1),
+              child: PixelWeaveMark(
+                families: visual.componentFamilies,
+                size: 20,
+                animate: true,
+              ),
+            ),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    visual.title,
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    visual.summary,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '${visual.componentCount}개',
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: PixelPalette.amber),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

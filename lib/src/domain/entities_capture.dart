@@ -366,3 +366,83 @@ class SurroundingMaterial {
         craftedObjectId: map['crafted_object_id'] as String?,
       );
 }
+
+class CollectedPattern {
+  const CollectedPattern({
+    required this.id,
+    required this.patternKey,
+    required this.scope,
+    required this.family,
+    required this.labelKo,
+    required this.descriptionKo,
+    required this.strength,
+    required this.componentKeys,
+    required this.capturedAt,
+    required this.sourceRecordId,
+    required this.schemaVersion,
+  });
+
+  final String id;
+  final String patternKey;
+  final CapturePatternScope scope;
+  final CapturePatternFamily family;
+  final String labelKo;
+  final String descriptionKo;
+  final double strength;
+  final List<String> componentKeys;
+  final DateTime capturedAt;
+  final String sourceRecordId;
+  final String schemaVersion;
+
+  bool get isCombination => scope == CapturePatternScope.combination;
+
+  Map<String, Object?> toMap() => <String, Object?>{
+    'id': id,
+    'pattern_key': patternKey,
+    'scope': scope.name,
+    'family': family.name,
+    'label_ko': labelKo,
+    'description_ko': descriptionKo,
+    'strength': strength,
+    'component_keys_json': jsonEncode(componentKeys),
+    'captured_at': capturedAt.millisecondsSinceEpoch,
+    'source_record_id': sourceRecordId,
+    'schema_version': schemaVersion,
+  };
+
+  factory CollectedPattern.fromMap(Map<String, Object?> map) =>
+      CollectedPattern(
+        id: map['id']! as String,
+        patternKey: map['pattern_key']! as String,
+        scope: enumByName(
+          CapturePatternScope.values,
+          map['scope']! as String,
+          CapturePatternScope.individual,
+        ),
+        family: enumByName(
+          CapturePatternFamily.values,
+          map['family']! as String,
+          CapturePatternFamily.weather,
+        ),
+        labelKo: map['label_ko']! as String,
+        descriptionKo: map['description_ko']! as String,
+        strength: (map['strength']! as num).toDouble(),
+        componentKeys: _decodePatternComponents(map['component_keys_json']),
+        capturedAt: DateTime.fromMillisecondsSinceEpoch(
+          map['captured_at']! as int,
+        ),
+        sourceRecordId: map['source_record_id']! as String,
+        schemaVersion: map['schema_version']! as String,
+      );
+}
+
+List<String> _decodePatternComponents(Object? raw) {
+  if (raw is! String || raw.isEmpty) return const <String>[];
+  try {
+    return (jsonDecode(raw) as List<Object?>).whereType<String>().toList(
+      growable: false,
+    );
+  } on Object {
+    return const <String>[];
+  }
+}

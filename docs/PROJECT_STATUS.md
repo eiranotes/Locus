@@ -15,10 +15,34 @@ safe-area-aware bottom region, and makes direction buttons an explicitly
 labeled fine-adjustment fallback to direct dragging. The home surface remains
 scene-first, the latest persisted visitor remains visible after its one-time
 arrival dialog, and collection stays a scene action rather than an oversized
-navigation item.
+navigation item. Captures now also retain separate time, season, weather, and
+surroundings patterns plus a bounded set of simultaneous-input combinations;
+the capture result and a dedicated inventory subtab distinguish the two. Those
+surfaces now use state-derived pixel marks, stepped disclosure carets, and
+terminal-ended ledger rules instead of generic Material network/category
+icons.
 
 ## Completed in the current slice
 
+- Added deterministic collection-pattern classification for time, season,
+  weather kind and numeric bands, surroundings kind and aggregate signal bands.
+- Added up to six separately collectible simultaneous-input combinations per
+  capture, including within-channel weaves and weather/time/surroundings cross
+  patterns. Only derived keys, labels, strength, and component provenance are
+  persisted; raw Bluetooth observations remain outside application storage.
+- Added schema-v3 `collected_patterns` persistence in the same transaction as
+  its capture/material rows, controller reload support, a pattern summary on
+  the capture result, and separate `개별 패턴` / `동시 수집 조합` inventory
+  sections without adding design tokens or bitmap assets.
+- Replaced the capture-result tag cloud and long generated combination titles
+  with category counts, two representative combinations, and fixed short
+  titles. Inventory now collapses individual patterns into three disclosure
+  groups and presents all combinations as divider rows inside one pixel panel.
+- Replaced pattern-surface Material glyphs with one shared 10×10-grid painter:
+  two- and three-input combinations expose their actual time, weather, and
+  surroundings families; same-family weaves remain distinct; disclosure and
+  divider states use hard-edged pixel geometry. System Korean text and the
+  existing Night Cabinet tokens remain unchanged.
 - Kept the capture-to-craft context visible in the recipe list, made the craft
   action persistently reachable on standard-height screens, and retained an
   inline scrolling fallback for compact or large-text layouts.
@@ -167,6 +191,26 @@ navigation item.
 - Extended the tour with deep-scroll captures for the expanded visitor,
   crafted-object, and recipe collection sections.
 
+## Collection-pattern verification
+
+Verified on 2026-08-10 with Flutter 3.44.1:
+
+- `flutter analyze` passed with no issues;
+- all 80 Dart/Flutter unit and widget tests passed;
+- `./tool/validate.sh` passed repository, content, manifest, Swift parse,
+  formatting, analysis, and test gates;
+- the required Android demo debug APK built successfully;
+- an iOS integration test downgraded an isolated demo database to schema v2,
+  reopened it through the v3 migration, transactionally saved ten derived
+  patterns with a capture, and restored all ten after another reopen;
+- the deterministic iOS demo tour passed on `LocusPlacementQA` and exported 21
+  full-resolution PNGs, including the capture pattern summary, individual
+  pattern inventory, and simultaneous-combination inventory.
+
+The iOS wrapper was regenerated only in a temporary recovery copy. Simulator
+screens prove deterministic app behavior, not physical Bluetooth or live
+WeatherKit behavior.
+
 ## Simulator evidence
 
 Verified on `AppAudit iPhone 16 Pro`, iOS 26.5, UDID
@@ -269,6 +313,15 @@ repository/content/manifest/Swift checks, analyzer, and all 67 tests. The first
 Android build attempt exposed one missing file in the host's global Gradle
 transform cache; the identical required demo APK build then passed with a fresh
 isolated `GRADLE_USER_HOME`, producing `build/app/outputs/flutter-apk/app-debug.apk`.
+
+The pixel-pattern UI pass was verified from a temporary platform-wrapper
+recovery copy on the same `LocusPlacementQA` simulator with the host's Flutter
+3.44.1. The schema-v2-to-v3 migration and complete deterministic demo tour
+passed and exported 21 full-resolution screenshots under
+`artifacts/ui-screenshots/2026-08-10-pixel-pattern-ui/`. The inspected capture,
+collapsed inventory, expanded weather group, and complete combination ledger
+show distinct code-rendered marks without clipped text or overflow. The
+repository checkout retained its intentionally omitted iOS wrapper files.
 
 ## Known risks and gates
 

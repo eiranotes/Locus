@@ -67,6 +67,10 @@ enum WeatherBasis {
 
 enum CaptureChannel { weather, surroundings }
 
+enum CapturePatternScope { individual, combination }
+
+enum CapturePatternFamily { time, season, weather, surroundings, combination }
+
 enum StepTrackingMode { undecided, real, fallback }
 
 enum VisitorRewardKind { recipe, variant, effect }

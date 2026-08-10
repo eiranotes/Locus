@@ -14,6 +14,7 @@ The product is not a sensor dashboard. Sensors are useful only when their meanin
 steps accumulate
 → weather / surroundings become ready
 → capture now or leave them ready
+→ retain each input pattern and any simultaneous-input combination pattern
 → use immediately or store
 → choose a recipe
 → spend one weather material, optional surroundings material, and steps
@@ -24,7 +25,7 @@ steps accumulate
 → collect again for a desired scene
 ```
 
-The user should need to understand only six verbs: collect, store, craft, place, complete, discover.
+The user should need to understand only six verbs: collect, store, craft, place, complete, discover. Patterns are collection results, not another required verb.
 
 ## Product boundaries
 
@@ -207,6 +208,8 @@ Visitors, crafted object families, and recipes. Undiscovered visitors show direc
 - one fixed pixel scale and one light direction;
 - limited local glow;
 - native Korean text, not baked pixel text;
+- collection marks use hard-edged code-rendered pixels and reflect the actual
+  time, weather, and surroundings inputs rather than a generic network icon;
 - no production use of fragments cut from exploratory concept screens;
 - authoring-time generated sprites require an explicit inventory, shared atlas
   contract, transparent outputs, recorded prompts/sources, and deterministic
@@ -223,6 +226,8 @@ Stored:
 
 - coarse location cell and optional user label;
 - classified weather evidence and provider/version;
+- derived individual and simultaneous-combination pattern keys, labels,
+  strength, component keys, and classifier version;
 - day-level observed/spent step buckets;
 - aggregate surroundings features and confidence;
 - recipe/generator versions;

@@ -4,12 +4,89 @@ import 'package:integration_test/integration_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:reality_diorama/main.dart' as app;
 import 'package:reality_diorama/src/data/database.dart';
+import 'package:reality_diorama/src/data/game_repository.dart';
 import 'package:reality_diorama/src/diorama/diorama_geometry.dart';
 import 'package:reality_diorama/src/diorama/diorama_view.dart';
+import 'package:reality_diorama/src/domain/engines/collection_pattern_engine.dart';
+import 'package:reality_diorama/src/domain/entities.dart';
+import 'package:reality_diorama/src/domain/enums.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_pattern_mark.dart';
 import 'package:sqflite/sqflite.dart';
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('schema v2 migrates and restores collected patterns', (
+    WidgetTester tester,
+  ) async {
+    final databasePath = p.join(
+      await getDatabasesPath(),
+      AppDatabase.demoDatabaseName,
+    );
+    await deleteDatabase(databasePath);
+    final initial = await AppDatabase.open(demoMode: true);
+    await initial.database.execute('DROP TABLE collected_patterns');
+    await initial.database.execute('PRAGMA user_version = 2');
+    await initial.close();
+
+    final capturedAt = DateTime.utc(2026, 8, 10, 12);
+    const recordId = 'migration-capture';
+    final upgraded = await AppDatabase.open(demoMode: true);
+    final repository = GameRepository(upgraded);
+    final record = CaptureRecord(
+      id: recordId,
+      capturedAt: capturedAt,
+      timeBand: TimeBand.afternoon,
+      season: Season.summer,
+      weatherBasis: WeatherBasis.providerCurrentModel,
+      sourceVersion: 'migration-test',
+      weatherMaterialId: 'migration-weather',
+    );
+    final weather = WeatherMaterial(
+      id: 'migration-weather',
+      kind: WeatherMaterialKind.clear,
+      timeBand: TimeBand.afternoon,
+      season: Season.summer,
+      capturedAt: capturedAt,
+      sourceRecordId: recordId,
+      visualSeed: 1,
+      providerName: 'Migration Test',
+    );
+    final patterns = const CollectionPatternEngine().derive(
+      sourceRecordId: recordId,
+      capturedAt: capturedAt,
+      timeBand: TimeBand.afternoon,
+      season: Season.summer,
+      weatherKind: WeatherMaterialKind.clear,
+      weatherSnapshot: WeatherSnapshot(
+        temperatureCelsius: 24,
+        apparentTemperatureCelsius: 25,
+        precipitationRateMmPerHour: 0,
+        cloudCoverPercent: 12,
+        windSpeedKph: 8,
+        visibilityMeters: 12000,
+        weatherCode: 0,
+        observedAt: capturedAt,
+        basis: WeatherBasis.providerCurrentModel,
+        providerName: 'Migration Test',
+      ),
+    );
+    await repository.saveCapture(
+      record: record,
+      weather: weather,
+      patterns: patterns,
+    );
+    expect(await repository.loadCollectedPatterns(), hasLength(10));
+    await upgraded.close();
+
+    final reopened = await AppDatabase.open(demoMode: true);
+    expect(
+      await GameRepository(reopened).loadCollectedPatterns(),
+      hasLength(10),
+    );
+    await reopened.close();
+    await deleteDatabase(databasePath);
+  });
 
   testWidgets('deterministic demo core loop and UI screenshot tour', (
     WidgetTester tester,
@@ -36,6 +113,13 @@ void main() {
     expect(find.text('수집 완료'), findsOneWidget);
     expect(find.text('이 재료로 만들기'), findsOneWidget);
     await binding.takeScreenshot('03-capture-result');
+    await tester.ensureVisible(find.text('동시 조합'));
+    await _waitForUi(tester);
+    expect(find.text('개별 패턴'), findsOneWidget);
+    expect(find.text('장면 조합'), findsOneWidget);
+    expect(find.byType(PixelPatternStamp), findsOneWidget);
+    expect(find.byType(PixelWeaveMark), findsNWidgets(2));
+    await binding.takeScreenshot('03b-capture-patterns');
 
     await tester.tap(find.text('이 재료로 만들기'));
     await _waitForUi(tester);
@@ -101,6 +185,31 @@ void main() {
     await tester.tap(find.widgetWithText(Tab, '재료'));
     await _waitForUi(tester);
     await binding.takeScreenshot('09-inventory-materials');
+
+    await tester.tap(find.widgetWithText(Tab, '패턴'));
+    await _waitForUi(tester);
+    expect(find.text('개별 패턴'), findsOneWidget);
+    expect(find.text('시간과 계절'), findsOneWidget);
+    expect(find.text('날씨'), findsOneWidget);
+    expect(find.text('주변'), findsOneWidget);
+    expect(find.text('동시 조합'), findsOneWidget);
+    expect(find.byType(PatternFamilyMark), findsNWidgets(3));
+    expect(find.byType(PixelCaret), findsNWidgets(3));
+    await binding.takeScreenshot('09b-inventory-patterns-individual');
+    await tester.tap(find.widgetWithText(ExpansionTile, '날씨'));
+    await _waitForUi(tester);
+    expect(find.text('가득 찬 구름'), findsOneWidget);
+    await binding.takeScreenshot('09bb-inventory-patterns-weather-expanded');
+    await tester.tap(find.widgetWithText(ExpansionTile, '날씨'));
+    await _waitForUi(tester);
+    await tester.scrollUntilVisible(
+      find.text('장면 조합'),
+      300,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await _waitForUi(tester);
+    expect(find.text('장면 조합'), findsOneWidget);
+    await binding.takeScreenshot('09c-inventory-patterns-combinations');
 
     await tester.tap(find.widgetWithText(Tab, '만든 것'));
     await _waitForUi(tester);

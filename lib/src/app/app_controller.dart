@@ -48,6 +48,7 @@ class AppController extends ChangeNotifier {
   List<WeatherMaterial> _weatherMaterials = const <WeatherMaterial>[];
   List<SurroundingMaterial> _surroundingMaterials =
       const <SurroundingMaterial>[];
+  List<CollectedPattern> _collectedPatterns = const <CollectedPattern>[];
   List<StepBucket> _stepBuckets = const <StepBucket>[];
   List<CraftedObject> _craftedObjects = const <CraftedObject>[];
   List<Placement> _placements = const <Placement>[];
@@ -69,6 +70,8 @@ class AppController extends ChangeNotifier {
       List<WeatherMaterial>.unmodifiable(_weatherMaterials);
   List<SurroundingMaterial> get surroundingMaterials =>
       List<SurroundingMaterial>.unmodifiable(_surroundingMaterials);
+  List<CollectedPattern> get collectedPatterns =>
+      List<CollectedPattern>.unmodifiable(_collectedPatterns);
   List<StepBucket> get stepBuckets =>
       List<StepBucket>.unmodifiable(_stepBuckets);
   List<CraftedObject> get craftedObjects =>

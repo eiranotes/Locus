@@ -3,6 +3,7 @@ import 'package:reality_diorama/src/domain/content_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/domain/engines/cooldown_engine.dart';
+import 'package:reality_diorama/src/domain/engines/collection_pattern_engine.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/engines/surrounding_classifier.dart';
 import 'package:reality_diorama/src/domain/engines/time_context.dart';
@@ -40,12 +41,14 @@ class CaptureBundle {
     required this.weatherMaterial,
     required this.surroundingMaterial,
     required this.ambientFeatures,
+    required this.patterns,
   });
 
   final CaptureRecord record;
   final WeatherMaterial? weatherMaterial;
   final SurroundingMaterial? surroundingMaterial;
   final AmbientFeatures? ambientFeatures;
+  final List<CollectedPattern> patterns;
 }
 
 class CaptureCoordinator {
@@ -200,11 +203,23 @@ class CaptureCoordinator {
       surroundingMaterialId: surroundingMaterial?.id,
     );
 
+    final patterns = const CollectionPatternEngine().derive(
+      sourceRecordId: recordId,
+      capturedAt: now,
+      timeBand: preparation.timeBand,
+      season: preparation.season,
+      weatherSnapshot: weatherMaterial == null ? null : weatherSnapshot,
+      weatherKind: weatherMaterial?.kind,
+      ambientFeatures: surroundingMaterial == null ? null : ambientFeatures,
+      surroundingKind: surroundingMaterial?.kind,
+    );
+
     return CaptureBundle(
       record: record,
       weatherMaterial: weatherMaterial,
       surroundingMaterial: surroundingMaterial,
       ambientFeatures: ambientFeatures,
+      patterns: patterns,
     );
   }
 }

@@ -2,6 +2,36 @@
 
 ## 2026-08-10
 
+### One capture can yield individual and simultaneous-combination patterns
+
+A successful capture no longer collapses all available context into only one
+weather material and one optional surroundings material. A deterministic
+`collection-patterns-v1` engine derives individually collectible time, season,
+weather-kind, normalized weather-band, surroundings-kind, and aggregate
+surroundings-band patterns. The same capture may also yield at most six
+separately collectible combinations: weather weave, surroundings weave,
+weather/time, surroundings/time, weather/surroundings, and the full
+weather/time/surroundings scene.
+
+SQLite schema v3 stores each occurrence by capture and pattern key in the same
+transaction as its capture and material rows. Stored component keys explain
+which derived patterns formed a combination, but raw Bluetooth identifiers,
+names, addresses, advertisements, or observations are never persisted. The UI
+adds a `패턴` subtab inside the existing inventory instead of a new top-level
+destination. The capture result does not expose the engine's full tag set: it
+shows category counts and at most two representative combinations. Inventory
+groups individual patterns into `시간과 계절`, `날씨`, and `주변` disclosure
+rows, while combination values use fixed short type titles and a separate
+component summary. One cut-corner panel contains each collection section so
+repeated borders do not become the hierarchy. This slice uses the existing
+Night Cabinet tokens and adds no visual token, bitmap asset, permission,
+provider, or dependency. A shared non-antialiased 10×10-grid painter replaces
+generic network, category, and disclosure glyphs on pattern surfaces. The
+combination mark derives fixed source positions and colors from persisted
+component families, so weather/time/surroundings and same-family weaves remain
+visually distinct without parsing presentation strings inside screen widgets.
+Native Korean typography is retained for legibility.
+
 ### Core-loop refinement changes hierarchy without adding visual tokens
 
 The existing Night Cabinet palette, system font, cut-corner `PixelButton`, and

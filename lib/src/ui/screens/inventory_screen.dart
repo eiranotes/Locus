@@ -6,12 +6,14 @@ import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/ui/number_format.dart';
+import 'package:reality_diorama/src/ui/pattern_presentation.dart';
 import 'package:reality_diorama/src/ui/screens/crafting_screen.dart';
 import 'package:reality_diorama/src/ui/screens/placement_editor_screen.dart';
 import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
 import 'package:reality_diorama/src/ui/widgets/object_visual_preview.dart';
 import 'package:reality_diorama/src/ui/widgets/atmospheric_trait_chips.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_pattern_mark.dart';
 
 class InventoryScreen extends StatelessWidget {
   const InventoryScreen({super.key});
@@ -20,7 +22,7 @@ class InventoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = AppScope.of(context);
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Column(
         children: <Widget>[
           Builder(
@@ -53,6 +55,7 @@ class InventoryScreen extends StatelessWidget {
             tabs: <Widget>[
               Tab(text: '기록'),
               Tab(text: '재료'),
+              Tab(text: '패턴'),
               Tab(text: '만든 것'),
             ],
           ),
@@ -61,6 +64,7 @@ class InventoryScreen extends StatelessWidget {
               children: <Widget>[
                 _RecordsTab(controller: controller),
                 _MaterialsTab(controller: controller),
+                _PatternsTab(controller: controller),
                 _ObjectsTab(controller: controller),
               ],
             ),
@@ -331,6 +335,346 @@ class _SurroundingMaterialRow extends StatelessWidget {
   }
 }
 
+class _PatternsTab extends StatelessWidget {
+  const _PatternsTab({required this.controller});
+
+  final AppController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    if (controller.collectedPatterns.isEmpty) {
+      return const _EmptyState(
+        visual: PixelPatternStamp(size: 52, color: PixelPalette.muted),
+        title: '아직 수집한 패턴이 없습니다',
+        body: '날씨와 주변 정보를 수집하면 각 정보와 동시 조합이 여기에 남습니다.',
+      );
+    }
+    final grouped = <String, List<CollectedPattern>>{};
+    for (final pattern in controller.collectedPatterns) {
+      grouped
+          .putIfAbsent(pattern.patternKey, () => <CollectedPattern>[])
+          .add(pattern);
+    }
+    final summaries = grouped.values.map((List<CollectedPattern> values) {
+      final latest = values.reduce(
+        (CollectedPattern left, CollectedPattern right) =>
+            left.capturedAt.isAfter(right.capturedAt) ? left : right,
+      );
+      return _PatternSummary(latest: latest, collectedCount: values.length);
+    }).toList();
+    final latestPatternsByKey = <String, CollectedPattern>{
+      for (final summary in summaries)
+        summary.latest.patternKey: summary.latest,
+    };
+    List<_PatternSummary> individualGroup(
+      bool Function(CapturePatternFamily family) includes,
+    ) =>
+        summaries
+            .where(
+              (_PatternSummary value) =>
+                  !value.latest.isCombination && includes(value.latest.family),
+            )
+            .toList()
+          ..sort(
+            (_PatternSummary a, _PatternSummary b) =>
+                a.latest.labelKo.compareTo(b.latest.labelKo),
+          );
+    final timeAndSeason = individualGroup(
+      (CapturePatternFamily family) =>
+          family == CapturePatternFamily.time ||
+          family == CapturePatternFamily.season,
+    );
+    final weather = individualGroup(
+      (CapturePatternFamily family) => family == CapturePatternFamily.weather,
+    );
+    final surroundings = individualGroup(
+      (CapturePatternFamily family) =>
+          family == CapturePatternFamily.surroundings,
+    );
+    final individualCount =
+        timeAndSeason.length + weather.length + surroundings.length;
+    final combinations =
+        summaries
+            .where((_PatternSummary value) => value.latest.isCombination)
+            .toList()
+          ..sort((_PatternSummary a, _PatternSummary b) {
+            final order = combinationPatternOrder(
+              a.latest,
+            ).compareTo(combinationPatternOrder(b.latest));
+            if (order != 0) return order;
+            return a.latest.patternKey.compareTo(b.latest.patternKey);
+          });
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 110),
+      children: <Widget>[
+        _PatternSectionHeading(
+          title: '개별 패턴',
+          count: individualCount,
+          body: '필요한 분류만 펼쳐서 확인',
+        ),
+        const SizedBox(height: 10),
+        PixelCard(
+          color: PixelPalette.scene,
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: <Widget>[
+              _IndividualPatternGroup(
+                title: '시간과 계절',
+                family: CapturePatternFamily.time,
+                patterns: timeAndSeason,
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: PixelRule(),
+              ),
+              _IndividualPatternGroup(
+                title: '날씨',
+                family: CapturePatternFamily.weather,
+                patterns: weather,
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: PixelRule(),
+              ),
+              _IndividualPatternGroup(
+                title: '주변',
+                family: CapturePatternFamily.surroundings,
+                patterns: surroundings,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 22),
+        _PatternSectionHeading(
+          title: '동시 조합',
+          count: combinations.length,
+          body: '같은 순간에 모인 정보가 만든 별도 수집물',
+        ),
+        const SizedBox(height: 10),
+        PixelCard(
+          color: PixelPalette.scene,
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: <Widget>[
+              for (
+                var index = 0;
+                index < combinations.length;
+                index += 1
+              ) ...<Widget>[
+                _CombinationInventoryRow(
+                  summary: combinations[index],
+                  patternsByKey: latestPatternsByKey,
+                ),
+                if (index != combinations.length - 1)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: PixelRule(),
+                  ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PatternSectionHeading extends StatelessWidget {
+  const _PatternSectionHeading({
+    required this.title,
+    required this.count,
+    required this.body,
+  });
+
+  final String title;
+  final int count;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(title, style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 3),
+              Text(body, style: Theme.of(context).textTheme.bodyMedium),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          '${formatNumber(count)}종',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      ],
+    );
+  }
+}
+
+class _IndividualPatternGroup extends StatefulWidget {
+  const _IndividualPatternGroup({
+    required this.title,
+    required this.family,
+    required this.patterns,
+  });
+
+  final String title;
+  final CapturePatternFamily family;
+  final List<_PatternSummary> patterns;
+
+  @override
+  State<_IndividualPatternGroup> createState() =>
+      _IndividualPatternGroupState();
+}
+
+class _IndividualPatternGroupState extends State<_IndividualPatternGroup> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: ExpansionTile(
+        tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+        childrenPadding: const EdgeInsets.fromLTRB(48, 0, 12, 8),
+        backgroundColor: PixelPalette.raised,
+        collapsedBackgroundColor: Colors.transparent,
+        shape: const Border(),
+        collapsedShape: const Border(),
+        leading: PatternFamilyMark(family: widget.family),
+        title: Text(
+          widget.title,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        subtitle: Text(
+          '${formatNumber(widget.patterns.length)}종',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        trailing: PixelCaret(expanded: _expanded),
+        onExpansionChanged: (bool value) {
+          setState(() => _expanded = value);
+        },
+        children: <Widget>[
+          for (
+            var index = 0;
+            index < widget.patterns.length;
+            index += 1
+          ) ...<Widget>[
+            _CompactIndividualPatternRow(summary: widget.patterns[index]),
+            if (index != widget.patterns.length - 1) const PixelRule(),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _CompactIndividualPatternRow extends StatelessWidget {
+  const _CompactIndividualPatternRow({required this.summary});
+
+  final _PatternSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final pattern = summary.latest;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 9),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(
+              compactPatternLabel(pattern),
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            '${formatNumber(summary.collectedCount)}회',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CombinationInventoryRow extends StatelessWidget {
+  const _CombinationInventoryRow({
+    required this.summary,
+    required this.patternsByKey,
+  });
+
+  final _PatternSummary summary;
+  final Map<String, CollectedPattern> patternsByKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final pattern = summary.latest;
+    final visual = combinationPatternVisualDescriptor(pattern, patternsByKey);
+    final collectionCount = formatNumber(summary.collectedCount);
+    return Semantics(
+      container: true,
+      label:
+          '${visual.title}, ${visual.summary}, ${visual.componentCount}개 정보, $collectionCount회 수집',
+      child: ExcludeSemantics(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 1),
+                child: PixelWeaveMark(
+                  families: visual.componentFamilies,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      visual.title,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      visual.summary,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      '${visual.componentCount}개 정보 · $collectionCount회 수집',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: PixelPalette.amber,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PatternSummary {
+  const _PatternSummary({required this.latest, required this.collectedCount});
+
+  final CollectedPattern latest;
+  final int collectedCount;
+}
+
 class _ObjectsTab extends StatelessWidget {
   const _ObjectsTab({required this.controller});
 
@@ -503,12 +847,14 @@ class _RecordStampPainter extends CustomPainter {
 
 class _EmptyState extends StatelessWidget {
   const _EmptyState({
-    required this.icon,
+    this.icon,
+    this.visual,
     required this.title,
     required this.body,
-  });
+  }) : assert(icon != null || visual != null);
 
-  final IconData icon;
+  final IconData? icon;
+  final Widget? visual;
   final String title;
   final String body;
 
@@ -520,7 +866,7 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Icon(icon, size: 52, color: PixelPalette.muted),
+            visual ?? Icon(icon, size: 52, color: PixelPalette.muted),
             const SizedBox(height: 14),
             Text(title, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 6),
@@ -548,6 +894,8 @@ String _countLabel(
 ) => switch (tabIndex) {
   1 =>
     '${formatNumber(controller.weatherMaterials.length + controller.surroundingMaterials.length)}개 재료',
-  2 => '${formatNumber(controller.craftedObjects.length)}개 물건',
+  2 =>
+    '${formatNumber(controller.collectedPatterns.map((CollectedPattern value) => value.patternKey).toSet().length)}종 패턴',
+  3 => '${formatNumber(controller.craftedObjects.length)}개 물건',
   _ => '${formatNumber(controller.captures.length)}개 기록',
 };

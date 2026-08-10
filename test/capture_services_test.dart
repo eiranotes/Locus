@@ -68,6 +68,11 @@ void main() {
       expect(result.record.weatherBasis, WeatherBasis.unavailable);
       expect(result.record.weatherMaterialId, isNull);
       expect(result.record.surroundingMaterialId, isNotNull);
+      expect(result.patterns, hasLength(10));
+      expect(
+        result.patterns.where((CollectedPattern value) => value.isCombination),
+        hasLength(2),
+      );
     },
   );
 
@@ -135,8 +140,43 @@ void main() {
       ]);
       expect(result.weatherMaterial?.traitSchemaVersion, 'weather-traits-v1');
       expect(result.record.weatherBasis, WeatherBasis.providerCurrentModel);
+      expect(result.patterns, hasLength(10));
     },
   );
+
+  test('simultaneous weather and surroundings create cross patterns', () async {
+    final coordinator = CaptureCoordinator(
+      locationGateway: const _FixedLocationGateway(),
+      weatherGateway: _CountingWeatherGateway(snapshot),
+      ambientScanner: const _FixedAmbientScanner(),
+      catalog: ContentCatalog(
+        recipes: const <RecipeDefinition>[],
+        visitors: const <VisitorDefinition>[],
+        balance: testBalance(),
+        placement: PlacementCatalog.empty,
+        atmosphericTraits: traitCatalog,
+      ),
+    );
+
+    final preparation = await coordinator.prepare(now: now);
+    final result = await coordinator.capture(
+      preparation: preparation,
+      now: now,
+      includeSurroundings: true,
+    );
+
+    expect(result.patterns, hasLength(20));
+    expect(
+      result.patterns.where((CollectedPattern value) => value.isCombination),
+      hasLength(6),
+    );
+    expect(
+      result.patterns.map((CollectedPattern value) => value.patternKey),
+      contains(
+        'combination.scene.weather.kind.rain.time.evening.surroundings.kind.dynamic',
+      ),
+    );
+  });
 }
 
 class _CountingWeatherGateway implements WeatherGateway {

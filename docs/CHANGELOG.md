@@ -35,6 +35,19 @@
 
 ### Changed
 
+- Captures now produce separately collectible time, season, weather, and
+  aggregate-surroundings patterns. When multiple inputs arrive together, up to
+  six weather, surroundings, time, and full-scene combinations are stored as
+  their own collectible patterns.
+- Capture results summarize individual pattern categories and show only two
+  representative simultaneous combinations. Inventory adds a `패턴` subtab
+  with three expandable individual groups, fixed short combination titles,
+  concise component summaries, and repeat collection counts without new design
+  tokens or assets.
+- Pattern surfaces now use shared non-antialiased pixel stamps, family marks,
+  component-derived two/three-input weave marks, stepped disclosure carets,
+  and terminal-ended ledger rules instead of generic Material glyphs. Korean
+  body typography and the existing token inventory are unchanged.
 - High-frequency actions, cards, scene frames, dialogs, and placement controls
   now use a cut-corner pixel-game grammar with pressed feedback. The existing
   design-token inventory is unchanged.
@@ -146,6 +159,16 @@
 
 ### Tests
 
+- Added deterministic pattern-engine coverage for both collection channels,
+  channel-specific failure paths, exact individual/combination counts,
+  component provenance, serialization round trips, short presentation titles,
+  representative selection, and compact labels. The iOS UI tour captures the
+  result summary, collapsed individual groups, expanded-group behavior, and
+  concise combination inventory.
+- Added painter-level distinction checks for two-input, three-input,
+  same-family, and mixed-family pixel marks. The iOS tour now exports a named
+  expanded-weather-group screenshot alongside the pattern summary and full
+  combination ledger.
 - Added isometric viewport/cell projection round trips, Korean visitor-target
   labels, exact 50-asset inventory/hash coverage, and pixel direction-control
   regression coverage.

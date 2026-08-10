@@ -38,6 +38,14 @@ class GameRepository {
     return rows.map(SurroundingMaterial.fromMap).toList(growable: false);
   }
 
+  Future<List<CollectedPattern>> loadCollectedPatterns() async {
+    final rows = await _db.query(
+      'collected_patterns',
+      orderBy: 'captured_at DESC, pattern_key ASC',
+    );
+    return rows.map(CollectedPattern.fromMap).toList(growable: false);
+  }
+
   Future<List<StepBucket>> loadStepBuckets() async {
     final rows = await _db.query('step_buckets', orderBy: 'day_key ASC');
     return rows.map(StepBucket.fromMap).toList(growable: false);
@@ -65,6 +73,7 @@ class GameRepository {
     required CaptureRecord record,
     WeatherMaterial? weather,
     SurroundingMaterial? surroundings,
+    List<CollectedPattern> patterns = const <CollectedPattern>[],
   }) async {
     await _db.transaction((Transaction transaction) async {
       await transaction.insert(
@@ -83,6 +92,13 @@ class GameRepository {
         await transaction.insert(
           'surrounding_materials',
           surroundings.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+      for (final pattern in patterns) {
+        await transaction.insert(
+          'collected_patterns',
+          pattern.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
       }

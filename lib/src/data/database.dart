@@ -6,7 +6,7 @@ class AppDatabase {
 
   final Database database;
 
-  static const int schemaVersion = 2;
+  static const int schemaVersion = 3;
   static const String productionDatabaseName = 'reality_diorama.sqlite3';
   static const String demoDatabaseName = 'reality_diorama_demo.sqlite3';
 
@@ -70,6 +70,7 @@ class AppDatabase {
         crafted_object_id TEXT
       )
     ''');
+    await _createCollectedPatterns(db);
     await db.execute('''
       CREATE TABLE step_buckets (
         day_key TEXT PRIMARY KEY,
@@ -148,6 +149,35 @@ class AppDatabase {
         "ALTER TABLE crafted_objects ADD COLUMN variant_key TEXT NOT NULL DEFAULT 'base'",
       );
     }
+    if (oldVersion < 3) {
+      await _createCollectedPatterns(db);
+    }
+  }
+
+  static Future<void> _createCollectedPatterns(Database db) async {
+    await db.execute('''
+      CREATE TABLE collected_patterns (
+        id TEXT PRIMARY KEY,
+        pattern_key TEXT NOT NULL,
+        scope TEXT NOT NULL,
+        family TEXT NOT NULL,
+        label_ko TEXT NOT NULL,
+        description_ko TEXT NOT NULL,
+        strength REAL NOT NULL,
+        component_keys_json TEXT NOT NULL,
+        captured_at INTEGER NOT NULL,
+        source_record_id TEXT NOT NULL,
+        schema_version TEXT NOT NULL,
+        UNIQUE(source_record_id, pattern_key),
+        FOREIGN KEY(source_record_id) REFERENCES capture_records(id) ON DELETE CASCADE
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX idx_pattern_time ON collected_patterns(captured_at DESC)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_pattern_key ON collected_patterns(pattern_key, captured_at DESC)',
+    );
   }
 
   Future<void> close() => database.close();
