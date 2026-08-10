@@ -13,6 +13,7 @@ import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
 import 'package:reality_diorama/src/ui/widgets/object_visual_preview.dart';
 import 'package:reality_diorama/src/ui/widgets/atmospheric_trait_chips.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_button.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_pattern_mark.dart';
 
 class InventoryScreen extends StatelessWidget {
@@ -96,25 +97,67 @@ class _RecordsTab extends StatelessWidget {
       for (final material in controller.surroundingMaterials)
         material.id: material,
     };
-    return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 110),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 0.83,
-      ),
-      itemCount: controller.captures.length,
-      itemBuilder: (BuildContext context, int index) {
-        final record = controller.captures[index];
-        return _RecordCard(
-          record: record,
-          weather: record.weatherMaterialId == null
-              ? null
-              : weatherById[record.weatherMaterialId],
-          surroundings: record.surroundingMaterialId == null
-              ? null
-              : surroundingById[record.surroundingMaterialId],
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final largeText = MediaQuery.textScalerOf(context).scale(14) > 18;
+        final singleColumn = constraints.maxWidth < 360 || largeText;
+        return CustomScrollView(
+          slivers: <Widget>[
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+              sliver: SliverGrid.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: singleColumn ? 1 : 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: singleColumn ? 1.10 : 0.83,
+                ),
+                itemCount: controller.captures.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final record = controller.captures[index];
+                  return _RecordCard(
+                    record: record,
+                    weather: record.weatherMaterialId == null
+                        ? null
+                        : weatherById[record.weatherMaterialId],
+                    surroundings: record.surroundingMaterialId == null
+                        ? null
+                        : surroundingById[record.surroundingMaterialId],
+                  );
+                },
+              ),
+            ),
+            if (controller.hasMoreCaptures)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        '${formatNumber(controller.captures.length)} / '
+                        '${formatNumber(controller.captureRecordTotal)}개 불러옴',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 8),
+                      PixelButton(
+                        key: const ValueKey<String>('load-more-captures'),
+                        label: controller.loadingMoreCaptures
+                            ? '기록 불러오는 중'
+                            : '이전 기록 더 보기',
+                        onPressed:
+                            controller.loadingMoreCaptures || controller.busy
+                            ? null
+                            : controller.loadMoreCaptures,
+                        tone: PixelButtonTone.quiet,
+                        fallbackIcon: Icons.expand_more,
+                        expand: true,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            const SliverToBoxAdapter(child: SizedBox(height: 94)),
+          ],
         );
       },
     );
@@ -910,5 +953,5 @@ String _countLabel(
   2 =>
     '${formatNumber(controller.collectedPatterns.map((CollectedPattern value) => value.patternKey).toSet().length)}종 패턴',
   3 => '${formatNumber(controller.craftedObjects.length)}개 물건',
-  _ => '${formatNumber(controller.captures.length)}개 기록',
+  _ => '${formatNumber(controller.captureRecordTotal)}개 기록',
 };

@@ -13,11 +13,24 @@ class GameRepository {
 
   Database get _db => _appDatabase.database;
 
-  Future<List<CaptureRecord>> loadCaptures({int limit = 100}) async {
+  Future<int> captureCount() async {
+    final result = await _db.rawQuery(
+      'SELECT COUNT(*) AS capture_count FROM capture_records',
+    );
+    return (result.single['capture_count']! as num).toInt();
+  }
+
+  Future<List<CaptureRecord>> loadCaptures({
+    int limit = 24,
+    int offset = 0,
+  }) async {
+    final boundedLimit = limit.clamp(1, 100);
+    final boundedOffset = offset < 0 ? 0 : offset;
     final rows = await _db.query(
       'capture_records',
-      orderBy: 'captured_at DESC',
-      limit: limit,
+      orderBy: 'captured_at DESC, id DESC',
+      limit: boundedLimit,
+      offset: boundedOffset,
     );
     return rows.map(CaptureRecord.fromMap).toList(growable: false);
   }

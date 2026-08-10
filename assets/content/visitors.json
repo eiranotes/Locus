@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "visitors": [
     {
       "id": "umbrella_walker",
@@ -28,10 +28,10 @@
     {
       "id": "roof_bird",
       "nameKo": "지붕 위 새",
-      "descriptionKo": "높은 곳과 멀리 이어진 길을 내려다봅니다.",
-      "hintsKo": ["높은 물건이 필요해요", "먼 연결을 좋아해요", "맑거나 바람 부는 날을 기다려요"],
+      "descriptionKo": "정류장 지붕과 멀리 이어진 길을 내려다봅니다.",
+      "hintsKo": ["정류장 지붕이 필요해요", "먼 연결을 좋아해요", "맑거나 바람 부는 날을 기다려요"],
       "requirements": [
-        {"kind": "highObjects", "min": 2},
+        {"kind": "objectKind", "anyOf": ["busStop"]},
         {"kind": "farConnections", "min": 1},
         {"kind": "weatherKind", "anyOf": ["clear", "windy"]}
       ],
@@ -64,10 +64,10 @@
     {
       "id": "light_swarm",
       "nameKo": "빛 무리",
-      "descriptionKo": "따뜻한 불빛 여러 개가 이어지면 작은 빛들이 모입니다.",
-      "hintsKo": ["따뜻한 칸을 좋아해요", "이어진 불빛이 많아야 해요", "저녁이나 밤에 잘 보여요"],
+      "descriptionKo": "밤 장터의 불빛 여러 개가 이어지면 작은 빛들이 모입니다.",
+      "hintsKo": ["밤 장터 불빛을 찾아요", "이어진 불빛이 많아야 해요", "저녁이나 밤에 잘 보여요"],
       "requirements": [
-        {"kind": "warmCells", "min": 2},
+        {"kind": "objectKind", "anyOf": ["marketStall"]},
         {"kind": "connectedLights", "min": 3},
         {"kind": "timeBand", "anyOf": ["evening", "night"]}
       ],
@@ -83,8 +83,8 @@
     {
       "id": "rain_frog", "nameKo": "빗잎 개구리", "descriptionKo": "비가 고인 정원의 넓은 잎 아래서 쉬어 갑니다.",
       "collectionId": "garden-life", "collectionNameKo": "정원 생태",
-      "hintsKo": ["젖은 칸이 필요해요", "비 오는 날 찾아와요", "새 목욕대가 있으면 좋아요"],
-      "requirements": [{"kind": "wetCells", "min": 2}, {"kind": "weatherKind", "anyOf": ["rain"]}, {"kind": "objectKind", "anyOf": ["birdBath"]}],
+      "hintsKo": ["젖은 칸이 필요해요", "비 오는 날 찾아와요", "작은 연못을 좋아해요"],
+      "requirements": [{"kind": "wetCells", "min": 2}, {"kind": "weatherKind", "anyOf": ["rain"]}, {"kind": "objectKind", "anyOf": ["pond"]}],
       "reward": {"kind": "recipe", "value": "fountain"}
     },
     {
@@ -109,17 +109,17 @@
       "reward": {"kind": "recipe", "value": "market_stall"}
     },
     {
-      "id": "wind_sprite", "nameKo": "바람 정령", "descriptionKo": "풍경 소리를 타고 골목 사이를 가볍게 맴돕니다.",
+      "id": "wind_sprite", "nameKo": "바람 정령", "descriptionKo": "풍경 소리와 작은 다리를 타고 골목 사이를 가볍게 맴돕니다.",
       "collectionId": "night-market", "collectionNameKo": "밤의 장터",
-      "hintsKo": ["풍경을 찾아요", "바람 부는 날 좋아해요", "먼 연결이 있으면 머물러요"],
-      "requirements": [{"kind": "objectKind", "anyOf": ["windChime"]}, {"kind": "weatherKind", "anyOf": ["windy"]}, {"kind": "farConnections", "min": 1}],
+      "hintsKo": ["풍경을 찾아요", "바람 부는 날 좋아해요", "작은 다리를 건너와요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["windChime"]}, {"kind": "weatherKind", "anyOf": ["windy"]}, {"kind": "objectKind", "anyOf": ["bridge"]}],
       "reward": {"kind": "recipe", "value": "stone_gate"}
     },
     {
       "id": "garden_keeper", "nameKo": "정원지기", "descriptionKo": "꽃길과 여러 식물이 잘 이어진 정원을 돌봅니다.",
       "collectionId": "garden-life", "collectionNameKo": "정원 생태",
-      "hintsKo": ["꽃 아치가 필요해요", "자연 물건이 둘 이상 필요해요", "따뜻한 칸을 좋아해요"],
-      "requirements": [{"kind": "objectKind", "anyOf": ["flowerArch"]}, {"kind": "taggedObjects", "tag": "nature", "min": 2}, {"kind": "warmCells", "min": 1}],
+      "hintsKo": ["꽃 아치가 필요해요", "피크닉 탁자를 돌봐요", "따뜻한 칸을 좋아해요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["flowerArch"]}, {"kind": "objectKind", "anyOf": ["picnicTable"]}, {"kind": "warmCells", "min": 1}],
       "reward": {"kind": "recipe", "value": "greenhouse"}
     },
     {
@@ -139,22 +139,22 @@
     {
       "id": "night_watcher", "nameKo": "밤 관측자", "descriptionKo": "높은 구조물과 안정된 불빛 사이에서 별을 관찰합니다.",
       "collectionId": "night-market", "collectionNameKo": "밤의 장터",
-      "hintsKo": ["석등을 찾아요", "높은 물건이 둘 필요해요", "밤에만 보여요"],
-      "requirements": [{"kind": "objectKind", "anyOf": ["stoneLantern"]}, {"kind": "highObjects", "min": 2}, {"kind": "timeBand", "anyOf": ["night"]}],
+      "hintsKo": ["석등을 찾아요", "작은 탑에서 별을 봐요", "밤에만 보여요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["stoneLantern"]}, {"kind": "objectKind", "anyOf": ["tower"]}, {"kind": "timeBand", "anyOf": ["night"]}],
       "reward": {"kind": "recipe", "value": "observatory"}
     },
     {
-      "id": "shelter_dog", "nameKo": "비 피하는 개", "descriptionKo": "빗속에서도 마른 머무름 자리를 찾아 골목을 돕니다.",
+      "id": "shelter_dog", "nameKo": "비 피하는 개", "descriptionKo": "빗속에서 우편함과 정류장 사이의 마른 자리를 찾아 골목을 돕니다.",
       "collectionId": "street-life", "collectionNameKo": "골목 생활",
-      "hintsKo": ["우편함 근처를 서성이어요", "비 오는 날 찾아와요", "머무는 자리가 필요해요"],
-      "requirements": [{"kind": "objectKind", "anyOf": ["mailbox"]}, {"kind": "weatherKind", "anyOf": ["rain"]}, {"kind": "objectTag", "anyOf": ["stay"]}],
+      "hintsKo": ["우편함 근처를 서성이어요", "비 오는 날 찾아와요", "정류장에서 비를 피해요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["mailbox"]}, {"kind": "weatherKind", "anyOf": ["rain"]}, {"kind": "objectKind", "anyOf": ["busStop"]}],
       "reward": {"kind": "recipe", "value": "rain_shelter"}
     },
     {
       "id": "rooftop_swallow", "nameKo": "지붕 제비", "descriptionKo": "바람을 타고 높은 골목과 빨랫줄 사이를 오갑니다.",
       "collectionId": "street-life", "collectionNameKo": "골목 생활",
-      "hintsKo": ["풍경 소리를 따라와요", "높은 물건을 좋아해요", "바람 부는 날 나타나요"],
-      "requirements": [{"kind": "objectKind", "anyOf": ["windChime"]}, {"kind": "highObjects", "min": 1}, {"kind": "weatherKind", "anyOf": ["windy"]}],
+      "hintsKo": ["풍경 소리를 따라와요", "골목 시계 위를 돌아요", "바람 부는 날 나타나요"],
+      "requirements": [{"kind": "objectKind", "anyOf": ["windChime"]}, {"kind": "objectKind", "anyOf": ["clockPost"]}, {"kind": "weatherKind", "anyOf": ["windy"]}],
       "reward": {"kind": "recipe", "value": "laundry_line"}
     }
   ]

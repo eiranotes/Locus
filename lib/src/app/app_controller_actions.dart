@@ -346,7 +346,7 @@ extension AppControllerActions on AppController {
   VisitorEvaluation? get targetVisitor {
     final snapshot = dioramaSnapshot;
     return const VisitorSelectionPolicy().target(
-      evaluations: snapshot.visitorEvaluations,
+      evaluations: _actionableVisitorEvaluations(snapshot.visitorEvaluations),
       sightings: _visitorSightings,
       now: DateTime.now(),
       repeatCooldown: Duration(
@@ -354,6 +354,15 @@ extension AppControllerActions on AppController {
       ),
     );
   }
+
+  List<VisitorEvaluation> _actionableVisitorEvaluations(
+    Iterable<VisitorEvaluation> evaluations,
+  ) => const VisitorProgressionPolicy().actionableEvaluations(
+    evaluations: evaluations,
+    unlockedRecipes: catalog.recipes.where(
+      (RecipeDefinition recipe) => _unlockedRecipeIds.contains(recipe.id),
+    ),
+  );
 
   Duration? visitorRepeatWait(String visitorId) {
     final previous = _visitorSightings
@@ -548,7 +557,7 @@ extension AppControllerActions on AppController {
       for (final sighting in _visitorSightings) sighting.visitorId: sighting,
     };
     final evaluation = const VisitorSelectionPolicy().arriving(
-      evaluations: snapshot.visitorEvaluations,
+      evaluations: _actionableVisitorEvaluations(snapshot.visitorEvaluations),
       sightings: _visitorSightings,
       now: now,
       repeatCooldown: Duration(
@@ -649,7 +658,10 @@ extension AppControllerActions on AppController {
   }
 
   Future<void> _reloadAll() async {
-    _captures = await repository.loadCaptures();
+    _captureRecordTotal = await repository.captureCount();
+    _captures = await repository.loadCaptures(
+      limit: AppController.capturePageSize,
+    );
     _weatherMaterials = await repository.loadWeatherMaterials();
     _surroundingMaterials = await repository.loadSurroundingMaterials();
     _collectedPatterns = await repository.loadCollectedPatterns();
@@ -658,6 +670,32 @@ extension AppControllerActions on AppController {
     _placements = await repository.loadPlacements();
     _visitorSightings = await repository.loadVisitorSightings();
     _visitorEncounterCounts = await repository.loadVisitorEncounterCounts();
+  }
+
+  Future<void> loadMoreCaptures() async {
+    if (_busy || _loadingMoreCaptures || !hasMoreCaptures) return;
+    _loadingMoreCaptures = true;
+    _errorMessage = null;
+    notifyChanged();
+    try {
+      final nextPage = await repository.loadCaptures(
+        limit: AppController.capturePageSize,
+        offset: _captures.length,
+      );
+      final existingIds = _captures
+          .map((CaptureRecord record) => record.id)
+          .toSet();
+      _captures = <CaptureRecord>[
+        ..._captures,
+        ...nextPage.where((CaptureRecord record) => existingIds.add(record.id)),
+      ];
+      _captureRecordTotal = await repository.captureCount();
+    } catch (error) {
+      _errorMessage = error.toString();
+    } finally {
+      _loadingMoreCaptures = false;
+      notifyChanged();
+    }
   }
 
   Future<void> _guard(Future<void> Function() action) async {

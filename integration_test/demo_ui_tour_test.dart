@@ -96,6 +96,7 @@ void main() {
       AppDatabase.demoDatabaseName,
     );
     await deleteDatabase(databasePath);
+    await _seedCaptureHistory();
 
     await app.main();
     await _waitForUi(tester, seconds: 4);
@@ -180,7 +181,27 @@ void main() {
     await tester.tap(find.text('보관함'));
     await _waitForUi(tester);
     expect(find.widgetWithText(Tab, '기록'), findsOneWidget);
+    expect(find.text('31개 기록'), findsOneWidget);
     await binding.takeScreenshot('08-inventory-records');
+    await tester.fling(
+      find.byType(CustomScrollView).last,
+      const Offset(0, -5000),
+      1500,
+    );
+    await _waitForUi(tester);
+    expect(
+      find.byKey(const ValueKey<String>('load-more-captures')),
+      findsOneWidget,
+    );
+    expect(find.text('24 / 31개 불러옴'), findsOneWidget);
+    await binding.takeScreenshot('08b-inventory-records-more');
+    await tester.tap(find.byKey(const ValueKey<String>('load-more-captures')));
+    await _waitForUi(tester, seconds: 2);
+    expect(
+      find.byKey(const ValueKey<String>('load-more-captures')),
+      findsNothing,
+    );
+    await binding.takeScreenshot('08c-inventory-records-complete');
 
     await tester.tap(find.widgetWithText(Tab, '재료'));
     await _waitForUi(tester);
@@ -253,6 +274,26 @@ void main() {
     expect(find.text('설정과 정보'), findsOneWidget);
     await binding.takeScreenshot('14-settings');
   });
+}
+
+Future<void> _seedCaptureHistory() async {
+  final database = await AppDatabase.open(demoMode: true);
+  final repository = GameRepository(database);
+  final baseTime = DateTime.utc(2026, 7, 1, 12);
+  for (var index = 0; index < 30; index += 1) {
+    await repository.saveCapture(
+      record: CaptureRecord(
+        id: 'history-$index',
+        capturedAt: baseTime.add(Duration(minutes: index)),
+        timeBand: TimeBand.afternoon,
+        season: Season.summer,
+        weatherBasis: WeatherBasis.providerCurrentModel,
+        sourceVersion: 'pagination-fixture-v1',
+        userPlaceLabel: '지난 기록 ${index + 1}',
+      ),
+    );
+  }
+  await database.close();
 }
 
 Future<void> _waitForUi(WidgetTester tester, {int seconds = 1}) async {

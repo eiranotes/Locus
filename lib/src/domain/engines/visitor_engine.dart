@@ -32,6 +32,85 @@ class VisitorEvaluation {
       progress.where((RequirementProgress item) => item.satisfied).length;
 }
 
+/// Separates visitors the current recipe library can actually pursue from
+/// later collection goals. Environment, time, and weather requirements remain
+/// player-facing conditions; only explicit object and tag requirements gate a
+/// visitor behind recipe progression.
+class VisitorProgressionPolicy {
+  const VisitorProgressionPolicy();
+
+  List<VisitorEvaluation> actionableEvaluations({
+    required Iterable<VisitorEvaluation> evaluations,
+    required Iterable<RecipeDefinition> unlockedRecipes,
+  }) {
+    final available = unlockedRecipes.toList(growable: false);
+    return evaluations
+        .where(
+          (VisitorEvaluation evaluation) =>
+              isActionable(evaluation.visitor, available),
+        )
+        .toList(growable: false);
+  }
+
+  bool isActionable(
+    VisitorDefinition visitor,
+    Iterable<RecipeDefinition> unlockedRecipes,
+  ) {
+    final available = unlockedRecipes.toList(growable: false);
+    return visitor.requirements.every((VisitorRequirement requirement) {
+      if (!_isRecipeRequirement(requirement.kind)) return true;
+      return _matchingRecipes(requirement, available).isNotEmpty;
+    });
+  }
+
+  RecipeDefinition? missingRecipeGate(
+    VisitorDefinition visitor,
+    Iterable<RecipeDefinition> unlockedRecipes,
+    Iterable<RecipeDefinition> allRecipes,
+  ) {
+    final available = unlockedRecipes.toList(growable: false);
+    final catalog = allRecipes.toList(growable: false);
+    for (final requirement in visitor.requirements) {
+      if (!_isRecipeRequirement(requirement.kind)) continue;
+      final availableCandidates = _matchingRecipes(requirement, available);
+      if (availableCandidates.isNotEmpty) continue;
+      final catalogCandidates = _matchingRecipes(requirement, catalog);
+      if (catalogCandidates.isNotEmpty) return catalogCandidates.first;
+    }
+    return null;
+  }
+
+  List<RecipeDefinition> _matchingRecipes(
+    VisitorRequirement requirement,
+    Iterable<RecipeDefinition> recipes,
+  ) => switch (requirement.kind) {
+    'objectKind' =>
+      recipes
+          .where(
+            (RecipeDefinition recipe) =>
+                requirement.anyOf.contains(recipe.kind.name),
+          )
+          .toList(growable: false),
+    'objectTag' =>
+      recipes
+          .where(
+            (RecipeDefinition recipe) =>
+                recipe.tags.any(requirement.anyOf.contains),
+          )
+          .toList(growable: false),
+    'taggedObjects' =>
+      recipes
+          .where(
+            (RecipeDefinition recipe) => recipe.tags.contains(requirement.tag),
+          )
+          .toList(growable: false),
+    _ => const <RecipeDefinition>[],
+  };
+
+  bool _isRecipeRequirement(String kind) =>
+      kind == 'objectKind' || kind == 'objectTag' || kind == 'taggedObjects';
+}
+
 /// Keeps the visitor shown as the next goal aligned with the visitor that can
 /// actually arrive. New visitors always outrank repeats; repeat candidates are
 /// ordered by the oldest last visit so one catalog entry cannot monopolize the

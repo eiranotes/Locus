@@ -4,6 +4,11 @@
 
 ### Fixed
 
+- Capture history no longer silently stops at the latest 100 records; older
+  entries can be loaded in stable 24-record pages with an exact total.
+- Temporarily unreachable later-layer visitors no longer appear as active home
+  goals or arrival candidates before their prerequisite recipe is unlocked.
+
 - Cold launch, app resume, capture, and construction completion now refresh
   readiness and visitor eligibility in a consistent order.
 - Satisfied unseen visitors can no longer be preempted by a repeat-ready entry
@@ -43,6 +48,12 @@
 - Prototype version text is now debug-only and cannot appear in a release UI.
 
 ### Changed
+
+- The 28-recipe collection now unfolds through deterministic 10/7/7/4 layers
+  instead of placing nearly every visitor reward directly after the initial
+  catalog. Later codex entries name their missing prerequisite recipe.
+- Record inventory uses an explicit pixel-style `이전 기록 더 보기` action and
+  a one-column fallback for narrow widths or large text.
 
 - Time and representative-weather patterns now appear as non-consuming visitor
   clues on home, capture results, inventory, and codex surfaces.
@@ -178,6 +189,9 @@
 
 ### Tests
 
+- Added actionable-visitor policy and exact 10/7/7/4 progression-layer tests.
+  The iOS tour now seeds 30 historical captures, verifies 24-of-31 paging and
+  the final seven-record load, and exports both pagination states.
 - Added visitor priority, repeat fairness, passive-permission, pattern-evidence,
   and scene-memory serialization coverage.
 

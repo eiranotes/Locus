@@ -4,6 +4,7 @@ import 'package:reality_diorama/src/app/app_scope.dart';
 import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
+import 'package:reality_diorama/src/domain/engines/visitor_engine.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/ui/number_format.dart';
@@ -63,6 +64,12 @@ class _VisitorsTab extends StatelessWidget {
     final seenIds = controller.visitorSightings
         .map((VisitorSighting item) => item.visitorId)
         .toSet();
+    final unlockedRecipes = controller.catalog.recipes
+        .where(
+          (RecipeDefinition recipe) =>
+              controller.unlockedRecipeIds.contains(recipe.id),
+        )
+        .toList(growable: false);
     final groups = _groupByCollection(
       controller.catalog.visitors,
       idOf: (visitor) => visitor.collectionId,
@@ -112,6 +119,12 @@ class _VisitorsTab extends StatelessWidget {
                   visitor,
                   controller.collectedPatterns,
                 ).firstOrNull;
+                final recipeGate = const VisitorProgressionPolicy()
+                    .missingRecipeGate(
+                      visitor,
+                      unlockedRecipes,
+                      controller.catalog.recipes,
+                    );
                 final rewardRecipe =
                     visitor.reward.kind == VisitorRewardKind.recipe
                     ? controller.catalog.recipeById(visitor.reward.value)
@@ -168,6 +181,8 @@ class _VisitorsTab extends StatelessWidget {
                       Text(
                         discovered
                             ? visitor.descriptionKo
+                            : recipeGate != null
+                            ? '선행 만드는 법 · ${recipeGate.nameKo}'
                             : clue == null
                             ? visitor.hintsKo.first
                             : '패턴 단서 · ${compactPatternLabel(clue.pattern)}',

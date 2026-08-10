@@ -28,13 +28,18 @@ void main() {
     final recipeById = <String, Map<String, Object?>>{
       for (final recipe in recipes) recipe['id']! as String: recipe,
     };
-    final reachable = <String>{
+    final initial = <String>{
       for (final recipe in recipes)
         if (recipe['initiallyUnlocked']! as bool) recipe['id']! as String,
     };
+    final reachable = <String>{...initial};
+    final tiers = <String, int>{for (final id in initial) id: 0};
 
-    bool requirementsReachable(Map<String, Object?> visitor) {
-      final available = reachable.map((id) => recipeById[id]!).toList();
+    bool requirementsReachable(
+      Map<String, Object?> visitor,
+      Set<String> availableIds,
+    ) {
+      final available = availableIds.map((id) => recipeById[id]!).toList();
       for (final requirement
           in (visitor['requirements']! as List<Object?>)
               .cast<Map<String, Object?>>()) {
@@ -61,19 +66,36 @@ void main() {
       return true;
     }
 
-    var changed = true;
-    while (changed) {
-      changed = false;
+    var tier = 1;
+    while (true) {
+      final additions = <String>{};
       for (final visitor in visitors) {
         final reward = visitor['reward']! as Map<String, Object?>;
-        if (reward['kind'] != 'recipe' || !requirementsReachable(visitor)) {
+        if (reward['kind'] != 'recipe' ||
+            !requirementsReachable(visitor, reachable)) {
           continue;
         }
-        changed = reachable.add(reward['value']! as String) || changed;
+        final recipeId = reward['value']! as String;
+        if (!reachable.contains(recipeId)) additions.add(recipeId);
       }
+      if (additions.isEmpty) break;
+      for (final id in additions) {
+        reachable.add(id);
+        tiers[id] = tier;
+      }
+      tier += 1;
     }
 
     expect(reachable, recipeById.keys.toSet());
+    expect(
+      <int, int>{
+        for (var value = 0; value <= 3; value += 1)
+          value: tiers.values.where((tier) => tier == value).length,
+      },
+      <int, int>{0: 10, 1: 7, 2: 7, 3: 4},
+      reason: 'the 28 recipes should unfold across three follow-up layers',
+    );
+    expect(tiers.values.reduce((a, b) => a > b ? a : b), 3);
     final rewarded = <String>{
       for (final visitor in visitors)
         if ((visitor['reward']! as Map<String, Object?>)['kind'] == 'recipe')

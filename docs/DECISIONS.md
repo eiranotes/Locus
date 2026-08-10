@@ -2,6 +2,34 @@
 
 ## 2026-08-10
 
+### Recipe progression is layered and only actionable visitors become goals
+
+The 28-recipe library now unfolds as 10 initial recipes followed by three
+deterministic layers containing 7, 7, and 4 recipes. Later visitors may require
+an object from an earlier layer, but still expose no more than three visible
+conditions. `VisitorProgressionPolicy` treats only explicit object-kind and tag
+requirements as recipe gates; weather, time, connections, and environment
+values remain live scene conditions rather than catalog locks.
+
+Home targeting and arrival resolution filter through that same actionable set,
+so a visitor cannot become the current goal before the player owns a recipe
+capable of meeting its explicit prerequisite. The codex remains a complete
+field guide and names the first missing prerequisite recipe for later visitors.
+An iterative content test computes tiers from a frozen layer snapshot, avoiding
+catalog-order shortcuts and proving the exact 10/7/7/4 distribution.
+
+### Permanent capture history uses explicit bounded pages
+
+Capture records remain permanent local history, but the controller loads 24 at
+a time using stable `captured_at DESC, id DESC` ordering and a separate exact
+count. The inventory does not auto-fetch while the user scrolls: a labeled
+48 dp cut-corner button shows loaded versus total records and requests the next
+page. This is predictable, accessible, and consistent with the existing pixel
+control vocabulary. Narrow widths and large text switch the record grid to one
+roomier column. No schema, token, asset, dependency, or retention policy is
+added; the former latest-100 visibility ceiling is removed rather than moving
+data elsewhere.
+
 ### World refresh and visitor selection share one return-loop contract
 
 Cold launch and app resume now refresh steps and construction, passively

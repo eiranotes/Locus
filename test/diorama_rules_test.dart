@@ -378,6 +378,89 @@ void main() {
       expect(selected?.visitor.id, 'complete');
     });
   });
+
+  group('visitor progression policy', () {
+    final lamp = testRecipe(
+      id: 'lamp',
+      kind: ObjectKind.alleyLamp,
+      tags: const <String>{'light'},
+    );
+    final stop = testRecipe(
+      id: 'stop',
+      kind: ObjectKind.busStop,
+      tags: const <String>{'stay', 'path'},
+    );
+    final visitor = VisitorDefinition(
+      id: 'roof-bird',
+      nameKo: '지붕 위 새',
+      descriptionKo: '테스트',
+      hintsKo: const <String>['정류장 지붕이 필요해요'],
+      requirements: const <VisitorRequirement>[
+        VisitorRequirement(kind: 'objectKind', anyOf: <String>['busStop']),
+        VisitorRequirement(kind: 'weatherKind', anyOf: <String>['clear']),
+      ],
+      reward: const VisitorReward(
+        kind: VisitorRewardKind.recipe,
+        value: 'bridge',
+      ),
+    );
+
+    test('locked object gates stay out of actionable visitor goals', () {
+      const policy = VisitorProgressionPolicy();
+
+      expect(policy.isActionable(visitor, <RecipeDefinition>[lamp]), isFalse);
+      expect(
+        policy
+            .missingRecipeGate(visitor, <RecipeDefinition>[lamp], [lamp, stop])
+            ?.id,
+        'stop',
+      );
+    });
+
+    test('unlocking the required recipe exposes the visitor', () {
+      const policy = VisitorProgressionPolicy();
+      final evaluation = _evaluation('roof-bird', satisfied: false);
+      final gatedEvaluation = VisitorEvaluation(
+        visitor: visitor,
+        progress: evaluation.progress,
+      );
+
+      expect(
+        policy.actionableEvaluations(
+          evaluations: <VisitorEvaluation>[gatedEvaluation],
+          unlockedRecipes: <RecipeDefinition>[lamp, stop],
+        ),
+        hasLength(1),
+      );
+    });
+
+    test('an unknown object prerequisite fails closed', () {
+      final invalidVisitor = VisitorDefinition(
+        id: 'invalid',
+        nameKo: '잘못된 방문자',
+        descriptionKo: '테스트',
+        hintsKo: const <String>['테스트'],
+        requirements: const <VisitorRequirement>[
+          VisitorRequirement(
+            kind: 'objectKind',
+            anyOf: <String>['missingKind'],
+          ),
+        ],
+        reward: const VisitorReward(
+          kind: VisitorRewardKind.effect,
+          value: 'test',
+        ),
+      );
+
+      expect(
+        const VisitorProgressionPolicy().isActionable(
+          invalidVisitor,
+          <RecipeDefinition>[lamp, stop],
+        ),
+        isFalse,
+      );
+    });
+  });
 }
 
 VisitorEvaluation _evaluation(

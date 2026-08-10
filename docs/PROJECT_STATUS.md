@@ -25,8 +25,23 @@ The retention P0 slice now makes every return path converge on the same world
 refresh order, aligns the visible visitor target with actual arrival priority,
 uses time/weather patterns as non-consuming visitor evidence, and accumulates
 repeat visits as coarse scene memories rather than overwriting the only record.
+The follow-up retention slice now unfolds the 28-recipe library across three
+post-initial progression layers and pages the permanent capture ledger instead
+of silently hiding everything older than the latest 100 records.
 
 ## Completed in the current slice
+
+- Rebalanced the recipe unlock graph from a nearly flat expansion into 10
+  initial recipes followed by deterministic layers of 7, 7, and 4 recipes.
+  Explicit object prerequisites stay within three visible visitor conditions.
+- Added a domain progression policy so home goals and arrivals include only
+  visitors whose explicit object/tag requirements can be attempted with the
+  currently unlocked recipe library. The codex names a missing prerequisite
+  recipe instead of presenting a temporarily impossible hint as an active goal.
+- Replaced the capture ledger's fixed latest-100 query with stable 24-record
+  pages and an exact total count. Inventory shows total versus loaded records,
+  uses an explicit 48 dp pixel `이전 기록 더 보기` action, and falls back to a
+  roomier one-column record grid on narrow or large-text layouts.
 
 - Added one world-refresh path for cold launch, resume, pull-to-refresh, capture,
   and construction-related step updates. Passive refresh never requests a new
@@ -356,6 +371,19 @@ found no clipped text or overflow at the tested simulator size. The temporary
 wrapper copies were deleted; the repository's intentionally omitted iOS
 project remained unchanged.
 
+The progression/pagination follow-up was verified on 2026-08-10 with Flutter
+3.44.1. `./tool/validate.sh` passed repository/content/manifest checks, Swift
+parse, formatting, analyzer, and all 89 unit/widget tests. The required Android
+demo debug APK built successfully. A temporary iOS wrapper-recovery copy passed
+the schema-v2-to-v4 migration and the 57-second deterministic drive. The tour
+seeded 30 historical records, made one current capture, proved the first 24 of
+31 records plus the explicit seven-record continuation, and exported 23
+full-resolution screenshots under
+`artifacts/ui-screenshots/2026-08-10-retention-p1/`. Visual inspection of the
+load-more states and deeper visitor cards found no clipped text or overflow.
+The temporary wrapper copy was deleted after export; tracked wrapper policy was
+unchanged.
+
 ## Known risks and gates
 
 - The first production-bound atlas pass is installed, but it still needs final
@@ -368,9 +396,9 @@ project remained unchanged.
 - Atmospheric thresholds are initial balance values and need product telemetry
   or structured playtest evidence before expanding providers or adding more
   traits.
-- Visitor encounter counts and coarse contexts are now persisted and visible,
-  but D7/D30 value still needs longitudinal beta evidence; the existing 28/18
-  content graph has not yet been rebalanced into deeper progression layers.
+- Visitor encounter counts, coarse contexts, and the deeper 10/7/7/4 unlock
+  graph are now implemented, but D7/D30 value and layer pacing still need
+  longitudinal beta or structured playtest evidence.
 - Directional art is authoring-complete for the current ten recipes, but a later
   populated-neighborhood visual pass may still tune individual scale/occlusion.
 - The AppIcon candidate requires owner review at actual icon sizes before use.

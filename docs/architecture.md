@@ -44,6 +44,7 @@ The domain engines are deterministic and independently testable:
 - environment grid;
 - connection graph;
 - visitor evaluator;
+- visitor progression policy;
 - visitor selection policy;
 - seeded visual descriptor.
 
@@ -83,6 +84,22 @@ existing bounded snapshot JSON. `GameRepository.saveVisitorResolution` writes
 the latest sighting, encounter, and unlock metadata in one transaction.
 Controllers query grouped encounter counts; detail consumers use a five-row
 recent-history limit rather than loading the full visit log.
+
+## Progression and capture-history bounds
+
+`VisitorProgressionPolicy` compares each visitor's explicit object-kind or tag
+requirements with the currently unlocked recipe definitions. Only actionable
+evaluations reach `VisitorSelectionPolicy`; the full evaluation catalog remains
+available to the codex. Static content tests recompute unlock layers from a
+frozen recipe set per iteration and require the current 10/7/7/4 distribution,
+so JSON order cannot accidentally flatten the graph.
+
+Capture records use count plus offset pages at the repository boundary. The
+controller initially holds 24 newest records and appends de-duplicated pages on
+an explicit inventory request. Ordering uses capture time and ID to stay stable
+when timestamps match. Weather materials, surroundings materials, and collected
+patterns keep their existing complete domain queries because they are active
+crafting/collection state rather than the visual history ledger.
 
 ## Diorama renderer
 

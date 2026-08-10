@@ -39,12 +39,16 @@ class AppController extends ChangeNotifier {
   final bool demoMode;
   final Uuid uuid;
 
+  static const int capturePageSize = 24;
+
   bool _initialized = false;
   bool _busy = false;
   String? _errorMessage;
   int _navigationIndex = 0;
 
   List<CaptureRecord> _captures = const <CaptureRecord>[];
+  int _captureRecordTotal = 0;
+  bool _loadingMoreCaptures = false;
   List<WeatherMaterial> _weatherMaterials = const <WeatherMaterial>[];
   List<SurroundingMaterial> _surroundingMaterials =
       const <SurroundingMaterial>[];
@@ -67,6 +71,9 @@ class AppController extends ChangeNotifier {
   int get navigationIndex => _navigationIndex;
   List<CaptureRecord> get captures =>
       List<CaptureRecord>.unmodifiable(_captures);
+  int get captureRecordTotal => _captureRecordTotal;
+  bool get loadingMoreCaptures => _loadingMoreCaptures;
+  bool get hasMoreCaptures => _captures.length < _captureRecordTotal;
   List<WeatherMaterial> get weatherMaterials =>
       List<WeatherMaterial>.unmodifiable(_weatherMaterials);
   List<SurroundingMaterial> get surroundingMaterials =>

@@ -41,6 +41,10 @@
       and distinguish new from repeated patterns in capture results.
 - [x] Persist repeat visitor encounters as bounded coarse scene memories and
       expose visit count plus latest weather/time context in the codex.
+- [x] Rebalance the 28-recipe graph into deterministic 10/7/7/4 unlock layers
+      and keep prerequisite-gated visitors out of active home goals.
+- [x] Replace the latest-100 capture-record ceiling with stable 24-row pages,
+      an exact total, and a pixel-style explicit load-more action.
 
 ## Next
 
