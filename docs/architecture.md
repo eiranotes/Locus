@@ -11,8 +11,9 @@ recent steps accumulate
 → craft or continue constructing a miniature object
 → place and rotate it on a 5×5 isometric board
 → recompute environment cells and object connections
-→ satisfy a visitor predicate
+→ refresh readiness and evaluate one prioritized visitor predicate
 → unlock a visitor, recipe, visual variant, or scene element
+→ retain repeat visits as coarse scene memories
 ```
 
 ## Cross-platform boundary
@@ -28,7 +29,7 @@ Android and iOS bridges return normalized values. A platform failure produces an
 
 ## State and persistence
 
-`AppController` is the single UI-facing state coordinator. `GameRepository` serializes all writes through one database boundary. Static content is versioned JSON; user state is SQLite.
+`AppController` is the single UI-facing state coordinator. `GameRepository` serializes all writes through one database boundary. Static content is versioned JSON; user state is SQLite. Cold launch and resume use one ordered refresh contract: steps/construction, passive capture preparation, then visitor evaluation. Passive preparation never requests location permission.
 
 The domain engines are deterministic and independently testable:
 
@@ -43,6 +44,7 @@ The domain engines are deterministic and independently testable:
 - environment grid;
 - connection graph;
 - visitor evaluator;
+- visitor selection policy;
 - seeded visual descriptor.
 
 ## Collection patterns
@@ -60,6 +62,10 @@ transaction, and deleting a capture cascades to its pattern rows. The inventory
 aggregates rows by stable `pattern_key` for unique-pattern and repeat-count UI;
 the underlying occurrences remain available for future progression rules.
 
+Time and representative-weather patterns are also presentation evidence for
+matching visitor requirements. They are never consumed, never satisfy a
+predicate on their own, and never become a currency or recipe gate.
+
 `pattern_presentation.dart` resolves each combination into a short title,
 summary, component count, and normalized visual-family list. Capture and
 inventory pass that same descriptor to `PixelWeaveMark`, whose non-antialiased
@@ -67,6 +73,16 @@ inventory pass that same descriptor to `PixelWeaveMark`, whose non-antialiased
 Same-family component lists deliberately retain duplicates, allowing a channel
 weave to paint differently from a mixed scene without adding bitmap assets or
 duplicating key parsing in screen widgets.
+
+## Visitor return history
+
+SQLite schema v4 keeps `visitor_sightings` as the latest per-visitor summary and
+adds append-only `visitor_encounters` for repeat scene memories. Each row keeps
+only visit time, a coarse weather/time variant, placed object IDs, and the
+existing bounded snapshot JSON. `GameRepository.saveVisitorResolution` writes
+the latest sighting, encounter, and unlock metadata in one transaction.
+Controllers query grouped encounter counts; detail consumers use a five-row
+recent-history limit rather than loading the full visit log.
 
 ## Diorama renderer
 

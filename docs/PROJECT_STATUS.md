@@ -21,8 +21,26 @@ the capture result and a dedicated inventory subtab distinguish the two. Those
 surfaces now use state-derived pixel marks, stepped disclosure carets, and
 terminal-ended ledger rules instead of generic Material network/category
 icons.
+The retention P0 slice now makes every return path converge on the same world
+refresh order, aligns the visible visitor target with actual arrival priority,
+uses time/weather patterns as non-consuming visitor evidence, and accumulates
+repeat visits as coarse scene memories rather than overwriting the only record.
 
 ## Completed in the current slice
+
+- Added one world-refresh path for cold launch, resume, pull-to-refresh, capture,
+  and construction-related step updates. Passive refresh never requests a new
+  location permission; the capture sheet keeps that contextual responsibility.
+- Added deterministic visitor priority shared by target and resolution:
+  satisfied unseen visitors first, then oldest eligible repeats after the
+  six-hour cooldown. Home shows repeat wait time and placement names newly
+  completed conditions.
+- Linked collected time/weather patterns to matching visitor requirements as
+  presentation evidence only. Capture results show new/repeated counts and
+  target relation; inventory and codex expose the same non-consuming clues.
+- Added SQLite schema v4 `visitor_encounters`, backfilled legacy sightings, and
+  grouped visit counts. The codex now shows repeat count and latest coarse
+  weather/time context without loading an unbounded encounter history.
 
 - Added deterministic collection-pattern classification for time, season,
   weather kind and numeric bands, surroundings kind and aggregate signal bands.
@@ -323,6 +341,21 @@ collapsed inventory, expanded weather group, and complete combination ledger
 show distinct code-rendered marks without clipped text or overflow. The
 repository checkout retained its intentionally omitted iOS wrapper files.
 
+The retention P0 slice was verified on 2026-08-10 with Flutter 3.44.1.
+`./tool/validate.sh` passed repository, content, manifest, Swift parse,
+formatting, analyzer, and all 86 unit/widget tests. The required Android demo
+debug APK built successfully. The first iOS migration run exposed that a
+partially upgraded database could already contain `visitor_encounters`; making
+schema-v4 table/index creation idempotent fixed that recovery case. A fresh
+temporary wrapper-recovery copy then passed the schema-v2-to-v4 migration and
+the complete 48-second deterministic tour on `LocusPlacementQA`, exporting 21
+full-resolution screenshots under
+`artifacts/ui-screenshots/2026-08-10-retention-p0/`. Visual inspection of home,
+capture patterns, expanded inventory, placement, and both codex scroll states
+found no clipped text or overflow at the tested simulator size. The temporary
+wrapper copies were deleted; the repository's intentionally omitted iOS
+project remained unchanged.
+
 ## Known risks and gates
 
 - The first production-bound atlas pass is installed, but it still needs final
@@ -335,6 +368,9 @@ repository checkout retained its intentionally omitted iOS wrapper files.
 - Atmospheric thresholds are initial balance values and need product telemetry
   or structured playtest evidence before expanding providers or adding more
   traits.
+- Visitor encounter counts and coarse contexts are now persisted and visible,
+  but D7/D30 value still needs longitudinal beta evidence; the existing 28/18
+  content graph has not yet been rebalanced into deeper progression layers.
 - Directional art is authoring-complete for the current ten recipes, but a later
   populated-neighborhood visual pass may still tune individual scale/occlusion.
 - The AppIcon candidate requires owner review at actual icon sizes before use.

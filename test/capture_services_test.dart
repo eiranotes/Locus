@@ -177,6 +177,41 @@ void main() {
       ),
     );
   });
+
+  test('passive preparation does not request location permission', () async {
+    final location = _PermissionRecordingLocationGateway();
+    final coordinator = CaptureCoordinator(
+      locationGateway: location,
+      weatherGateway: _CountingWeatherGateway(
+        WeatherSnapshot(
+          temperatureCelsius: 20,
+          apparentTemperatureCelsius: 20,
+          precipitationRateMmPerHour: 0,
+          cloudCoverPercent: 10,
+          windSpeedKph: 4,
+          visibilityMeters: 12000,
+          weatherCode: 0,
+          observedAt: DateTime.utc(2026, 8, 10),
+          basis: WeatherBasis.demo,
+          providerName: 'Test',
+        ),
+      ),
+      ambientScanner: const _FixedAmbientScanner(),
+      catalog: ContentCatalog(
+        recipes: const <RecipeDefinition>[],
+        visitors: const <VisitorDefinition>[],
+        balance: testBalance(),
+        placement: PlacementCatalog.empty,
+      ),
+    );
+
+    await coordinator.prepare(
+      now: DateTime.utc(2026, 8, 10),
+      requestLocationPermission: false,
+    );
+
+    expect(location.lastRequestPermission, isFalse);
+  });
 }
 
 class _CountingWeatherGateway implements WeatherGateway {
@@ -232,24 +267,48 @@ class _FixedLocationGateway implements LocationGateway {
   const _FixedLocationGateway();
 
   @override
-  Future<LocationFix> current() async => const LocationFix(
-    point: GeoPoint(latitude: 37.5446, longitude: 127.0559, accuracyMeters: 30),
-    label: '성수동',
-    isFallback: false,
-  );
+  Future<LocationFix> current({bool requestPermission = true}) async =>
+      const LocationFix(
+        point: GeoPoint(
+          latitude: 37.5446,
+          longitude: 127.0559,
+          accuracyMeters: 30,
+        ),
+        label: '성수동',
+        isFallback: false,
+      );
 }
 
 class _FallbackLocationGateway implements LocationGateway {
   const _FallbackLocationGateway();
 
   @override
-  Future<LocationFix> current() async => const LocationFix(
-    point: GeoPoint(
-      latitude: 37.5665,
-      longitude: 126.9780,
-      accuracyMeters: 5000,
-    ),
-    label: '위치 권한 필요',
-    isFallback: true,
-  );
+  Future<LocationFix> current({bool requestPermission = true}) async =>
+      const LocationFix(
+        point: GeoPoint(
+          latitude: 37.5665,
+          longitude: 126.9780,
+          accuracyMeters: 5000,
+        ),
+        label: '위치 권한 필요',
+        isFallback: true,
+      );
+}
+
+class _PermissionRecordingLocationGateway implements LocationGateway {
+  bool? lastRequestPermission;
+
+  @override
+  Future<LocationFix> current({bool requestPermission = true}) async {
+    lastRequestPermission = requestPermission;
+    return const LocationFix(
+      point: GeoPoint(
+        latitude: 37.5446,
+        longitude: 127.0559,
+        accuracyMeters: 30,
+      ),
+      label: '성수동',
+      isFallback: false,
+    );
+  }
 }

@@ -117,3 +117,36 @@ class VisitorSighting {
 
   static String encodeSnapshot(Map<String, Object?> value) => jsonEncode(value);
 }
+
+class VisitorEncounter {
+  const VisitorEncounter({
+    required this.id,
+    required this.visitorId,
+    required this.seenAt,
+    required this.variantKey,
+    this.snapshotJson,
+  });
+
+  final String id;
+  final String visitorId;
+  final DateTime seenAt;
+  final String variantKey;
+  final String? snapshotJson;
+
+  Map<String, Object?> toMap() => <String, Object?>{
+    'id': id,
+    'visitor_id': visitorId,
+    'seen_at': seenAt.millisecondsSinceEpoch,
+    'variant_key': variantKey,
+    'snapshot_json': snapshotJson,
+  };
+
+  factory VisitorEncounter.fromMap(Map<String, Object?> map) =>
+      VisitorEncounter(
+        id: map['id']! as String,
+        visitorId: map['visitor_id']! as String,
+        seenAt: DateTime.fromMillisecondsSinceEpoch(map['seen_at']! as int),
+        variantKey: map['variant_key']! as String,
+        snapshotJson: map['snapshot_json'] as String?,
+      );
+}

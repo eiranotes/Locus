@@ -186,7 +186,8 @@ extension AppControllerActions on AppController {
       _lastCaptureBundle = bundle;
       output = bundle;
       await _reloadAll();
-      await refreshCapturePreparation(notify: false);
+      await _refreshCapturePreparationState(requestLocationPermission: false);
+      await _evaluateAndPersistVisitors();
     });
     notifyChanged();
     return output;
@@ -344,15 +345,30 @@ extension AppControllerActions on AppController {
 
   VisitorEvaluation? get targetVisitor {
     final snapshot = dioramaSnapshot;
-    final unseen =
-        snapshot.visitorEvaluations.where((VisitorEvaluation item) {
-          return !_visitorSightings.any(
-            (VisitorSighting sighting) => sighting.visitorId == item.visitor.id,
-          );
-        }).toList()..sort((VisitorEvaluation a, VisitorEvaluation b) {
-          return b.satisfiedCount.compareTo(a.satisfiedCount);
-        });
-    return unseen.firstOrNull ?? snapshot.visitorEvaluations.firstOrNull;
+    return const VisitorSelectionPolicy().target(
+      evaluations: snapshot.visitorEvaluations,
+      sightings: _visitorSightings,
+      now: DateTime.now(),
+      repeatCooldown: Duration(
+        hours: catalog.balance.repeatVisitorCooldownHours,
+      ),
+    );
+  }
+
+  Duration? visitorRepeatWait(String visitorId) {
+    final previous = _visitorSightings
+        .where((VisitorSighting sighting) => sighting.visitorId == visitorId)
+        .firstOrNull;
+    if (previous == null) return null;
+    final cooldown = Duration(
+      hours: catalog.balance.repeatVisitorCooldownHours,
+    );
+    final measuredElapsed = DateTime.now().difference(previous.lastSeenAt);
+    final elapsed = measuredElapsed.isNegative
+        ? Duration.zero
+        : measuredElapsed;
+    if (elapsed >= cooldown) return Duration.zero;
+    return cooldown - elapsed;
   }
 
   VisitorEvaluation? previewTargetVisitor({
@@ -531,53 +547,67 @@ extension AppControllerActions on AppController {
     final seenById = <String, VisitorSighting>{
       for (final sighting in _visitorSightings) sighting.visitorId: sighting,
     };
-
-    for (final evaluation in snapshot.visitorEvaluations) {
-      if (!evaluation.satisfied) continue;
-      final previous = seenById[evaluation.visitor.id];
-      final repeatReady =
-          previous == null ||
-          now.difference(previous.lastSeenAt) >=
-              Duration(hours: catalog.balance.repeatVisitorCooldownHours);
-      if (!repeatReady) continue;
-      final sighting = VisitorSighting(
-        id: previous?.id ?? uuid.v4(),
-        visitorId: evaluation.visitor.id,
-        firstSeenAt: previous?.firstSeenAt ?? now,
-        lastSeenAt: now,
-        variantKey:
-            '${sceneWeatherKind.name}_${sceneTimeBand.name}_${_captures.firstOrNull?.coarseCellId ?? 'local'}',
-        snapshotJson: VisitorSighting.encodeSnapshot(<String, Object?>{
-          'weather': sceneWeatherKind.name,
-          'timeBand': sceneTimeBand.name,
-          'objects': _placements
-              .map((Placement item) => item.craftedObjectId)
-              .toList(),
-        }),
-      );
-      final nextRecipeIds = Set<String>.from(_unlockedRecipeIds);
-      final nextRewardKeys = Set<String>.from(_unlockedRewardKeys);
-      final reward = evaluation.visitor.reward;
-      final rewardKey = '${reward.kind.name}:${reward.value}';
-      if (nextRewardKeys.add(rewardKey) &&
-          reward.kind == VisitorRewardKind.recipe) {
-        nextRecipeIds.add(reward.value);
-      }
-      await repository.saveVisitorResolution(
-        sighting: sighting,
-        unlockedRecipeIds: nextRecipeIds,
-        unlockedRewardKeys: nextRewardKeys,
-      );
-      _visitorSightings = _replaceById(
-        _visitorSightings,
-        sighting,
-        (VisitorSighting value) => value.id,
-      );
-      _unlockedRecipeIds = nextRecipeIds;
-      _unlockedRewardKeys = nextRewardKeys;
-      if (previous == null) _newVisitorId = evaluation.visitor.id;
-      break;
+    final evaluation = const VisitorSelectionPolicy().arriving(
+      evaluations: snapshot.visitorEvaluations,
+      sightings: _visitorSightings,
+      now: now,
+      repeatCooldown: Duration(
+        hours: catalog.balance.repeatVisitorCooldownHours,
+      ),
+    );
+    if (evaluation == null) return;
+    final previous = seenById[evaluation.visitor.id];
+    final variantKey =
+        '${sceneWeatherKind.name}_${sceneTimeBand.name}_${_captures.firstOrNull?.coarseCellId ?? 'local'}';
+    final snapshotJson = VisitorSighting.encodeSnapshot(<String, Object?>{
+      'weather': sceneWeatherKind.name,
+      'timeBand': sceneTimeBand.name,
+      'objects': _placements
+          .map((Placement item) => item.craftedObjectId)
+          .toList(),
+    });
+    final sighting = VisitorSighting(
+      id: previous?.id ?? uuid.v4(),
+      visitorId: evaluation.visitor.id,
+      firstSeenAt: previous?.firstSeenAt ?? now,
+      lastSeenAt: now,
+      variantKey: variantKey,
+      snapshotJson: snapshotJson,
+    );
+    final encounter = VisitorEncounter(
+      id: uuid.v4(),
+      visitorId: evaluation.visitor.id,
+      seenAt: now,
+      variantKey: variantKey,
+      snapshotJson: snapshotJson,
+    );
+    final nextRecipeIds = Set<String>.from(_unlockedRecipeIds);
+    final nextRewardKeys = Set<String>.from(_unlockedRewardKeys);
+    final reward = evaluation.visitor.reward;
+    final rewardKey = '${reward.kind.name}:${reward.value}';
+    if (nextRewardKeys.add(rewardKey) &&
+        reward.kind == VisitorRewardKind.recipe) {
+      nextRecipeIds.add(reward.value);
     }
+    await repository.saveVisitorResolution(
+      sighting: sighting,
+      encounter: encounter,
+      unlockedRecipeIds: nextRecipeIds,
+      unlockedRewardKeys: nextRewardKeys,
+    );
+    _visitorSightings = _replaceById(
+      _visitorSightings,
+      sighting,
+      (VisitorSighting value) => value.id,
+    );
+    _visitorEncounterCounts = <String, int>{
+      ..._visitorEncounterCounts,
+      evaluation.visitor.id:
+          (_visitorEncounterCounts[evaluation.visitor.id] ?? 0) + 1,
+    };
+    _unlockedRecipeIds = nextRecipeIds;
+    _unlockedRewardKeys = nextRewardKeys;
+    if (previous == null) _newVisitorId = evaluation.visitor.id;
   }
 
   Placement? _firstAvailablePlacement(
@@ -627,6 +657,7 @@ extension AppControllerActions on AppController {
     _craftedObjects = await repository.loadCraftedObjects();
     _placements = await repository.loadPlacements();
     _visitorSightings = await repository.loadVisitorSightings();
+    _visitorEncounterCounts = await repository.loadVisitorEncounterCounts();
   }
 
   Future<void> _guard(Future<void> Function() action) async {

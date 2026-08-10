@@ -5,7 +5,9 @@ import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
+import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/ui/number_format.dart';
+import 'package:reality_diorama/src/ui/pattern_presentation.dart';
 import 'package:reality_diorama/src/ui/widgets/object_visual_preview.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 
@@ -73,7 +75,7 @@ class _VisitorsTab extends StatelessWidget {
             label: '만난 방문자',
             completed: seenIds.length,
             total: controller.catalog.visitors.length,
-            supportingText: '계절과 배치를 바꾸며 네 개의 방문자 기록을 채워보세요.',
+            supportingText: '시간·날씨 패턴을 단서로 삼아 방문자 기록을 채워보세요.',
           ),
         ),
         for (final group in groups) ...<Widget>[
@@ -93,12 +95,27 @@ class _VisitorsTab extends StatelessWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio: 0.77,
+                childAspectRatio: 0.72,
               ),
               itemCount: group.items.length,
               itemBuilder: (BuildContext context, int index) {
                 final visitor = group.items[index];
                 final discovered = seenIds.contains(visitor.id);
+                final encounterCount =
+                    controller.visitorEncounterCounts[visitor.id] ?? 0;
+                final sighting = controller.visitorSightings
+                    .where(
+                      (VisitorSighting item) => item.visitorId == visitor.id,
+                    )
+                    .firstOrNull;
+                final clue = visitorPatternEvidence(
+                  visitor,
+                  controller.collectedPatterns,
+                ).firstOrNull;
+                final rewardRecipe =
+                    visitor.reward.kind == VisitorRewardKind.recipe
+                    ? controller.catalog.recipeById(visitor.reward.value)
+                    : null;
                 return PixelCard(
                   radius: PixelRadii.tile,
                   color: discovered ? PixelPalette.scene : Colors.transparent,
@@ -151,10 +168,33 @@ class _VisitorsTab extends StatelessWidget {
                       Text(
                         discovered
                             ? visitor.descriptionKo
-                            : visitor.hintsKo.first,
-                        maxLines: 3,
+                            : clue == null
+                            ? visitor.hintsKo.first
+                            : '패턴 단서 · ${compactPatternLabel(clue.pattern)}',
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      if (discovered) ...<Widget>[
+                        const SizedBox(height: 4),
+                        Text(
+                          '$encounterCount회 방문 · ${_visitorSceneLabel(sighting)}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: PixelPalette.visitor),
+                        ),
+                      ],
+                      const SizedBox(height: 5),
+                      Text(
+                        discovered && rewardRecipe != null
+                            ? '${rewardRecipe.nameKo} 해금'
+                            : '첫 만남 보상 · 새 만드는 법',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: PixelPalette.reward,
+                        ),
                       ),
                     ],
                   ),
@@ -167,6 +207,19 @@ class _VisitorsTab extends StatelessWidget {
       ],
     );
   }
+}
+
+String _visitorSceneLabel(VisitorSighting? sighting) {
+  if (sighting == null) return '장면 기록 없음';
+  final parts = sighting.variantKey.split('_');
+  if (parts.length < 2) return '장면 기록';
+  final weather = enumByName(
+    WeatherMaterialKind.values,
+    parts[0],
+    WeatherMaterialKind.cloudy,
+  );
+  final time = enumByName(TimeBand.values, parts[1], TimeBand.evening);
+  return '${weather.labelKo} · ${time.labelKo}';
 }
 
 class _ObjectKindsTab extends StatelessWidget {

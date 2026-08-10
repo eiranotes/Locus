@@ -17,6 +17,75 @@ final class PatternVisualDescriptor {
   final int componentCount;
 }
 
+final class VisitorPatternEvidence {
+  const VisitorPatternEvidence({
+    required this.requirementIndex,
+    required this.pattern,
+  });
+
+  final int requirementIndex;
+  final CollectedPattern pattern;
+}
+
+List<VisitorPatternEvidence> visitorPatternEvidence(
+  VisitorDefinition visitor,
+  Iterable<CollectedPattern> patterns,
+) {
+  final latestByKey = <String, CollectedPattern>{};
+  for (final pattern in patterns) {
+    final previous = latestByKey[pattern.patternKey];
+    if (previous == null || pattern.capturedAt.isAfter(previous.capturedAt)) {
+      latestByKey[pattern.patternKey] = pattern;
+    }
+  }
+  final evidence = <VisitorPatternEvidence>[];
+  for (var index = 0; index < visitor.requirements.length; index += 1) {
+    final requirement = visitor.requirements[index];
+    final prefixes = switch (requirement.kind) {
+      'timeBand' => requirement.anyOf.map((String value) => 'time.$value'),
+      'weatherKind' => requirement.anyOf.map(
+        (String value) => 'weather.kind.$value',
+      ),
+      _ => const Iterable<String>.empty(),
+    };
+    CollectedPattern? match;
+    for (final key in prefixes) {
+      final candidate = latestByKey[key];
+      if (candidate != null &&
+          (match == null || candidate.capturedAt.isAfter(match.capturedAt))) {
+        match = candidate;
+      }
+    }
+    if (match != null) {
+      evidence.add(
+        VisitorPatternEvidence(requirementIndex: index, pattern: match),
+      );
+    }
+  }
+  return evidence;
+}
+
+int visitorClueCountForPattern(
+  CollectedPattern pattern,
+  Iterable<VisitorDefinition> visitors,
+) {
+  final key = pattern.patternKey;
+  if (!key.startsWith('time.') && !key.startsWith('weather.kind.')) return 0;
+  return visitors.where((VisitorDefinition visitor) {
+    return visitor.requirements.any((VisitorRequirement requirement) {
+      return switch (requirement.kind) {
+        'timeBand' => requirement.anyOf.any(
+          (String value) => key == 'time.$value',
+        ),
+        'weatherKind' => requirement.anyOf.any(
+          (String value) => key == 'weather.kind.$value',
+        ),
+        _ => false,
+      };
+    });
+  }).length;
+}
+
 PatternVisualDescriptor combinationPatternVisualDescriptor(
   CollectedPattern pattern,
   Map<String, CollectedPattern> patternsByKey,

@@ -30,6 +30,7 @@ class _CaptureSheetState extends State<CaptureSheet> {
   bool _includeSurroundings = true;
   bool _capturing = false;
   CaptureBundle? _result;
+  VisitorDefinition? _targetAtCapture;
 
   @override
   void initState() {
@@ -111,7 +112,11 @@ class _CaptureSheetState extends State<CaptureSheet> {
                           setState(() => _includeSurroundings = value);
                         },
                       )
-                    : _ResultView(bundle: _result!),
+                    : _ResultView(
+                        bundle: _result!,
+                        targetVisitor: _targetAtCapture,
+                        allCollectedPatterns: controller.collectedPatterns,
+                      ),
               ),
               const SizedBox(height: 14),
               if (!_capturing && _result == null)
@@ -174,6 +179,7 @@ class _CaptureSheetState extends State<CaptureSheet> {
       return;
     }
     setState(() => _capturing = true);
+    _targetAtCapture = controller.targetVisitor?.visitor;
     final bundle = await controller.performCapture(
       includeSurroundings: include,
     );
@@ -454,9 +460,15 @@ class _CaptureProgress extends StatelessWidget {
 }
 
 class _ResultView extends StatelessWidget {
-  const _ResultView({required this.bundle});
+  const _ResultView({
+    required this.bundle,
+    required this.targetVisitor,
+    required this.allCollectedPatterns,
+  });
 
   final CaptureBundle bundle;
+  final VisitorDefinition? targetVisitor;
+  final List<CollectedPattern> allCollectedPatterns;
 
   @override
   Widget build(BuildContext context) {
@@ -550,7 +562,11 @@ class _ResultView extends StatelessWidget {
           const PixelCard(child: Text('새로 준비된 재료가 없어 기록만 확인했습니다.')),
         if (bundle.patterns.isNotEmpty) ...<Widget>[
           const SizedBox(height: 14),
-          _CollectedPatternsSection(patterns: bundle.patterns),
+          _CollectedPatternsSection(
+            patterns: bundle.patterns,
+            allCollectedPatterns: allCollectedPatterns,
+            targetVisitor: targetVisitor,
+          ),
         ],
         const SizedBox(height: 14),
         Text(
@@ -565,9 +581,15 @@ class _ResultView extends StatelessWidget {
 }
 
 class _CollectedPatternsSection extends StatelessWidget {
-  const _CollectedPatternsSection({required this.patterns});
+  const _CollectedPatternsSection({
+    required this.patterns,
+    required this.allCollectedPatterns,
+    required this.targetVisitor,
+  });
 
   final List<CollectedPattern> patterns;
+  final List<CollectedPattern> allCollectedPatterns;
+  final VisitorDefinition? targetVisitor;
 
   @override
   Widget build(BuildContext context) {
@@ -581,6 +603,21 @@ class _CollectedPatternsSection extends StatelessWidget {
       for (final pattern in patterns) pattern.patternKey: pattern,
     };
     final representatives = representativeCombinationPatterns(patterns);
+    final countsByKey = <String, int>{};
+    for (final pattern in allCollectedPatterns) {
+      countsByKey.update(
+        pattern.patternKey,
+        (int value) => value + 1,
+        ifAbsent: () => 1,
+      );
+    }
+    final newCount = patterns.where((CollectedPattern pattern) {
+      return countsByKey[pattern.patternKey] == 1;
+    }).length;
+    final repeatedCount = patterns.length - newCount;
+    final targetEvidence = targetVisitor == null
+        ? const <VisitorPatternEvidence>[]
+        : visitorPatternEvidence(targetVisitor!, patterns);
     final timeAndSeasonCount = individual
         .where(
           (CollectedPattern value) =>
@@ -616,7 +653,7 @@ class _CollectedPatternsSection extends StatelessWidget {
                 ),
               ),
               Text(
-                '${patterns.length}개',
+                '신규 $newCount · 다시 만남 $repeatedCount',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
@@ -664,6 +701,18 @@ class _CollectedPatternsSection extends StatelessWidget {
                 ),
               ),
             ],
+          ],
+          if (targetEvidence.isNotEmpty) ...<Widget>[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: PixelRule(),
+            ),
+            _PatternResultSummary(
+              title: '${targetVisitor!.nameKo} 단서',
+              count: targetEvidence.length,
+              summary:
+                  '${targetEvidence.map((VisitorPatternEvidence item) => compactPatternLabel(item.pattern)).join(' · ')} · 소모되지 않음',
+            ),
           ],
         ],
       ),

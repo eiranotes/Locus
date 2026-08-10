@@ -8,6 +8,7 @@ import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/domain/engines/visitor_engine.dart';
 import 'package:reality_diorama/src/ui/number_format.dart';
+import 'package:reality_diorama/src/ui/pattern_presentation.dart';
 import 'package:reality_diorama/src/ui/screens/crafting_screen.dart';
 import 'package:reality_diorama/src/ui/screens/placement_editor_screen.dart';
 import 'package:reality_diorama/src/ui/screens/settings_screen.dart';
@@ -39,12 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final construction = controller.construction;
 
     return RefreshIndicator(
-      onRefresh: () async {
-        if (controller.stepTrackingConfigured) {
-          await controller.refreshSteps();
-        }
-        await controller.refreshCapturePreparation();
-      },
+      onRefresh: controller.refreshWorld,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: <Widget>[
@@ -87,7 +83,24 @@ class _HomeScreenState extends State<HomeScreen> {
                             left: 10,
                             right: 10,
                             top: 10,
-                            child: _VisitorGoal(evaluation: target),
+                            child: _VisitorGoal(
+                              evaluation: target,
+                              collectedPatterns: controller.collectedPatterns,
+                              discovered: controller.visitorSightings.any(
+                                (VisitorSighting sighting) =>
+                                    sighting.visitorId == target.visitor.id,
+                              ),
+                              repeatWait: controller.visitorRepeatWait(
+                                target.visitor.id,
+                              ),
+                              rewardRecipeName:
+                                  target.visitor.reward.kind ==
+                                      VisitorRewardKind.recipe
+                                  ? controller.catalog
+                                        .recipeById(target.visitor.reward.value)
+                                        .nameKo
+                                  : null,
+                            ),
                           ),
                         Positioned(
                           left: 10,
@@ -261,14 +274,32 @@ class _ResourceStrip extends StatelessWidget {
 }
 
 class _VisitorGoal extends StatelessWidget {
-  const _VisitorGoal({required this.evaluation});
+  const _VisitorGoal({
+    required this.evaluation,
+    required this.collectedPatterns,
+    required this.discovered,
+    required this.repeatWait,
+    this.rewardRecipeName,
+  });
 
   final VisitorEvaluation evaluation;
+  final List<CollectedPattern> collectedPatterns;
+  final bool discovered;
+  final Duration? repeatWait;
+  final String? rewardRecipeName;
 
   @override
   Widget build(BuildContext context) {
     final missing = evaluation.progress
         .where((RequirementProgress item) => !item.satisfied)
+        .firstOrNull;
+    final missingIndex = missing == null
+        ? -1
+        : evaluation.progress.indexOf(missing);
+    final clue = visitorPatternEvidence(evaluation.visitor, collectedPatterns)
+        .where((VisitorPatternEvidence item) {
+          return item.requirementIndex == missingIndex;
+        })
         .firstOrNull;
     return Material(
       color: PixelPalette.surface.withValues(alpha: 0.94),
@@ -302,7 +333,7 @@ class _VisitorGoal extends StatelessWidget {
                     children: <Widget>[
                       Expanded(
                         child: Text(
-                          '다음 방문자 · ${evaluation.visitor.nameKo}',
+                          '${discovered ? '다시 올 방문자' : '다음 방문자'} · ${evaluation.visitor.nameKo}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context).textTheme.titleMedium,
@@ -326,6 +357,25 @@ class _VisitorGoal extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
+                  const SizedBox(height: 2),
+                  Text(
+                    repeatWait != null && repeatWait! > Duration.zero
+                        ? _repeatWaitLabel(repeatWait!)
+                        : clue != null
+                        ? '패턴 단서 · ${compactPatternLabel(clue.pattern)}에서 다시 확인'
+                        : discovered
+                        ? '조건이 맞으면 장면 기록이 하나 더 남습니다.'
+                        : rewardRecipeName == null
+                        ? '조건을 맞추면 새 기록이 열립니다.'
+                        : '첫 만남 보상 · $rewardRecipeName',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: clue != null
+                          ? PixelPalette.weather
+                          : PixelPalette.reward,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -334,6 +384,12 @@ class _VisitorGoal extends StatelessWidget {
       ),
     );
   }
+}
+
+String _repeatWaitLabel(Duration duration) {
+  final minutes = duration.inMinutes.clamp(1, 24 * 60);
+  if (minutes < 60) return '$minutes분 뒤 장면 기록 가능';
+  return '${(minutes + 59) ~/ 60}시간 뒤 장면 기록 가능';
 }
 
 String _visitorRequirementSummary(RequirementProgress progress) {

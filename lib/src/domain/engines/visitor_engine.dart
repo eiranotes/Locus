@@ -32,6 +32,125 @@ class VisitorEvaluation {
       progress.where((RequirementProgress item) => item.satisfied).length;
 }
 
+/// Keeps the visitor shown as the next goal aligned with the visitor that can
+/// actually arrive. New visitors always outrank repeats; repeat candidates are
+/// ordered by the oldest last visit so one catalog entry cannot monopolize the
+/// scene after every cooldown.
+class VisitorSelectionPolicy {
+  const VisitorSelectionPolicy();
+
+  VisitorEvaluation? target({
+    required List<VisitorEvaluation> evaluations,
+    required Iterable<VisitorSighting> sightings,
+    required DateTime now,
+    required Duration repeatCooldown,
+  }) {
+    if (evaluations.isEmpty) return null;
+    final sightingsByVisitor = <String, VisitorSighting>{
+      for (final sighting in sightings) sighting.visitorId: sighting,
+    };
+    final unseen = _orderedByProgress(
+      evaluations
+          .where(
+            (VisitorEvaluation evaluation) =>
+                !sightingsByVisitor.containsKey(evaluation.visitor.id),
+          )
+          .toList(growable: false),
+      evaluations,
+    );
+    if (unseen.isNotEmpty) return unseen.first;
+
+    final repeatReady =
+        evaluations
+            .where((VisitorEvaluation evaluation) {
+              if (!evaluation.satisfied) return false;
+              final previous = sightingsByVisitor[evaluation.visitor.id];
+              return previous != null &&
+                  now.difference(previous.lastSeenAt) >= repeatCooldown;
+            })
+            .toList(growable: false)
+          ..sort((VisitorEvaluation a, VisitorEvaluation b) {
+            final byTime = sightingsByVisitor[a.visitor.id]!.lastSeenAt
+                .compareTo(sightingsByVisitor[b.visitor.id]!.lastSeenAt);
+            if (byTime != 0) return byTime;
+            return _catalogIndex(
+              evaluations,
+              a,
+            ).compareTo(_catalogIndex(evaluations, b));
+          });
+    if (repeatReady.isNotEmpty) return repeatReady.first;
+    return _orderedByProgress(evaluations, evaluations).first;
+  }
+
+  VisitorEvaluation? arriving({
+    required List<VisitorEvaluation> evaluations,
+    required Iterable<VisitorSighting> sightings,
+    required DateTime now,
+    required Duration repeatCooldown,
+  }) {
+    final sightingsByVisitor = <String, VisitorSighting>{
+      for (final sighting in sightings) sighting.visitorId: sighting,
+    };
+    final unseenSatisfied = _orderedByProgress(
+      evaluations
+          .where(
+            (VisitorEvaluation evaluation) =>
+                evaluation.satisfied &&
+                !sightingsByVisitor.containsKey(evaluation.visitor.id),
+          )
+          .toList(growable: false),
+      evaluations,
+    );
+    if (unseenSatisfied.isNotEmpty) return unseenSatisfied.first;
+
+    final repeatReady =
+        evaluations
+            .where((VisitorEvaluation evaluation) {
+              if (!evaluation.satisfied) return false;
+              final previous = sightingsByVisitor[evaluation.visitor.id];
+              return previous != null &&
+                  now.difference(previous.lastSeenAt) >= repeatCooldown;
+            })
+            .toList(growable: false)
+          ..sort((VisitorEvaluation a, VisitorEvaluation b) {
+            final byTime = sightingsByVisitor[a.visitor.id]!.lastSeenAt
+                .compareTo(sightingsByVisitor[b.visitor.id]!.lastSeenAt);
+            if (byTime != 0) return byTime;
+            return _catalogIndex(
+              evaluations,
+              a,
+            ).compareTo(_catalogIndex(evaluations, b));
+          });
+    return repeatReady.firstOrNull;
+  }
+
+  List<VisitorEvaluation> _orderedByProgress(
+    List<VisitorEvaluation> candidates,
+    List<VisitorEvaluation> catalogOrder,
+  ) =>
+      candidates.toList(growable: false)
+        ..sort((VisitorEvaluation a, VisitorEvaluation b) {
+          if (a.satisfied != b.satisfied) return a.satisfied ? -1 : 1;
+          final bySatisfied = b.satisfiedCount.compareTo(a.satisfiedCount);
+          if (bySatisfied != 0) return bySatisfied;
+          final byMissing = (a.progress.length - a.satisfiedCount).compareTo(
+            b.progress.length - b.satisfiedCount,
+          );
+          if (byMissing != 0) return byMissing;
+          return _catalogIndex(
+            catalogOrder,
+            a,
+          ).compareTo(_catalogIndex(catalogOrder, b));
+        });
+
+  int _catalogIndex(
+    List<VisitorEvaluation> evaluations,
+    VisitorEvaluation candidate,
+  ) => evaluations.indexWhere(
+    (VisitorEvaluation item) => item.visitor.id == candidate.visitor.id,
+  );
+}
+
 class VisitorContext {
   const VisitorContext({
     required this.grid,

@@ -6,7 +6,7 @@ class AppDatabase {
 
   final Database database;
 
-  static const int schemaVersion = 3;
+  static const int schemaVersion = 4;
   static const String productionDatabaseName = 'reality_diorama.sqlite3';
   static const String demoDatabaseName = 'reality_diorama_demo.sqlite3';
 
@@ -117,6 +117,7 @@ class AppDatabase {
         snapshot_json TEXT
       )
     ''');
+    await _createVisitorEncounters(db);
     await db.execute('''
       CREATE TABLE metadata (
         key TEXT PRIMARY KEY,
@@ -152,6 +153,33 @@ class AppDatabase {
     if (oldVersion < 3) {
       await _createCollectedPatterns(db);
     }
+    if (oldVersion < 4) {
+      await _createVisitorEncounters(db);
+      await db.execute('''
+        INSERT OR IGNORE INTO visitor_encounters (
+          id, visitor_id, seen_at, variant_key, snapshot_json
+        )
+        SELECT
+          'legacy-' || id, visitor_id, last_seen_at, variant_key, snapshot_json
+        FROM visitor_sightings
+      ''');
+    }
+  }
+
+  static Future<void> _createVisitorEncounters(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS visitor_encounters (
+        id TEXT PRIMARY KEY,
+        visitor_id TEXT NOT NULL,
+        seen_at INTEGER NOT NULL,
+        variant_key TEXT NOT NULL,
+        snapshot_json TEXT
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_visitor_encounter_time '
+      'ON visitor_encounters(visitor_id, seen_at DESC)',
+    );
   }
 
   static Future<void> _createCollectedPatterns(Database db) async {

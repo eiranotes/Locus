@@ -69,6 +69,33 @@ class GameRepository {
     return rows.map(VisitorSighting.fromMap).toList(growable: false);
   }
 
+  Future<Map<String, int>> loadVisitorEncounterCounts() async {
+    final rows = await _db.rawQuery('''
+      SELECT visitor_id, COUNT(*) AS encounter_count
+      FROM visitor_encounters
+      GROUP BY visitor_id
+    ''');
+    return <String, int>{
+      for (final row in rows)
+        row['visitor_id']! as String: (row['encounter_count']! as num).toInt(),
+    };
+  }
+
+  Future<List<VisitorEncounter>> loadRecentVisitorEncounters({
+    required String visitorId,
+    int limit = 5,
+  }) async {
+    final boundedLimit = limit.clamp(1, 5);
+    final rows = await _db.query(
+      'visitor_encounters',
+      where: 'visitor_id = ?',
+      whereArgs: <Object?>[visitorId],
+      orderBy: 'seen_at DESC',
+      limit: boundedLimit,
+    );
+    return rows.map(VisitorEncounter.fromMap).toList(growable: false);
+  }
+
   Future<void> saveCapture({
     required CaptureRecord record,
     WeatherMaterial? weather,
@@ -223,6 +250,7 @@ class GameRepository {
 
   Future<void> saveVisitorResolution({
     required VisitorSighting sighting,
+    required VisitorEncounter encounter,
     required Set<String> unlockedRecipeIds,
     required Set<String> unlockedRewardKeys,
   }) async {
@@ -231,6 +259,11 @@ class GameRepository {
         'visitor_sightings',
         sighting.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      await transaction.insert(
+        'visitor_encounters',
+        encounter.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.ignore,
       );
       await transaction.insert('metadata', <String, Object?>{
         'key': 'unlocked_recipe_ids',

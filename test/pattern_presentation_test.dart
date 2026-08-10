@@ -114,4 +114,44 @@ void main() {
     expect(compactPatternLabel(time), TimeBand.afternoon.labelKo);
     expect(compactPatternLabel(weather), WeatherMaterialKind.cloudy.labelKo);
   });
+
+  test('time and weather patterns act as non-consuming visitor clues', () {
+    final visitor = VisitorDefinition(
+      id: 'pattern-visitor',
+      nameKo: '패턴 방문자',
+      descriptionKo: '테스트',
+      hintsKo: const <String>['테스트'],
+      requirements: const <VisitorRequirement>[
+        VisitorRequirement(kind: 'timeBand', anyOf: <String>['afternoon']),
+        VisitorRequirement(kind: 'weatherKind', anyOf: <String>['cloudy']),
+        VisitorRequirement(kind: 'wetCells', minimum: 2),
+      ],
+      reward: const VisitorReward(
+        kind: VisitorRewardKind.effect,
+        value: 'test',
+      ),
+    );
+
+    final evidence = visitorPatternEvidence(visitor, patterns);
+
+    expect(evidence, hasLength(2));
+    expect(
+      evidence.map((VisitorPatternEvidence item) => item.requirementIndex),
+      <int>[0, 1],
+    );
+    expect(
+      visitorClueCountForPattern(
+        patternsByKey['weather.kind.cloudy']!,
+        <VisitorDefinition>[visitor],
+      ),
+      1,
+    );
+    expect(
+      visitorClueCountForPattern(
+        patternsByKey['weather.temperature.mild']!,
+        <VisitorDefinition>[visitor],
+      ),
+      0,
+    );
+  });
 }

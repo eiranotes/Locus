@@ -33,6 +33,14 @@
 - [x] Replace generic pattern and combination glyphs with shared state-derived
       pixel marks, stepped disclosure carets, ledger dividers, and simulator
       evidence for collapsed, expanded, and combination states.
+- [x] Unify cold-launch, resume, capture, step/construction, and visitor
+      refresh ordering without requesting location permission out of context.
+- [x] Use one deterministic visitor-selection policy for the visible target and
+      actual arrival, with unseen visitors ahead of repeat-ready visitors.
+- [x] Connect time/weather patterns to visitor hints as non-consuming evidence
+      and distinguish new from repeated patterns in capture results.
+- [x] Persist repeat visitor encounters as bounded coarse scene memories and
+      expose visit count plus latest weather/time context in the codex.
 
 ## Next
 
@@ -87,6 +95,8 @@
 - [x] Add direct drag-to-cell manipulation across placed objects and
       long-press catalog drops with tested Flame/Flutter projection behavior.
 - [x] Add target-visitor condition deltas for proposed placements.
+- [x] Name newly completed visitor conditions during placement previews instead
+      of showing only an anonymous before/after count.
 - [ ] Add compact/medium/expanded layout policies and large-text fallbacks for
       records, visitors, material pickers, and the placement catalog.
 

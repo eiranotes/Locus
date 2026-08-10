@@ -14,7 +14,7 @@ class LocationFix {
 }
 
 abstract interface class LocationGateway {
-  Future<LocationFix> current();
+  Future<LocationFix> current({bool requestPermission = true});
 }
 
 class GeolocatorLocationGateway implements LocationGateway {
@@ -27,14 +27,14 @@ class GeolocatorLocationGateway implements LocationGateway {
   final double fallbackLongitude;
 
   @override
-  Future<LocationFix> current() async {
+  Future<LocationFix> current({bool requestPermission = true}) async {
     try {
       final enabled = await Geolocator.isLocationServiceEnabled();
       if (!enabled) {
         return _fallback();
       }
       var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
+      if (permission == LocationPermission.denied && requestPermission) {
         permission = await Geolocator.requestPermission();
       }
       if (permission == LocationPermission.denied ||
@@ -76,9 +76,14 @@ class DemoLocationGateway implements LocationGateway {
   const DemoLocationGateway();
 
   @override
-  Future<LocationFix> current() async => const LocationFix(
-    point: GeoPoint(latitude: 37.5446, longitude: 127.0559, accuracyMeters: 30),
-    label: '성수동',
-    isFallback: false,
-  );
+  Future<LocationFix> current({bool requestPermission = true}) async =>
+      const LocationFix(
+        point: GeoPoint(
+          latitude: 37.5446,
+          longitude: 127.0559,
+          accuracyMeters: 30,
+        ),
+        label: '성수동',
+        isFallback: false,
+      );
 }

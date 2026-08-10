@@ -4,6 +4,15 @@
 
 ### Fixed
 
+- Cold launch, app resume, capture, and construction completion now refresh
+  readiness and visitor eligibility in a consistent order.
+- Satisfied unseen visitors can no longer be preempted by a repeat-ready entry
+  earlier in catalog order; the shown target and actual arrival use one policy.
+- Passive app refresh no longer risks asking for location permission outside
+  the focused capture flow.
+- Visitor codex copy no longer claims that the 18-entry catalog has four
+  records.
+
 - Visitor goals no longer expose internal English object, tag, weather, or time
   identifiers in Korean UI.
 - Capture-result material art is precached and shows a glyph until the first
@@ -34,6 +43,16 @@
 - Prototype version text is now debug-only and cannot appear in a release UI.
 
 ### Changed
+
+- Time and representative-weather patterns now appear as non-consuming visitor
+  clues on home, capture results, inventory, and codex surfaces.
+- Capture results distinguish new and repeated pattern occurrences and name
+  the current target visitor when the capture contains a matching clue.
+- Repeat visitor encounters now append a coarse scene-memory row in SQLite v4;
+  the codex shows total visits and the latest weather/time context.
+- Home shows repeat cooldown wait text, visitor first-meeting rewards, and
+  action-oriented pattern hints. Placement feedback names conditions completed
+  by the proposed drop.
 
 - Captures now produce separately collectible time, season, weather, and
   aggregate-surroundings patterns. When multiple inputs arrive together, up to
@@ -158,6 +177,9 @@
   pixels do not obscure the daytime neighborhood grid.
 
 ### Tests
+
+- Added visitor priority, repeat fairness, passive-permission, pattern-evidence,
+  and scene-memory serialization coverage.
 
 - Added deterministic pattern-engine coverage for both collection channels,
   channel-specific failure paths, exact individual/combination counts,

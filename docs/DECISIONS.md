@@ -2,6 +2,40 @@
 
 ## 2026-08-10
 
+### World refresh and visitor selection share one return-loop contract
+
+Cold launch and app resume now refresh steps and construction, passively
+prepare capture readiness, then evaluate visitors in that order. Capture,
+manual step refresh, step-source configuration, crafting, placement, and
+storage changes all evaluate visitors after their state mutation. Passive
+refresh checks existing location authorization but never opens a permission
+prompt; the focused capture sheet remains the only path that may request it.
+Provider failure continues to leave weather visitor requirements unavailable
+rather than satisfying them from rendered fallback atmosphere.
+
+`VisitorSelectionPolicy` is the deterministic source for both the home target
+and the actual arrival candidate. Satisfied unseen visitors always outrank
+repeat visitors. After all visitors are discovered, the oldest repeat-ready
+satisfied visitor wins, preventing catalog order from monopolizing six-hour
+returns. Home exposes the remaining repeat wait and the exact placement
+condition that a valid drag would complete.
+
+### Patterns are evidence, not currency, and repeat visits are scene memories
+
+Time and representative-weather patterns can explain matching time/weather
+visitor requirements in capture results, inventory, home, and codex. This link
+never consumes a pattern, never auto-satisfies a visitor, and never gates a
+recipe. Signal-strength bands and surroundings patterns remain collectible
+context rather than being forced into visitor requirements that do not exist.
+
+SQLite schema v4 adds append-only `visitor_encounters` beside the existing
+per-visitor latest-sighting row. Each encounter stores only visit time, coarse
+weather/time variant, placed object IDs, and the already-bounded scene snapshot;
+raw Bluetooth data is still prohibited. Migration backfills one legacy
+encounter per existing sighting. The controller loads grouped counts rather
+than scanning the history, while repository callers may request at most five
+recent encounters for a visitor.
+
 ### One capture can yield individual and simultaneous-combination patterns
 
 A successful capture no longer collapses all available context into only one

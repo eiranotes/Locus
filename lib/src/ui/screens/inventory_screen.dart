@@ -411,7 +411,7 @@ class _PatternsTab extends StatelessWidget {
         _PatternSectionHeading(
           title: '개별 패턴',
           count: individualCount,
-          body: '필요한 분류만 펼쳐서 확인',
+          body: '시간·날씨 기록은 방문자 조건을 읽는 비소모 단서',
         ),
         const SizedBox(height: 10),
         PixelCard(
@@ -423,6 +423,7 @@ class _PatternsTab extends StatelessWidget {
                 title: '시간과 계절',
                 family: CapturePatternFamily.time,
                 patterns: timeAndSeason,
+                visitors: controller.catalog.visitors,
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 12),
@@ -432,6 +433,7 @@ class _PatternsTab extends StatelessWidget {
                 title: '날씨',
                 family: CapturePatternFamily.weather,
                 patterns: weather,
+                visitors: controller.catalog.visitors,
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 12),
@@ -441,6 +443,7 @@ class _PatternsTab extends StatelessWidget {
                 title: '주변',
                 family: CapturePatternFamily.surroundings,
                 patterns: surroundings,
+                visitors: controller.catalog.visitors,
               ),
             ],
           ),
@@ -521,11 +524,13 @@ class _IndividualPatternGroup extends StatefulWidget {
     required this.title,
     required this.family,
     required this.patterns,
+    required this.visitors,
   });
 
   final String title;
   final CapturePatternFamily family;
   final List<_PatternSummary> patterns;
+  final List<VisitorDefinition> visitors;
 
   @override
   State<_IndividualPatternGroup> createState() =>
@@ -565,7 +570,10 @@ class _IndividualPatternGroupState extends State<_IndividualPatternGroup> {
             index < widget.patterns.length;
             index += 1
           ) ...<Widget>[
-            _CompactIndividualPatternRow(summary: widget.patterns[index]),
+            _CompactIndividualPatternRow(
+              summary: widget.patterns[index],
+              visitors: widget.visitors,
+            ),
             if (index != widget.patterns.length - 1) const PixelRule(),
           ],
         ],
@@ -575,13 +583,18 @@ class _IndividualPatternGroupState extends State<_IndividualPatternGroup> {
 }
 
 class _CompactIndividualPatternRow extends StatelessWidget {
-  const _CompactIndividualPatternRow({required this.summary});
+  const _CompactIndividualPatternRow({
+    required this.summary,
+    required this.visitors,
+  });
 
   final _PatternSummary summary;
+  final List<VisitorDefinition> visitors;
 
   @override
   Widget build(BuildContext context) {
     final pattern = summary.latest;
+    final clueCount = visitorClueCountForPattern(pattern, visitors);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 9),
       child: Row(
@@ -594,7 +607,7 @@ class _CompactIndividualPatternRow extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Text(
-            '${formatNumber(summary.collectedCount)}회',
+            '${clueCount > 0 ? '방문자 $clueCount명 · ' : ''}${formatNumber(summary.collectedCount)}회',
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],

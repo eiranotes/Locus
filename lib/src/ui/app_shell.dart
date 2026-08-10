@@ -42,12 +42,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   }
 
   Future<void> _refreshAfterResume(AppController controller) async {
-    if (controller.stepTrackingConfigured) {
-      await controller.refreshSteps();
-    }
-    if (controller.capturePreparation != null) {
-      await controller.refreshCapturePreparation();
-    }
+    await controller.refreshWorld();
   }
 
   @override

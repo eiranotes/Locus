@@ -36,6 +36,30 @@ void main() {
     expect(sceneVisitorIdFor(sightings: const <VisitorSighting>[]), isNull);
   });
 
+  test('visitor encounter preserves a bounded scene-memory payload', () {
+    final encounter = VisitorEncounter(
+      id: 'encounter-1',
+      visitorId: 'night-moth',
+      seenAt: DateTime.utc(2026, 8, 10, 21),
+      variantKey: 'rain_night_local',
+      snapshotJson: VisitorSighting.encodeSnapshot(<String, Object?>{
+        'weather': 'rain',
+        'timeBand': 'night',
+        'objects': <String>['lamp-1'],
+      }),
+    );
+
+    final restored = VisitorEncounter.fromMap(encounter.toMap());
+
+    expect(restored.visitorId, encounter.visitorId);
+    expect(
+      restored.seenAt.millisecondsSinceEpoch,
+      encounter.seenAt.millisecondsSinceEpoch,
+    );
+    expect(restored.variantKey, encounter.variantKey);
+    expect(restored.snapshotJson, encounter.snapshotJson);
+  });
+
   testWidgets('diorama exposes the supplied scene summary', (
     WidgetTester tester,
   ) async {

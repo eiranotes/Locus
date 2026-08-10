@@ -71,8 +71,11 @@ class CaptureCoordinator {
     WeatherMaterial? lastWeather,
     SurroundingMaterial? lastSurrounding,
     ({double latitude, double longitude})? lastAmbientCoordinate,
+    bool requestLocationPermission = true,
   }) async {
-    final location = await locationGateway.current();
+    final location = await locationGateway.current(
+      requestPermission: requestLocationPermission,
+    );
     final timeBand = timeBandFor(now);
     final cooldown = CooldownEngine(catalog.balance);
 

@@ -988,7 +988,18 @@ class _PlacementFeedback extends StatelessWidget {
     final after = preview?.satisfiedCount;
     final total = preview?.progress.length;
     final improved = before != null && after != null && after > before;
-    final label = before == null || after == null || total == null
+    final completedLabels = current == null || preview == null
+        ? const <String>[]
+        : <String>[
+            for (var index = 0; index < preview!.progress.length; index += 1)
+              if (index < current!.progress.length &&
+                  !current!.progress[index].satisfied &&
+                  preview!.progress[index].satisfied)
+                preview!.progress[index].label,
+          ];
+    final label = completedLabels.isNotEmpty
+        ? '${preview!.visitor.nameKo} · ${completedLabels.join(' · ')} 완성'
+        : before == null || after == null || total == null
         ? '놓으면 바로 저장됩니다'
         : '${preview!.visitor.nameKo} 조건 $before/$total → $after/$total';
     return _SceneInstruction(

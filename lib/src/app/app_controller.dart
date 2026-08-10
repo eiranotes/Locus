@@ -53,6 +53,7 @@ class AppController extends ChangeNotifier {
   List<CraftedObject> _craftedObjects = const <CraftedObject>[];
   List<Placement> _placements = const <Placement>[];
   List<VisitorSighting> _visitorSightings = const <VisitorSighting>[];
+  Map<String, int> _visitorEncounterCounts = const <String, int>{};
   Set<String> _unlockedRecipeIds = <String>{};
   Set<String> _unlockedRewardKeys = <String>{};
   CapturePreparation? _capturePreparation;
@@ -79,6 +80,8 @@ class AppController extends ChangeNotifier {
   List<Placement> get placements => List<Placement>.unmodifiable(_placements);
   List<VisitorSighting> get visitorSightings =>
       List<VisitorSighting>.unmodifiable(_visitorSightings);
+  Map<String, int> get visitorEncounterCounts =>
+      Map<String, int>.unmodifiable(_visitorEncounterCounts);
   Set<String> get unlockedRecipeIds =>
       Set<String>.unmodifiable(_unlockedRecipeIds);
   CapturePreparation? get capturePreparation => _capturePreparation;
@@ -173,6 +176,7 @@ class AppController extends ChangeNotifier {
         await repository.replaceStepBuckets(_stepBuckets);
       }
       await _syncStepsAndConstruction();
+      await _refreshCapturePreparationState(requestLocationPermission: false);
       await _evaluateAndPersistVisitors();
       _initialized = true;
     });
@@ -195,7 +199,9 @@ class AppController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> refreshCapturePreparation({bool notify = true}) async {
+  Future<void> _refreshCapturePreparationState({
+    required bool requestLocationPermission,
+  }) async {
     final lastWeather = _weatherMaterials.isEmpty
         ? null
         : _weatherMaterials.first;
@@ -208,7 +214,31 @@ class AppController extends ChangeNotifier {
       lastWeather: lastWeather,
       lastSurrounding: lastSurrounding,
       lastAmbientCoordinate: lastCoordinate,
+      requestLocationPermission: requestLocationPermission,
     );
+  }
+
+  Future<void> refreshCapturePreparation({
+    bool notify = true,
+    bool requestLocationPermission = true,
+  }) async {
+    await _guard(() async {
+      await _refreshCapturePreparationState(
+        requestLocationPermission: requestLocationPermission,
+      );
+      await _evaluateAndPersistVisitors();
+    });
+    if (notify) notifyListeners();
+  }
+
+  Future<void> refreshWorld({bool notify = true}) async {
+    await _guard(() async {
+      if (stepTrackingConfigured) {
+        await _syncStepsAndConstruction();
+      }
+      await _refreshCapturePreparationState(requestLocationPermission: false);
+      await _evaluateAndPersistVisitors();
+    });
     if (notify) notifyListeners();
   }
 
@@ -216,7 +246,10 @@ class AppController extends ChangeNotifier {
       captureCoordinator.weatherGateway.attribution();
 
   Future<void> refreshSteps() async {
-    await _guard(_syncStepsAndConstruction);
+    await _guard(() async {
+      await _syncStepsAndConstruction();
+      await _evaluateAndPersistVisitors();
+    });
     notifyListeners();
   }
 
@@ -242,6 +275,7 @@ class AppController extends ChangeNotifier {
       await repository.setMetadata('step_tracking_mode', mode.name);
       await repository.replaceStepBuckets(_stepBuckets);
       await _advanceConstruction();
+      await _evaluateAndPersistVisitors();
     });
     notifyListeners();
   }

@@ -300,4 +300,124 @@ void main() {
       '맑음',
     ]);
   });
+
+  group('visitor selection policy', () {
+    final now = DateTime.utc(2026, 8, 10, 12);
+    const cooldown = Duration(hours: 6);
+
+    test('an unseen satisfied visitor outranks a repeat-ready visitor', () {
+      final repeat = _evaluation('repeat', satisfied: true);
+      final unseen = _evaluation('unseen', satisfied: true);
+      final evaluations = <VisitorEvaluation>[repeat, unseen];
+      final sightings = <VisitorSighting>[
+        _visitorSighting('repeat', now.subtract(const Duration(hours: 8))),
+      ];
+
+      final policy = const VisitorSelectionPolicy();
+      expect(
+        policy
+            .target(
+              evaluations: evaluations,
+              sightings: sightings,
+              now: now,
+              repeatCooldown: cooldown,
+            )
+            ?.visitor
+            .id,
+        'unseen',
+      );
+      expect(
+        policy
+            .arriving(
+              evaluations: evaluations,
+              sightings: sightings,
+              now: now,
+              repeatCooldown: cooldown,
+            )
+            ?.visitor
+            .id,
+        'unseen',
+      );
+    });
+
+    test('the oldest eligible repeat gets the next scene memory', () {
+      final recent = _evaluation('recent', satisfied: true);
+      final oldest = _evaluation('oldest', satisfied: true);
+      final evaluations = <VisitorEvaluation>[recent, oldest];
+      final sightings = <VisitorSighting>[
+        _visitorSighting('recent', now.subtract(const Duration(hours: 7))),
+        _visitorSighting('oldest', now.subtract(const Duration(hours: 12))),
+      ];
+
+      final selected = const VisitorSelectionPolicy().arriving(
+        evaluations: evaluations,
+        sightings: sightings,
+        now: now,
+        repeatCooldown: cooldown,
+      );
+
+      expect(selected?.visitor.id, 'oldest');
+    });
+
+    test('a fully satisfied unseen goal outranks partial progress', () {
+      final partial = _evaluation(
+        'partial',
+        satisfied: false,
+        satisfiedCount: 2,
+        total: 3,
+      );
+      final complete = _evaluation('complete', satisfied: true);
+
+      final selected = const VisitorSelectionPolicy().target(
+        evaluations: <VisitorEvaluation>[partial, complete],
+        sightings: const <VisitorSighting>[],
+        now: now,
+        repeatCooldown: cooldown,
+      );
+
+      expect(selected?.visitor.id, 'complete');
+    });
+  });
 }
+
+VisitorEvaluation _evaluation(
+  String id, {
+  required bool satisfied,
+  int satisfiedCount = 1,
+  int total = 1,
+}) {
+  final boundedSatisfiedCount = satisfied
+      ? total
+      : satisfiedCount.clamp(0, total - 1);
+  return VisitorEvaluation(
+    visitor: VisitorDefinition(
+      id: id,
+      nameKo: id,
+      descriptionKo: '테스트',
+      hintsKo: const <String>['테스트'],
+      requirements: const <VisitorRequirement>[],
+      reward: const VisitorReward(
+        kind: VisitorRewardKind.effect,
+        value: 'test',
+      ),
+    ),
+    progress: List<RequirementProgress>.generate(
+      total,
+      (int index) => RequirementProgress(
+        label: '조건 $index',
+        current: index < boundedSatisfiedCount ? '1' : '0',
+        target: '1',
+        satisfied: index < boundedSatisfiedCount,
+      ),
+    ),
+  );
+}
+
+VisitorSighting _visitorSighting(String id, DateTime lastSeenAt) =>
+    VisitorSighting(
+      id: 'sighting-$id',
+      visitorId: id,
+      firstSeenAt: lastSeenAt.subtract(const Duration(days: 1)),
+      lastSeenAt: lastSeenAt,
+      variantKey: 'test',
+    );
