@@ -1,0 +1,594 @@
+{
+  "schemaVersion": 1,
+  "package": "locus-scene-ui-v1",
+  "generator": "OpenAI built-in image_gen",
+  "styleReferences": [
+    "artifacts/imagegen/locus-art-v1/contact-sheet.png",
+    "artifacts/imagegen/locus-collection-expansion-v1/contact-sheet.png"
+  ],
+  "chromaKey": "#FF00FF",
+  "sources": [
+    {
+      "path": "artifacts/imagegen/locus-scene-ui-v1/sources/actions.png",
+      "width": 1402,
+      "height": 1122,
+      "sha256": "a01cce4215e4720a0f648cc57272286eaa77d3211b9f206f208e074b0e5d15ac"
+    },
+    {
+      "path": "artifacts/imagegen/locus-scene-ui-v1/sources/atmosphere.png",
+      "width": 1402,
+      "height": 1122,
+      "sha256": "56856f7e9d50fa4a7f695c6582a4704db641c102e0861df5b851e793ca6603f4"
+    },
+    {
+      "path": "artifacts/imagegen/locus-scene-ui-v1/sources/editor.png",
+      "width": 1402,
+      "height": 1122,
+      "sha256": "741942454f748e7ff2d6240dcf8f9051c0881efd2dfcd522f778c4cbf71264b0"
+    },
+    {
+      "path": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-a.png",
+      "width": 1983,
+      "height": 793,
+      "sha256": "20594d493e084d55383cd8a605141bd1ed2a53dffd5125c366db04ca1f249987"
+    },
+    {
+      "path": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-b.png",
+      "width": 1983,
+      "height": 793,
+      "sha256": "a0426e28966aca7465b01723b303a99037d6111123b709086e79d4f8774368a3"
+    }
+  ],
+  "assets": [
+    {
+      "name": "capture",
+      "category": "action",
+      "path": "assets/art/generated/v1/action/capture.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/actions.png",
+      "sourceCell": 0,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "4d2c616864f8eb08b596ea71d81d5760d64824a10a035e700de1e43e5875f288"
+    },
+    {
+      "name": "codex",
+      "category": "action",
+      "path": "assets/art/generated/v1/action/codex.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/actions.png",
+      "sourceCell": 8,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "70b533a7f72bfce764667328afb16afd8b4cd4b474610a7508217c19d6132fd6"
+    },
+    {
+      "name": "craft",
+      "category": "action",
+      "path": "assets/art/generated/v1/action/craft.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/actions.png",
+      "sourceCell": 1,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "b7f944071a5b679bf5c92571652e8b325dc555ef8f88662b0d9fd45743300488"
+    },
+    {
+      "name": "place",
+      "category": "action",
+      "path": "assets/art/generated/v1/action/place.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/actions.png",
+      "sourceCell": 2,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "3097e576e38068b70b40287ea94b3ef757362ffd2ae6f18da4352ff84f337325"
+    },
+    {
+      "name": "rotate",
+      "category": "action",
+      "path": "assets/art/generated/v1/action/rotate.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/actions.png",
+      "sourceCell": 3,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "878ab1434eea82c0132bcd30385767e2ecf4ebb7b44124d5d7f581d1baf15ed3"
+    },
+    {
+      "name": "settings",
+      "category": "action",
+      "path": "assets/art/generated/v1/action/settings.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/actions.png",
+      "sourceCell": 9,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "f2254ea0cd9c970d6a86d49fcb84183bba744a505bb09b9af941e6ecd7247d21"
+    },
+    {
+      "name": "store",
+      "category": "action",
+      "path": "assets/art/generated/v1/action/store.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/actions.png",
+      "sourceCell": 4,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "733017c6b361423bfc9aff73952fe7bbb47bf38f56ea8a9356d6444dcf5fead7"
+    },
+    {
+      "name": "surroundings",
+      "category": "action",
+      "path": "assets/art/generated/v1/action/surroundings.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/actions.png",
+      "sourceCell": 6,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "8245292716843fab68b34df7ef79f52630bbed532a688881da63f5e1c38c1502"
+    },
+    {
+      "name": "visitor",
+      "category": "action",
+      "path": "assets/art/generated/v1/action/visitor.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/actions.png",
+      "sourceCell": 7,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "7f87e4a082ac19a24fc1417e2bdf8e6ac917245f78721f14913f729bf233dd25"
+    },
+    {
+      "name": "weather",
+      "category": "action",
+      "path": "assets/art/generated/v1/action/weather.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/actions.png",
+      "sourceCell": 5,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "55b9ba330f6453dd0d97f8586d16af5e5d51be474d987a4d3153014b49517861"
+    },
+    {
+      "name": "dawn_sparkle",
+      "category": "atmosphere",
+      "path": "assets/art/generated/v1/atmosphere/dawn_sparkle.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/atmosphere.png",
+      "sourceCell": 5,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "22211dee1d22c1049bc9280c3594c49e30bc9e8690ca7dba173958b5c0ef5c95"
+    },
+    {
+      "name": "evening_windows",
+      "category": "atmosphere",
+      "path": "assets/art/generated/v1/atmosphere/evening_windows.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/atmosphere.png",
+      "sourceCell": 7,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "0d632b012e631fbd996e52079759688562841a279b05290c5ac03bcd86a5d825"
+    },
+    {
+      "name": "falling_raindrops",
+      "category": "atmosphere",
+      "path": "assets/art/generated/v1/atmosphere/falling_raindrops.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/atmosphere.png",
+      "sourceCell": 9,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "edcbcfcda2d645b72ba73b0008e1e0374d465b1283237a3dadf5cf648491ec88"
+    },
+    {
+      "name": "frost_sparkles",
+      "category": "atmosphere",
+      "path": "assets/art/generated/v1/atmosphere/frost_sparkles.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/atmosphere.png",
+      "sourceCell": 2,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "ff6fb36e87b910334874c8beb4bf2195ae4ceb50e4e153b443ea3da61a7f2a3a"
+    },
+    {
+      "name": "mist_wisp",
+      "category": "atmosphere",
+      "path": "assets/art/generated/v1/atmosphere/mist_wisp.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/atmosphere.png",
+      "sourceCell": 1,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "5f78b6ae71683aa1fe380d14073df682664aea23d762f75d69d00811e981f8ad"
+    },
+    {
+      "name": "morning_rays",
+      "category": "atmosphere",
+      "path": "assets/art/generated/v1/atmosphere/morning_rays.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/atmosphere.png",
+      "sourceCell": 6,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "fbb0243950de1eb4b2fd20367e667aa942c9ad1ec5551e0143ef6af2ea1ac396"
+    },
+    {
+      "name": "night_moths",
+      "category": "atmosphere",
+      "path": "assets/art/generated/v1/atmosphere/night_moths.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/atmosphere.png",
+      "sourceCell": 8,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "b2461178c4ea039d484f40d1047881c93f724630509481f4fbb19b3a3b245d10"
+    },
+    {
+      "name": "rain_ripples",
+      "category": "atmosphere",
+      "path": "assets/art/generated/v1/atmosphere/rain_ripples.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/atmosphere.png",
+      "sourceCell": 0,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "e07caea8ee7697fee02b22a8dab765bf4ce4e57e8c5bb6d2b5be036f39e8bb2d"
+    },
+    {
+      "name": "warm_motes",
+      "category": "atmosphere",
+      "path": "assets/art/generated/v1/atmosphere/warm_motes.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/atmosphere.png",
+      "sourceCell": 3,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "d32f7dbe6ffa080166a099951d113dbacb65668cc6a7a84a704b577ca953bce1"
+    },
+    {
+      "name": "wind_leaves",
+      "category": "atmosphere",
+      "path": "assets/art/generated/v1/atmosphere/wind_leaves.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/atmosphere.png",
+      "sourceCell": 4,
+      "width": 96,
+      "height": 96,
+      "pngColorType": 6,
+      "sha256": "380ac4581a94faa5d20b5a3d6817ed7c85383984442fccd959f7d9f45138b9ad"
+    },
+    {
+      "name": "arrow_down",
+      "category": "editor",
+      "path": "assets/art/generated/v1/editor/arrow_down.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/editor.png",
+      "sourceCell": 7,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "54e612630a6bb8d6700a4f47b413098e1711dd46567d686b1a9d0141440f01e0"
+    },
+    {
+      "name": "arrow_left",
+      "category": "editor",
+      "path": "assets/art/generated/v1/editor/arrow_left.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/editor.png",
+      "sourceCell": 5,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "04db83dd7ff40fd1bbcfbf8476fa1b9cfc099955a6a51caa08ccf1fabebcffde"
+    },
+    {
+      "name": "arrow_right",
+      "category": "editor",
+      "path": "assets/art/generated/v1/editor/arrow_right.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/editor.png",
+      "sourceCell": 8,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "2843a49d97a0ee11a8f39392c3752ab6bd66d0cce37ae64d4362c2688c5bb65b"
+    },
+    {
+      "name": "arrow_up",
+      "category": "editor",
+      "path": "assets/art/generated/v1/editor/arrow_up.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/editor.png",
+      "sourceCell": 6,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "6822f6c8a6507b14a8245d03c215f2e17f06fabba8d5a9d1178f623456ba908f"
+    },
+    {
+      "name": "grab_hand",
+      "category": "editor",
+      "path": "assets/art/generated/v1/editor/grab_hand.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/editor.png",
+      "sourceCell": 3,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "addf5a7d73ad221847af7698f001578fe7f2df23eb480dc31971892d99ef39c7"
+    },
+    {
+      "name": "invalid_target",
+      "category": "editor",
+      "path": "assets/art/generated/v1/editor/invalid_target.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/editor.png",
+      "sourceCell": 2,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "4a015703b9711b9bb13d5b525ca4f6c3d2207e7b08254f6c0927a59f7d9d729e"
+    },
+    {
+      "name": "place_chevron",
+      "category": "editor",
+      "path": "assets/art/generated/v1/editor/place_chevron.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/editor.png",
+      "sourceCell": 4,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "643664eb099af76c04f2d7ce620b3381971d5f0815b65d1d26e89730c94fb93d"
+    },
+    {
+      "name": "rotate",
+      "category": "editor",
+      "path": "assets/art/generated/v1/editor/rotate.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/editor.png",
+      "sourceCell": 9,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "b344173583647d8fb9386b3b2bb575763cf63c108db75756e624662b700e88c8"
+    },
+    {
+      "name": "selected_target",
+      "category": "editor",
+      "path": "assets/art/generated/v1/editor/selected_target.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/editor.png",
+      "sourceCell": 1,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "503180c5de01c2f9d0ad69f69d76b17ba620251c7262a183b2a0ce2414a76a84"
+    },
+    {
+      "name": "valid_target",
+      "category": "editor",
+      "path": "assets/art/generated/v1/editor/valid_target.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/editor.png",
+      "sourceCell": 0,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "fb55bdf2d0036c19df30a66d21aecddbf095ceead7a73e4d251e38d47c6193f7"
+    },
+    {
+      "name": "acorns",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/acorns.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-b.png",
+      "sourceCell": 6,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "920b3ee42eb9f15beaed7110527e7f9f59657cbb9f5b7faac26aff8994b7164e"
+    },
+    {
+      "name": "autumn_leaves",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/autumn_leaves.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-a.png",
+      "sourceCell": 5,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "c740c11ed64acc84a2fa2f6294514f642163d68cd0c7d09b6d371c01e1f191d6"
+    },
+    {
+      "name": "chalk_star",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/chalk_star.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-b.png",
+      "sourceCell": 1,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "a1d665675c8d962d18c856550a205cecb7b925336a13b59936ae4ddc8edcfedb"
+    },
+    {
+      "name": "clover",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/clover.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-a.png",
+      "sourceCell": 3,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "98e1f3998a4eeb6a29af723831155d0fd1c50a33c129a960fb65ec5e2c045753"
+    },
+    {
+      "name": "crack_grass",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/crack_grass.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-b.png",
+      "sourceCell": 9,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "eae349e38576cb7c071df1d0531efedb85d4d5c8babcbf716381dd7fdece7f10"
+    },
+    {
+      "name": "cracked_cobble",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/cracked_cobble.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-b.png",
+      "sourceCell": 0,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "5767514a26d569c3c1e341a3fdd1630d7f3f5dbdc986204158922dfc46b16dc6"
+    },
+    {
+      "name": "drain_grate",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/drain_grate.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-a.png",
+      "sourceCell": 9,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "9c5ae82a456b9d9a01d1a2f937b8699824b96678e76c6f4542dd14846cca62a5"
+    },
+    {
+      "name": "dry_weed",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/dry_weed.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-b.png",
+      "sourceCell": 5,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "04775859695c99fdc0aae2d4a72c854ef488803b947db87947a721a05ffd47ba"
+    },
+    {
+      "name": "fern",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/fern.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-a.png",
+      "sourceCell": 8,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "c3b19efc6a08bd60e165dc9df6dd12a472a2ad4ccf4a0aaae696500f93b04af1"
+    },
+    {
+      "name": "flower_petals",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/flower_petals.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-b.png",
+      "sourceCell": 7,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "ba72cae824e319007b411a807e48db4d6d4904d70cd267ccbbf6f53f691fe771"
+    },
+    {
+      "name": "grass_blades",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/grass_blades.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-a.png",
+      "sourceCell": 2,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "23c2cd23851a2d8ace4e7c6847ccf7272ce3ae82710814f687d14ac3716a69d0"
+    },
+    {
+      "name": "moss",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/moss.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-a.png",
+      "sourceCell": 1,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "d991539c2d31c48c433b68ef2c2082bea4610c227f89ee20d5861edb24f937e9"
+    },
+    {
+      "name": "mushrooms",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/mushrooms.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-a.png",
+      "sourceCell": 4,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "4d4691f5a704b87c23167404a0cc044e89b843ec03456ac7547a2882f6eedf91"
+    },
+    {
+      "name": "pebbles",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/pebbles.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-a.png",
+      "sourceCell": 0,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "0986ff220d73cd208fbf168cd3f5d2f87131b32af478e35f9fc80dbdd788b1e8"
+    },
+    {
+      "name": "puddle_glint",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/puddle_glint.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-b.png",
+      "sourceCell": 2,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "ee23f6ac156a8222c1eb0011f1cf6cb6ca6887cf5a3e3c79ca951372559bdd80"
+    },
+    {
+      "name": "snow_tuft",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/snow_tuft.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-b.png",
+      "sourceCell": 4,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "1b2caf3fbd961dd6ff202067831a966a298707616c39c09d6c787c65b148ace9"
+    },
+    {
+      "name": "stepping_marks",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/stepping_marks.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-b.png",
+      "sourceCell": 8,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "6f8ca36c8ba0483a6bb753f1f89607a0be574896325682128479bac229f306e5"
+    },
+    {
+      "name": "twig",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/twig.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-a.png",
+      "sourceCell": 7,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "99c8595189d86209bb2a1bb11094d339ff9f6cbf2865c05396204021df5956bb"
+    },
+    {
+      "name": "wet_leaf",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/wet_leaf.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-b.png",
+      "sourceCell": 3,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "f1420d12d69723c68a55bc6efde9e7858d5d937c703a31db14476491612d1993"
+    },
+    {
+      "name": "wildflowers",
+      "category": "terrain",
+      "path": "assets/art/generated/v1/terrain/wildflowers.png",
+      "source": "artifacts/imagegen/locus-scene-ui-v1/sources/terrain-a.png",
+      "sourceCell": 6,
+      "width": 64,
+      "height": 64,
+      "pngColorType": 6,
+      "sha256": "168d483488a37e5d1b38992929a0bfc5388248c56cfdba4fd4e74094e7683dc6"
+    }
+  ]
+}

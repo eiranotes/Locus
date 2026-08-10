@@ -13,6 +13,7 @@ import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
 import 'package:reality_diorama/src/ui/widgets/atmospheric_trait_chips.dart';
 import 'package:reality_diorama/src/ui/widgets/object_visual_preview.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_button.dart';
 
 class RecipeListScreen extends StatelessWidget {
   const RecipeListScreen({
@@ -323,16 +324,16 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
             ),
           ],
           const SizedBox(height: 22),
-          FilledButton.icon(
+          PixelButton(
             onPressed: canSubmit
                 ? () => _craft(controller, weather, surroundings, focusTrait)
                 : null,
-            icon: const Icon(Icons.handyman_outlined),
-            label: Text(
-              controller.availableSteps >= widget.recipe.stepCost
-                  ? '만들기'
-                  : '공사 시작',
-            ),
+            actionAsset: 'craft',
+            fallbackIcon: Icons.handyman_outlined,
+            expand: true,
+            label: controller.availableSteps >= widget.recipe.stepCost
+                ? '만들기'
+                : '공사 시작',
           ),
           const SizedBox(height: 10),
           Text(

@@ -374,6 +374,7 @@ def check_generated_art() -> None:
         "process_construction_art.py",
         "process_weather_art.py",
         "process_collection_expansion.py",
+        "process_scene_ui_art.py",
     ):
         result = subprocess.run(
             [sys.executable, str(ROOT / f"tool/{script}"), "--validate-only"],
@@ -393,6 +394,9 @@ def check_generated_art() -> None:
         fail("pubspec.yaml must bundle the construction art directory")
     if "assets/art/generated/v1/weather/" not in pubspec:
         fail("pubspec.yaml must bundle the weather art directory")
+    for directory in ("terrain", "atmosphere", "editor", "action"):
+        if f"assets/art/generated/v1/{directory}/" not in pubspec:
+            fail(f"pubspec.yaml must bundle the {directory} art directory")
     catalog = (ROOT / "lib/src/diorama/generated_art_catalog.dart").read_text(
         encoding="utf-8"
     )
@@ -415,11 +419,13 @@ def check_required_files() -> None:
         "tool/process_construction_art.py",
         "tool/process_weather_art.py",
         "tool/process_collection_expansion.py",
+        "tool/process_scene_ui_art.py",
         "artifacts/imagegen/locus-art-v1/manifest.json",
         "artifacts/imagegen/locus-directional-art-v1/manifest.json",
         "artifacts/imagegen/locus-construction-art-v1/manifest.json",
         "artifacts/imagegen/locus-weather-treatments-v1/manifest.json",
         "artifacts/imagegen/locus-collection-expansion-v1/manifest.json",
+        "artifacts/imagegen/locus-scene-ui-v1/manifest.json",
         "assets/content/placement_catalog.json",
         "assets/content/crafting_art_catalog.json",
         "assets/content/visual_layer_catalog.json",

@@ -35,24 +35,24 @@ void main() {
       }
       expect(
         tester
-            .widget<IconButton>(
+            .widget<InkWell>(
               find.descendant(
                 of: find.byKey(const ValueKey<String>('move-left')),
-                matching: find.byType(IconButton),
+                matching: find.byType(InkWell),
               ),
             )
-            .onPressed,
+            .onTap,
         isNull,
       );
       expect(
         tester
-            .widget<IconButton>(
+            .widget<InkWell>(
               find.descendant(
                 of: find.byKey(const ValueKey<String>('move-right')),
-                matching: find.byType(IconButton),
+                matching: find.byType(InkWell),
               ),
             )
-            .onPressed,
+            .onTap,
         isNull,
       );
 

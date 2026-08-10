@@ -6,6 +6,7 @@ import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/services/weather_gateway.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -280,10 +281,11 @@ class _StepSourceCard extends StatelessWidget {
           if (mode != StepTrackingMode.real)
             SizedBox(
               width: double.infinity,
-              child: FilledButton.icon(
+              child: PixelButton(
                 onPressed: busy ? null : onUseRealSteps,
-                icon: const Icon(Icons.directions_walk),
-                label: const Text('실제 걸음 사용'),
+                fallbackIcon: Icons.directions_walk,
+                expand: true,
+                label: '실제 걸음 사용',
               ),
             ),
           if (mode == StepTrackingMode.undecided) ...<Widget>[

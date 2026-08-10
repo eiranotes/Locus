@@ -98,9 +98,15 @@ final class DioramaEditorOverlay {
     required this.selectedObjectId,
     required this.selectedCells,
     required this.validAnchorCells,
+    this.previewPlacement,
+    this.previewValid = true,
+    this.dragging = false,
   });
 
   final String selectedObjectId;
   final Set<GridCell> selectedCells;
   final Set<GridCell> validAnchorCells;
+  final Placement? previewPlacement;
+  final bool previewValid;
+  final bool dragging;
 }

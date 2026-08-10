@@ -4,13 +4,18 @@ import 'package:reality_diorama/src/app/app_controller.dart';
 import 'package:reality_diorama/src/app/app_scope.dart';
 import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/diorama/diorama_view.dart';
+import 'package:reality_diorama/src/diorama/diorama_geometry.dart';
+import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/engines/placement_engine.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/game_snapshot.dart';
+import 'package:reality_diorama/src/domain/engines/visitor_engine.dart';
 import 'package:reality_diorama/src/domain/placement_catalog.dart';
 import 'package:reality_diorama/src/ui/widgets/object_visual_preview.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_button.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_surface.dart';
 import 'package:reality_diorama/src/ui/widgets/placement_direction_pad.dart';
 
 class PlacementEditorScreen extends StatefulWidget {
@@ -25,6 +30,13 @@ class PlacementEditorScreen extends StatefulWidget {
 class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
   String? _selectedObjectId;
   final Map<String, int> _pendingRotations = <String, int>{};
+  final GlobalKey _boardKey = GlobalKey();
+  String? _draggingObjectId;
+  GridCell? _dragAnchor;
+  int? _dragRotation;
+  bool _dragValid = false;
+  bool _catalogDrag = false;
+  Offset? _pointerToAnchor;
 
   @override
   void didChangeDependencies() {
@@ -67,6 +79,15 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
       catalogEntry: selectedCatalogEntry,
       rotation: selectedRotation,
     );
+    final currentVisitor = controller.targetVisitor;
+    final previewVisitor = _dragAnchor == null || _draggingObjectId == null
+        ? null
+        : controller.previewTargetVisitor(
+            craftedObjectId: _draggingObjectId!,
+            column: _dragAnchor!.column,
+            row: _dragAnchor!.row,
+            rotation: _dragRotation ?? selectedRotation,
+          );
 
     return Scaffold(
       appBar: AppBar(
@@ -87,12 +108,53 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
               Expanded(
                 child: AspectRatio(
                   aspectRatio: 1,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: PixelPalette.scene,
-                      borderRadius: BorderRadius.circular(PixelRadii.scene),
+                  child: Material(
+                    color: PixelPalette.scene,
+                    shape: const PixelCutBorder(
+                      color: PixelPalette.divider,
+                      width: 2,
+                      cut: 8,
                     ),
-                    child: DioramaView(snapshot: editorSnapshot),
+                    clipBehavior: Clip.hardEdge,
+                    child: DragTarget<_CatalogPlacementDrag>(
+                      onWillAcceptWithDetails: (_) => true,
+                      onMove:
+                          (DragTargetDetails<_CatalogPlacementDrag> value) =>
+                              _updateCatalogDrag(controller, value),
+                      onLeave: (_) => _cancelCatalogDrag(),
+                      onAcceptWithDetails:
+                          (DragTargetDetails<_CatalogPlacementDrag> value) =>
+                              _acceptCatalogDrag(controller, value.data),
+                      builder: (BuildContext context, _, __) => Stack(
+                        children: <Widget>[
+                          Positioned.fill(
+                            child: DioramaView(
+                              key: _boardKey,
+                              snapshot: editorSnapshot,
+                              borderRadius: BorderRadius.zero,
+                              semanticLabel: '배치 편집판. 놓인 물건은 끌어서 옮길 수 있습니다.',
+                              onDragStart: (Offset logical) =>
+                                  _startSceneDrag(controller, logical),
+                              onDragUpdate: (Offset logical) =>
+                                  _updateSceneDrag(controller, logical),
+                              onDragEnd: () => _finishSceneDrag(controller),
+                              onDragCancel: _cancelSceneDrag,
+                            ),
+                          ),
+                          Positioned(
+                            left: 10,
+                            right: 10,
+                            top: 10,
+                            child: _PlacementFeedback(
+                              dragging: _dragAnchor != null,
+                              valid: _dragValid,
+                              current: currentVisitor,
+                              preview: previewVisitor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -111,6 +173,8 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
                     HapticFeedback.selectionClick();
                     setState(() => _selectedObjectId = objectId);
                   },
+                  onDragStarted: _startCatalogDrag,
+                  onDragCancelled: _cancelCatalogDrag,
                 ),
                 const SizedBox(height: 10),
                 if (selectedPlacement != null &&
@@ -175,19 +239,36 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
       columns: controller.catalog.balance.gridColumns,
       rows: controller.catalog.balance.gridRows,
     );
+    final draggingSelected =
+        _draggingObjectId == object.id && _dragAnchor != null;
+    final previewPlacement = draggingSelected
+        ? Placement(
+            id: placement?.id ?? 'preview-${object.id}',
+            craftedObjectId: object.id,
+            column: _dragAnchor!.column,
+            row: _dragAnchor!.row,
+            rotation: _dragRotation ?? rotation,
+          )
+        : null;
+    final highlightedPlacement = previewPlacement ?? placement;
     return snapshot.withEditorOverlay(
       DioramaEditorOverlay(
         selectedObjectId: object.id,
-        selectedCells: placement == null
+        selectedCells: highlightedPlacement == null
             ? const <GridCell>{}
             : engine.occupiedCells(
-                placement: placement,
+                placement: highlightedPlacement,
                 footprint: recipe.footprint,
               ),
-        validAnchorCells: controller.validPlacementAnchors(
-          craftedObjectId: object.id,
-          rotation: rotation,
-        ),
+        validAnchorCells: placement == null || draggingSelected
+            ? controller.validPlacementAnchors(
+                craftedObjectId: object.id,
+                rotation: _dragRotation ?? rotation,
+              )
+            : const <GridCell>{},
+        previewPlacement: previewPlacement,
+        previewValid: draggingSelected ? _dragValid : true,
+        dragging: draggingSelected,
       ),
     );
   }
@@ -205,6 +286,196 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
       rotation: rotation,
     );
     if (placed) HapticFeedback.lightImpact();
+  }
+
+  void _startSceneDrag(AppController controller, Offset logical) {
+    final placement = _placementAt(controller, logical);
+    if (placement == null) return;
+    HapticFeedback.selectionClick();
+    setState(() {
+      _selectedObjectId = placement.craftedObjectId;
+      _draggingObjectId = placement.craftedObjectId;
+      _dragAnchor = GridCell(placement.column, placement.row);
+      _dragRotation = placement.rotation;
+      _dragValid = true;
+      _catalogDrag = false;
+      _pointerToAnchor =
+          logical -
+          DioramaGeometry.tileTop(
+            placement.column.toDouble(),
+            placement.row.toDouble(),
+          );
+    });
+  }
+
+  void _updateSceneDrag(AppController controller, Offset logical) {
+    final objectId = _draggingObjectId;
+    final pointerOffset = _pointerToAnchor;
+    final rotation = _dragRotation;
+    if (objectId == null || pointerOffset == null || rotation == null) return;
+    final anchor = DioramaGeometry.nearestCell(logical - pointerOffset);
+    final validation = controller.validatePlacementCandidate(
+      craftedObjectId: objectId,
+      column: anchor.column,
+      row: anchor.row,
+      rotation: rotation,
+    );
+    if (_dragAnchor == anchor && _dragValid == validation.valid) return;
+    setState(() {
+      _dragAnchor = anchor;
+      _dragValid = validation.valid;
+    });
+  }
+
+  Future<void> _finishSceneDrag(AppController controller) async {
+    if (_catalogDrag) return;
+    final objectId = _draggingObjectId;
+    final anchor = _dragAnchor;
+    final rotation = _dragRotation;
+    final valid = _dragValid;
+    _clearDragState();
+    if (!valid || objectId == null || anchor == null || rotation == null) {
+      return;
+    }
+    final placement = controller.placements
+        .where((Placement item) => item.craftedObjectId == objectId)
+        .firstOrNull;
+    if (placement != null &&
+        placement.column == anchor.column &&
+        placement.row == anchor.row &&
+        placement.rotation == rotation) {
+      return;
+    }
+    final moved = await controller.placeOrMoveObject(
+      craftedObjectId: objectId,
+      column: anchor.column,
+      row: anchor.row,
+      rotation: rotation,
+    );
+    if (moved) HapticFeedback.mediumImpact();
+  }
+
+  void _cancelSceneDrag() {
+    if (_catalogDrag) return;
+    _clearDragState();
+  }
+
+  Placement? _placementAt(AppController controller, Offset logical) {
+    final placements = controller.placements.toList(growable: false)
+      ..sort(
+        (Placement a, Placement b) =>
+            (a.column + a.row).compareTo(b.column + b.row),
+      );
+    final cell = DioramaGeometry.nearestCell(logical);
+    final engine = PlacementEngine(
+      columns: controller.catalog.balance.gridColumns,
+      rows: controller.catalog.balance.gridRows,
+    );
+    for (final placement in placements.reversed) {
+      final object = controller.craftedObjects
+          .where((CraftedObject item) => item.id == placement.craftedObjectId)
+          .firstOrNull;
+      if (object == null) continue;
+      final recipe = controller.catalog.recipeById(object.recipeId);
+      if (engine
+          .occupiedCells(placement: placement, footprint: recipe.footprint)
+          .contains(cell)) {
+        return placement;
+      }
+    }
+    for (final placement in placements.reversed) {
+      final anchor = DioramaGeometry.tileTop(
+        placement.column.toDouble(),
+        placement.row.toDouble(),
+      );
+      if (Rect.fromLTRB(
+        anchor.dx - 52,
+        anchor.dy - 118,
+        anchor.dx + 52,
+        anchor.dy + 12,
+      ).contains(logical)) {
+        return placement;
+      }
+    }
+    return null;
+  }
+
+  void _startCatalogDrag(_CatalogPlacementDrag drag) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _selectedObjectId = drag.objectId;
+      _draggingObjectId = drag.objectId;
+      _dragRotation = drag.rotation;
+      _dragAnchor = null;
+      _dragValid = false;
+      _catalogDrag = true;
+      _pointerToAnchor = Offset.zero;
+    });
+  }
+
+  void _updateCatalogDrag(
+    AppController controller,
+    DragTargetDetails<_CatalogPlacementDrag> details,
+  ) {
+    if (!_catalogDrag || _draggingObjectId != details.data.objectId) return;
+    final renderObject = _boardKey.currentContext?.findRenderObject();
+    if (renderObject is! RenderBox) return;
+    final local = renderObject.globalToLocal(details.offset);
+    final logical = DioramaGeometry.localToLogical(local, renderObject.size);
+    final anchor = DioramaGeometry.nearestCell(logical);
+    final alreadyPlaced = controller.placements.any(
+      (Placement item) => item.craftedObjectId == details.data.objectId,
+    );
+    final atLimit =
+        !alreadyPlaced &&
+        controller.placements.length >=
+            controller.catalog.balance.activeObjectLimit;
+    final validation = controller.validatePlacementCandidate(
+      craftedObjectId: details.data.objectId,
+      column: anchor.column,
+      row: anchor.row,
+      rotation: details.data.rotation,
+    );
+    final valid = !atLimit && validation.valid;
+    if (_dragAnchor == anchor && _dragValid == valid) return;
+    setState(() {
+      _dragAnchor = anchor;
+      _dragValid = valid;
+    });
+  }
+
+  Future<void> _acceptCatalogDrag(
+    AppController controller,
+    _CatalogPlacementDrag drag,
+  ) async {
+    final anchor = _dragAnchor;
+    final valid = _dragValid && _draggingObjectId == drag.objectId;
+    _clearDragState();
+    if (!valid || anchor == null) return;
+    final placed = await controller.placeOrMoveObject(
+      craftedObjectId: drag.objectId,
+      column: anchor.column,
+      row: anchor.row,
+      rotation: drag.rotation,
+    );
+    if (placed) HapticFeedback.mediumImpact();
+  }
+
+  void _cancelCatalogDrag() {
+    if (!_catalogDrag) return;
+    _clearDragState();
+  }
+
+  void _clearDragState() {
+    if (!mounted) return;
+    setState(() {
+      _draggingObjectId = null;
+      _dragAnchor = null;
+      _dragRotation = null;
+      _dragValid = false;
+      _catalogDrag = false;
+      _pointerToAnchor = null;
+    });
   }
 
   Future<void> _move(
@@ -255,6 +526,8 @@ class _PlacementObjectCatalog extends StatelessWidget {
     required this.selectedObjectId,
     required this.pendingRotations,
     required this.onSelected,
+    required this.onDragStarted,
+    required this.onDragCancelled,
   });
 
   final AppController controller;
@@ -262,6 +535,8 @@ class _PlacementObjectCatalog extends StatelessWidget {
   final String? selectedObjectId;
   final Map<String, int> pendingRotations;
   final ValueChanged<String> onSelected;
+  final ValueChanged<_CatalogPlacementDrag> onDragStarted;
+  final VoidCallback onDragCancelled;
 
   @override
   Widget build(BuildContext context) {
@@ -289,7 +564,7 @@ class _PlacementObjectCatalog extends StatelessWidget {
           final visual = entry.visualFor(rotation);
           final direction = controller.catalog.placement.directionFor(rotation);
           final selected = object.id == selectedObjectId;
-          return SizedBox(
+          final card = SizedBox(
             width: 124,
             child: PixelCard(
               radius: PixelRadii.tile,
@@ -350,6 +625,45 @@ class _PlacementObjectCatalog extends StatelessWidget {
                 ],
               ),
             ),
+          );
+          final drag = _CatalogPlacementDrag(
+            objectId: object.id,
+            rotation: rotation,
+          );
+          return LongPressDraggable<_CatalogPlacementDrag>(
+            data: drag,
+            dragAnchorStrategy: pointerDragAnchorStrategy,
+            hapticFeedbackOnStart: true,
+            onDragStarted: () => onDragStarted(drag),
+            onDraggableCanceled: (_, __) => onDragCancelled(),
+            feedback: Material(
+              color: Colors.transparent,
+              child: SizedBox(
+                width: 82,
+                height: 92,
+                child: ObjectVisualPreview(
+                  visual: ObjectVisualDescriptor.fromCraftedObject(
+                    object,
+                    timeBand: weatherById[object.weatherMaterialId]?.timeBand,
+                  ),
+                  rotation: rotation,
+                  assetPath: visual.assetPath,
+                  mirrorX: visual.mirrorX,
+                  constructionAssetPath: controller.catalog.craftingArt
+                      .constructionAssetFor(
+                        object.recipeId,
+                        object.requiredSteps <= 0
+                            ? 1
+                            : object.appliedSteps / object.requiredSteps,
+                      ),
+                  visualLayerCatalog: controller.catalog.visualLayers,
+                  atmosphericTraitCatalog: controller.catalog.atmosphericTraits,
+                  semanticLabel: '${recipe.nameKo} 끌어서 배치',
+                ),
+              ),
+            ),
+            childWhenDragging: Opacity(opacity: 0.42, child: card),
+            child: card,
           );
         },
       ),
@@ -429,33 +743,27 @@ class _StoredObjectPlacementControls extends StatelessWidget {
           const SizedBox(height: 10),
           Row(
             children: <Widget>[
-              SizedBox(
-                height: 52,
-                child: FilledButton.tonalIcon(
-                  key: const ValueKey<String>('placement-rotate-stored'),
-                  onPressed: nextRotation == null
-                      ? null
-                      : () => onRotate(nextRotation),
-                  icon: const Icon(Icons.rotate_right),
-                  label: Text(
-                    nextRotation == null
-                        ? '회전 공간 필요'
-                        : placementCatalog
-                              .directionFor(nextRotation)
-                              .shortLabelKo,
-                  ),
-                ),
+              PixelButton(
+                key: const ValueKey<String>('placement-rotate-stored'),
+                onPressed: nextRotation == null
+                    ? null
+                    : () => onRotate(nextRotation),
+                actionAsset: 'rotate',
+                fallbackIcon: Icons.rotate_right,
+                tone: PixelButtonTone.secondary,
+                label: nextRotation == null
+                    ? '회전 공간 필요'
+                    : placementCatalog.directionFor(nextRotation).shortLabelKo,
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: SizedBox(
-                  height: 52,
-                  child: FilledButton.icon(
-                    key: const ValueKey<String>('placement-place-stored'),
-                    onPressed: anchors.isEmpty ? null : onPlace,
-                    icon: const Icon(Icons.grid_view_outlined),
-                    label: Text(atLimit ? '배치 한도 도달' : '빈 칸에 배치'),
-                  ),
+                child: PixelButton(
+                  key: const ValueKey<String>('placement-place-stored'),
+                  onPressed: anchors.isEmpty ? null : onPlace,
+                  actionAsset: 'place',
+                  fallbackIcon: Icons.grid_view_outlined,
+                  expand: true,
+                  label: atLimit ? '배치 한도 도달' : '빈 칸에 배치',
                 ),
               ),
             ],
@@ -578,22 +886,17 @@ class _PlacementControls extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              SizedBox(
-                height: 52,
-                child: FilledButton.tonalIcon(
-                  key: const ValueKey<String>('placement-rotate'),
-                  onPressed: nextRotation == null
-                      ? null
-                      : () => onRotate(nextRotation),
-                  icon: const Icon(Icons.rotate_right),
-                  label: Text(
-                    nextRotation == null
-                        ? '회전 공간 필요'
-                        : placementCatalog
-                              .directionFor(nextRotation)
-                              .shortLabelKo,
-                  ),
-                ),
+              PixelButton(
+                key: const ValueKey<String>('placement-rotate'),
+                onPressed: nextRotation == null
+                    ? null
+                    : () => onRotate(nextRotation),
+                assetPath: GeneratedArtPaths.editorMarker('rotate'),
+                fallbackIcon: Icons.rotate_right,
+                tone: PixelButtonTone.secondary,
+                label: nextRotation == null
+                    ? '회전 공간 필요'
+                    : placementCatalog.directionFor(nextRotation).shortLabelKo,
               ),
             ],
           ),
@@ -633,6 +936,107 @@ class _PlacementControls extends StatelessWidget {
     }
     return null;
   }
+}
+
+class _PlacementFeedback extends StatelessWidget {
+  const _PlacementFeedback({
+    required this.dragging,
+    required this.valid,
+    required this.current,
+    required this.preview,
+  });
+
+  final bool dragging;
+  final bool valid;
+  final VisitorEvaluation? current;
+  final VisitorEvaluation? preview;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!dragging) {
+      return const _SceneInstruction(
+        icon: 'grab_hand',
+        label: '물건을 끌어 옮기거나 아래 목록을 길게 눌러 배치',
+        color: PixelPalette.textBody,
+      );
+    }
+    if (!valid) {
+      return const _SceneInstruction(
+        icon: 'invalid_target',
+        label: '이 칸에는 놓을 수 없습니다',
+        color: PixelPalette.danger,
+      );
+    }
+    final before = current?.satisfiedCount;
+    final after = preview?.satisfiedCount;
+    final total = preview?.progress.length;
+    final improved = before != null && after != null && after > before;
+    final label = before == null || after == null || total == null
+        ? '놓으면 바로 저장됩니다'
+        : '${preview!.visitor.nameKo} 조건 $before/$total → $after/$total';
+    return _SceneInstruction(
+      icon: 'place_chevron',
+      label: label,
+      color: improved ? PixelPalette.action : PixelPalette.textStrong,
+    );
+  }
+}
+
+class _SceneInstruction extends StatelessWidget {
+  const _SceneInstruction({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  final String icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    liveRegion: true,
+    label: label,
+    child: Material(
+      color: PixelPalette.canvas.withValues(alpha: 0.90),
+      shape: const PixelCutBorder(color: PixelPalette.divider, cut: 5),
+      clipBehavior: Clip.hardEdge,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Image.asset(
+              GeneratedArtPaths.editorMarker(icon),
+              width: 22,
+              height: 22,
+              filterQuality: FilterQuality.none,
+            ),
+            const SizedBox(width: 7),
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+final class _CatalogPlacementDrag {
+  const _CatalogPlacementDrag({required this.objectId, required this.rotation});
+
+  final String objectId;
+  final int rotation;
 }
 
 extension _FirstOrNull<T> on Iterable<T> {

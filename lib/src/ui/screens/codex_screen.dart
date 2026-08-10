@@ -76,15 +76,15 @@ class _VisitorsTab extends StatelessWidget {
           ),
         ),
         for (final group in groups) ...<Widget>[
-          SliverToBoxAdapter(
-            child: _CollectionHeading(
-              label: group.label,
-              completed: group.items
-                  .where((visitor) => seenIds.contains(visitor.id))
-                  .length,
-              total: group.items.length,
+            SliverToBoxAdapter(
+              child: _CollectionHeading(
+                label: group.label,
+                completed: group.items
+                    .where((visitor) => seenIds.contains(visitor.id))
+                    .length,
+                total: group.items.length,
+              ),
             ),
-          ),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
             sliver: SliverGrid.builder(
@@ -361,13 +361,64 @@ class _RecipesTab extends StatelessWidget {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverList.separated(
-              itemCount: group.items.length,
+              itemCount:
+                  group.items
+                      .where(
+                        (recipe) =>
+                            controller.unlockedRecipeIds.contains(recipe.id),
+                      )
+                      .length +
+                  (group.items.any(
+                        (recipe) =>
+                            !controller.unlockedRecipeIds.contains(recipe.id),
+                      )
+                      ? 1
+                      : 0),
               separatorBuilder: (_, __) => const Divider(),
               itemBuilder: (BuildContext context, int index) {
-                final recipe = group.items[index];
-                final unlocked = controller.unlockedRecipeIds.contains(
-                  recipe.id,
-                );
+                final unlockedItems = group.items
+                    .where(
+                      (recipe) =>
+                          controller.unlockedRecipeIds.contains(recipe.id),
+                    )
+                    .toList(growable: false);
+                final lockedCount = group.items.length - unlockedItems.length;
+                if (index == unlockedItems.length) {
+                  return PixelCard(
+                    color: PixelPalette.scene,
+                    radius: PixelRadii.tile,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 14,
+                    ),
+                    child: Row(
+                      children: <Widget>[
+                        const Icon(
+                          Icons.lock_outline,
+                          color: PixelPalette.muted,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                '아직 만나지 못한 만드는 법 $lockedCount개',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '이 모음의 방문자 조건을 맞추면 차례로 열립니다.',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                final recipe = unlockedItems[index];
                 return PixelCard(
                   color: Colors.transparent,
                   radius: 0,
@@ -381,25 +432,16 @@ class _RecipesTab extends StatelessWidget {
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(
-                          color: unlocked
-                              ? PixelPalette.mint.withValues(alpha: 0.10)
-                              : PixelPalette.background,
+                          color: PixelPalette.mint.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(PixelRadii.tile),
                         ),
-                        child: unlocked
-                            ? Padding(
-                                padding: const EdgeInsets.all(3),
-                                child: ObjectVisualPreview(
-                                  visual: ObjectVisualDescriptor.forRecipe(
-                                    recipe,
-                                  ),
-                                  semanticLabel: '${recipe.nameKo} 기본 형태',
-                                ),
-                              )
-                            : const Icon(
-                                Icons.lock_outline,
-                                color: PixelPalette.muted,
-                              ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(3),
+                          child: ObjectVisualPreview(
+                            visual: ObjectVisualDescriptor.forRecipe(recipe),
+                            semanticLabel: '${recipe.nameKo} 기본 형태',
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -407,14 +449,12 @@ class _RecipesTab extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              unlocked ? recipe.nameKo : '잠긴 만드는 법',
+                              recipe.nameKo,
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              unlocked
-                                  ? '${recipe.stepCost}걸음 · 날씨 1개 · 주변 선택'
-                                  : '방문자가 새로운 만드는 법을 남깁니다.',
+                              '${recipe.stepCost}걸음 · 날씨 1개 · 주변 선택',
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ],

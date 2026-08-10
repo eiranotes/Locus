@@ -37,3 +37,7 @@ flutter:
     - assets/art/generated/v1/directional/
     - assets/art/generated/v1/construction/
     - assets/art/generated/v1/weather/
+    - assets/art/generated/v1/terrain/
+    - assets/art/generated/v1/atmosphere/
+    - assets/art/generated/v1/editor/
+    - assets/art/generated/v1/action/

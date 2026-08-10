@@ -18,6 +18,10 @@
       material, and atmosphere art package with prompt/source/hash provenance.
 - [x] Use generated sprites across the home scene, crafting, inventory, codex,
       visitor goal, and materials while preserving deterministic fallbacks.
+- [x] Generate and integrate a 50-piece scene/UI pixel-art pack with source,
+      prompt, contact-sheet, alpha, inventory, and hash provenance.
+- [x] Replace high-frequency rounded Material controls with cut-corner pixel
+      controls using the existing design palette and token inventory.
 
 ## Next
 
@@ -69,9 +73,9 @@
       unique visitor ID in the codex and persisted scene selection.
 - [ ] Tune sprite scale and occlusion against neighborhoods containing the full
       eight-object limit and validate large-text card layouts.
-- [ ] Add direct drag-to-cell manipulation after Flame/Flutter coordinate and
-      accessibility behavior has a tested contract.
-- [ ] Add target-visitor condition deltas for proposed placements.
+- [x] Add direct drag-to-cell manipulation across placed objects and
+      long-press catalog drops with tested Flame/Flutter projection behavior.
+- [x] Add target-visitor condition deltas for proposed placements.
 - [ ] Add compact/medium/expanded layout policies and large-text fallbacks for
       records, visitors, material pickers, and the placement catalog.
 

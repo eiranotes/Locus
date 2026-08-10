@@ -4,6 +4,15 @@
 
 ### Fixed
 
+- Visitor goals no longer expose internal English object, tag, weather, or time
+  identifiers in Korean UI.
+- Capture-result material art is precached and shows a glyph until the first
+  decoded asset frame is ready instead of capturing a blank orb.
+- Repeated locked recipe rows are collapsed into one undiscovered count per
+  collection, and visitor arrival names the recipe it unlocked.
+- Android launch-background XML now wraps its navy color in a valid rectangle
+  drawable, allowing AAPT resource linking to complete.
+
 - iOS simulator installation now has valid executable bundle metadata.
 - iOS cold launch no longer stops on a direct WAL pragma in sqflite.
 - Deterministic demo capture and crafting no longer request unavailable real
@@ -20,6 +29,15 @@
   assertion.
 
 ### Changed
+
+- High-frequency actions, cards, scene frames, dialogs, and placement controls
+  now use a cut-corner pixel-game grammar with pressed feedback. The existing
+  design-token inventory is unchanged.
+- Placed objects can be dragged directly across the diorama with live
+  valid/invalid previews and commit-on-release behavior. Stored objects can be
+  long-pressed from the catalog and dropped onto a chosen valid cell.
+- Placement previews now show the target visitor's before/after condition
+  count while reusing the production rule engines.
 
 - Expanded the deterministic collection to 28 recipes and 18 visitors while
   preserving the 5×5 board, eight-active-object limit, offline loop, and
@@ -80,6 +98,10 @@
 
 ### Assets
 
+- Added 50 distinct generated RGBA assets: 20 terrain details, 10 weather/time
+  details, 10 placement-editor markers, and 10 action emblems, with five source
+  atlases, prompts, contact sheet, hashes, and a reproducible processor.
+
 - Added 156 collection-expansion runtime sprites covering 18 base objects, 72
   true directional views, 54 construction stages, and 12 visitor portraits,
   plus source atlases, prompts, contact sheet, hashes, and a reproducible
@@ -109,6 +131,10 @@
   pixels do not obscure the daytime neighborhood grid.
 
 ### Tests
+
+- Added isometric viewport/cell projection round trips, Korean visitor-target
+  labels, exact 50-asset inventory/hash coverage, and pixel direction-control
+  regression coverage.
 
 - Added a deterministic progression test for the complete 28-recipe graph and
   dynamic generated-art coverage for all 18 visitor IDs.

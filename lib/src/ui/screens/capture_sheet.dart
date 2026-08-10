@@ -5,12 +5,15 @@ import 'package:reality_diorama/src/app/app_controller.dart';
 import 'package:reality_diorama/src/app/app_scope.dart';
 import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
+import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/services/capture_coordinator.dart';
 import 'package:reality_diorama/src/ui/screens/crafting_screen.dart';
 import 'package:reality_diorama/src/ui/widgets/material_visuals.dart';
 import 'package:reality_diorama/src/ui/widgets/atmospheric_trait_chips.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_button.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_surface.dart';
 
 class CaptureSheet extends StatefulWidget {
   const CaptureSheet({super.key});
@@ -109,18 +112,20 @@ class _CaptureSheetState extends State<CaptureSheet> {
               ),
               const SizedBox(height: 14),
               if (!_capturing && _result == null)
-                FilledButton.icon(
+                PixelButton(
                   onPressed:
                       preparation == null ||
                           (!preparation.weatherReadiness.isReady &&
                               !preparation.surroundingReadiness.isReady)
                       ? null
                       : () => _capture(preparation),
-                  icon: const Icon(Icons.sensors_outlined),
-                  label: const Text('수집 시작'),
+                  actionAsset: 'capture',
+                  fallbackIcon: Icons.sensors_outlined,
+                  expand: true,
+                  label: '수집 시작',
                 ),
               if (!_capturing && _result != null) ...<Widget>[
-                FilledButton.icon(
+                PixelButton(
                   onPressed: _result!.weatherMaterial == null
                       ? null
                       : () => Navigator.of(context).push<void>(
@@ -133,13 +138,19 @@ class _CaptureSheetState extends State<CaptureSheet> {
                             ),
                           ),
                         ),
-                  icon: const Icon(Icons.handyman_outlined),
-                  label: const Text('이 재료로 만들기'),
+                  actionAsset: 'craft',
+                  fallbackIcon: Icons.handyman_outlined,
+                  expand: true,
+                  label: '이 재료로 만들기',
                 ),
                 const SizedBox(height: 8),
-                OutlinedButton(
+                PixelButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('보관하고 닫기'),
+                  actionAsset: 'store',
+                  fallbackIcon: Icons.inventory_2_outlined,
+                  tone: PixelButtonTone.quiet,
+                  expand: true,
+                  label: '보관하고 닫기',
                 ),
               ],
             ],
@@ -165,6 +176,20 @@ class _CaptureSheetState extends State<CaptureSheet> {
     );
     if (!mounted) {
       return;
+    }
+    if (bundle != null) {
+      final assets = <String>[
+        if (bundle.weatherMaterial != null)
+          GeneratedArtPaths.weatherMaterial(bundle.weatherMaterial!.kind),
+        if (bundle.surroundingMaterial != null)
+          GeneratedArtPaths.surroundingMaterial(
+            bundle.surroundingMaterial!.kind,
+          ),
+      ];
+      await Future.wait(
+        assets.map((String path) => precacheImage(AssetImage(path), context)),
+      );
+      if (!mounted) return;
     }
     setState(() {
       _capturing = false;
@@ -214,6 +239,7 @@ class _PreparationView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               _ReadinessRow(
+                actionAsset: 'weather',
                 icon: value.weatherKind == null
                     ? Icons.cloud_off_outlined
                     : weatherIcon(value.weatherKind!),
@@ -248,6 +274,7 @@ class _PreparationView extends StatelessWidget {
           child: Column(
             children: <Widget>[
               _ReadinessRow(
+                actionAsset: 'surroundings',
                 icon: Icons.radar,
                 iconColor: PixelPalette.violet,
                 title: '주변',
@@ -321,7 +348,8 @@ class _CaptureSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: tone,
-      borderRadius: BorderRadius.circular(PixelRadii.tray),
+      shape: const PixelCutBorder(color: PixelPalette.divider, cut: 6),
+      clipBehavior: Clip.hardEdge,
       child: Padding(padding: const EdgeInsets.all(16), child: child),
     );
   }
@@ -329,6 +357,7 @@ class _CaptureSection extends StatelessWidget {
 
 class _ReadinessRow extends StatelessWidget {
   const _ReadinessRow({
+    this.actionAsset,
     required this.icon,
     required this.iconColor,
     required this.title,
@@ -337,6 +366,7 @@ class _ReadinessRow extends StatelessWidget {
   });
 
   final IconData icon;
+  final String? actionAsset;
   final Color iconColor;
   final String title;
   final String value;
@@ -347,7 +377,15 @@ class _ReadinessRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Icon(icon, color: iconColor, size: 28),
+        if (actionAsset == null)
+          Icon(icon, color: iconColor, size: 28)
+        else
+          Image.asset(
+            GeneratedArtPaths.action(actionAsset!),
+            width: 30,
+            height: 30,
+            filterQuality: FilterQuality.none,
+          ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(

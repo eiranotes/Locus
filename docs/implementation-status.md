@@ -15,7 +15,8 @@
 - crafting/construction flow;
 - 5×5 placement and visitor rules;
 - catalog-driven four-direction placement editor with selected footprints,
-  valid anchors, collision-aware disabled actions, and directional art;
+  valid anchors, collision-aware disabled actions, directional art, direct
+  board dragging, long-press catalog drops, and target-visitor deltas;
 - production-bound static pixel-art package shared by the home scene, crafting,
   inventory, and codex, with persisted `visualSeed` tint details and Canvas
   fallbacks;
@@ -29,7 +30,6 @@
 ## Deliberately not represented as complete
 
 - frame animation and additional scenery variants beyond the static v1 atlas;
-- direct drag placement and proposed visitor-condition deltas;
 - Apple Developer portal App ID/profile activation for WeatherKit;
 - Play Billing/App Store product identifiers;
 - home-screen widgets and Android Quick Settings tile;
@@ -75,7 +75,8 @@ The normal Flutter workflow is read-only. A separate `workflow_run` reporter may
 
 Distribution signing, store configuration, WeatherKit provisioning, production Android weather-provider selection, and physical-device accessibility/battery/thermal testing remain release gates rather than import gates.
 
-The current image-asset scope includes one owner-review AppIcon candidate plus
-the 42-asset static runtime package under `assets/art/generated/v1`. Prompts,
-source sheets, contact sheet, crop contract, and hashes are tracked under
-`artifacts/imagegen/locus-art-v1`.
+The current image-asset scope includes one owner-review AppIcon candidate and
+330 runtime PNG files under `assets/art/generated/v1`, representing 312 distinct
+payload hashes. The newest bounded package contributes 50 distinct terrain,
+atmosphere, editor, and action files. Prompts, source sheets, contact sheets,
+crop contracts, and hashes are tracked under `artifacts/imagegen/`.

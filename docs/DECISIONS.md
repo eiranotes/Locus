@@ -1,5 +1,37 @@
 # Decisions
 
+## 2026-08-10
+
+### Pixel-game UI polish changes components, not the token inventory
+
+The existing Night Cabinet colors remain the source of truth. This slice adds
+no color, spacing, typography, or radius token. High-frequency actions instead
+use one cut-corner, two-pixel-border control with a two-pixel pressed offset;
+cards, dialogs, scene frames, and direction controls use the same hard-edged
+shape grammar. Native text and Material semantics remain intact, and all
+interactive targets stay at least 48 dp.
+
+### Direct placement separates preview state from persisted state
+
+The Flutter/Flame boundary shares one reversible 360-unit isometric projection.
+A board drag preserves the pointer-to-object-anchor offset, updates only an
+editor-overlay `Placement`, and calls `placeOrMoveObject` once on a valid
+release. Invalid or cancelled drags discard the overlay. A long press on the
+catalog supports placing stored objects onto an explicit cell; the deterministic
+first-empty-cell button and direction pad remain keyboard/screen-reader-safe
+fallbacks. Preview visitor counts rebuild through the same environment,
+connection, and visitor engines used by a committed placement.
+
+### The 50-piece art addition is bounded by runtime roles
+
+The added ImageGen package contains exactly 20 terrain details, 10 atmosphere
+details, 10 editor markers, and 10 action emblems. Sources use the existing
+Locus contact sheets as strict style references and a removable magenta key.
+The processor produces distinct RGBA files and records dimensions, source cell,
+and SHA-256 for every output. These are ambient and interaction assets, so they
+do not expand the recipe catalog, visitor graph, 5×5 board, or eight-object
+active limit.
+
 ## 2026-08-09
 
 ### Night Cabinet replaces the universal outlined-card grammar
@@ -143,22 +175,24 @@ not runtime mirrors, so asymmetric openings, backs, signs, and approaches remain
 spatially truthful. Source atlases, reviewed row bounds, contact sheet, alpha
 processing, and hashes are retained as a reproducible authoring contract.
 
-Board selection fills, valid-anchor markers, connection emphasis, and direction
-controls remain code-rendered. They are stateful interaction feedback rather
-than collectible art and must scale cleanly with layout and accessibility.
+Board selection fills and connection emphasis remain code-rendered while the
+new generated editor markers reinforce valid, selected, invalid, grab, drop,
+direction, and rotation states. They are interaction feedback rather than
+collectible art and must scale cleanly with layout and accessibility.
 
 All editor actions query the same `PlacementEngine` validation used by commits.
 Invalid moves and rotations are disabled before mutation, selected footprints
 and valid anchors are visible on the board, and only connections involving the
-selected object remain emphasized. Direct drag is deferred until coordinate,
-gesture-cancellation, and accessibility behavior can be tested together.
+selected object remain emphasized. Direct drag now uses the same validation and
+commit API; its coordinate, cancellation, preview, and fallback contracts are
+recorded in the 2026-08-10 decision above.
 
 The editor catalog includes every crafted object, not only rows already present
 in the placements table. Stored or temporarily unplaced construction objects
 remain selectable, may preview any catalog-supported direction, and are written
-back only after the user presses the explicit empty-cell placement action. The
-first cell is deterministic row-major order; normal collision, footprint, and
-active-object-limit validation remains authoritative.
+back only after a valid long-press drop or the explicit empty-cell placement
+action. The fallback first cell is deterministic row-major order; normal
+collision, footprint, and active-object-limit validation remains authoritative.
 
 ### Combination art is layered, not exhaustively baked
 

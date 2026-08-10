@@ -11,6 +11,8 @@ import 'package:reality_diorama/src/ui/screens/crafting_screen.dart';
 import 'package:reality_diorama/src/ui/screens/placement_editor_screen.dart';
 import 'package:reality_diorama/src/ui/screens/settings_screen.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_button.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_surface.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -62,16 +64,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 12),
                 AspectRatio(
                   aspectRatio: 0.88,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: PixelPalette.scene,
-                      borderRadius: BorderRadius.circular(PixelRadii.scene),
+                  child: Material(
+                    color: PixelPalette.scene,
+                    shape: const PixelCutBorder(
+                      color: PixelPalette.divider,
+                      width: 2,
+                      cut: 8,
                     ),
+                    clipBehavior: Clip.hardEdge,
                     child: Stack(
                       children: <Widget>[
                         Positioned.fill(
                           child: DioramaView(
                             snapshot: controller.dioramaSnapshot,
+                            borderRadius: BorderRadius.zero,
                             semanticLabel: _sceneSemanticLabel(controller),
                           ),
                         ),
@@ -90,31 +96,28 @@ class _HomeScreenState extends State<HomeScreen> {
                             label: Text('${controller.captureReadyCount}'),
                             backgroundColor: PixelPalette.reward,
                             textColor: PixelPalette.actionInk,
-                            child: FilledButton.icon(
+                            child: PixelButton(
                               onPressed: widget.onCapture,
-                              icon: const Icon(
-                                Icons.sensors_outlined,
-                                size: 18,
-                              ),
-                              label: const Text('수집'),
+                              actionAsset: 'capture',
+                              fallbackIcon: Icons.sensors_outlined,
+                              label: '수집',
                             ),
                           ),
                         ),
                         Positioned(
                           right: 10,
                           bottom: 10,
-                          child: FilledButton.tonalIcon(
+                          child: PixelButton(
                             onPressed: () => Navigator.of(context).push<void>(
                               MaterialPageRoute<void>(
                                 builder: (BuildContext context) =>
                                     const PlacementEditorScreen(),
                               ),
                             ),
-                            icon: const Icon(
-                              Icons.grid_view_outlined,
-                              size: 18,
-                            ),
-                            label: const Text('배치 편집'),
+                            actionAsset: 'place',
+                            fallbackIcon: Icons.grid_view_outlined,
+                            tone: PixelButtonTone.secondary,
+                            label: '배치 편집',
                           ),
                         ),
                       ],
@@ -186,7 +189,12 @@ class _Header extends StatelessWidget {
         IconButton(
           onPressed: onSettings,
           tooltip: '설정',
-          icon: const Icon(Icons.more_horiz),
+          icon: Image.asset(
+            GeneratedArtPaths.action('settings'),
+            width: 24,
+            height: 24,
+            filterQuality: FilterQuality.none,
+          ),
         ),
       ],
     );
@@ -263,9 +271,7 @@ class _VisitorGoal extends StatelessWidget {
         .firstOrNull;
     return Material(
       color: PixelPalette.surface.withValues(alpha: 0.94),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(PixelRadii.card),
-      ),
+      shape: const PixelCutBorder(color: PixelPalette.divider, cut: 6),
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Row(
@@ -275,7 +281,7 @@ class _VisitorGoal extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 color: PixelPalette.blue.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: PixelPalette.divider),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(4),
@@ -314,7 +320,7 @@ class _VisitorGoal extends StatelessWidget {
                   Text(
                     missing == null
                         ? '조건을 모두 완성했습니다.'
-                        : '${missing.label} ${missing.current}/${missing.target}',
+                        : _visitorRequirementSummary(missing),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyMedium,
@@ -327,6 +333,13 @@ class _VisitorGoal extends StatelessWidget {
       ),
     );
   }
+}
+
+String _visitorRequirementSummary(RequirementProgress progress) {
+  if (progress.current == '있음' || progress.current == '없음') {
+    return '${progress.target} · ${progress.current}';
+  }
+  return '${progress.label} ${progress.current}/${progress.target}';
 }
 
 class _ConstructionCard extends StatelessWidget {
@@ -386,9 +399,11 @@ class _CraftPrompt extends StatelessWidget {
       highlighted: canCraft,
       child: Row(
         children: <Widget>[
-          Icon(
-            canCraft ? Icons.handyman_outlined : Icons.cloud_download_outlined,
-            color: canCraft ? PixelPalette.mint : PixelPalette.muted,
+          Image.asset(
+            GeneratedArtPaths.action(canCraft ? 'craft' : 'weather'),
+            width: 30,
+            height: 30,
+            filterQuality: FilterQuality.none,
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -427,16 +442,35 @@ class _VisitorArrivalDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final rewardRecipe = visitor.reward.kind == VisitorRewardKind.recipe
+        ? controller.catalog.recipeById(visitor.reward.value)
+        : null;
     return Dialog(
       insetPadding: const EdgeInsets.all(18),
       backgroundColor: PixelPalette.background,
+      shape: const PixelCutBorder(
+        color: PixelPalette.divider,
+        width: 2,
+        cut: 8,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text('새 방문자', style: Theme.of(context).textTheme.bodyMedium),
+            Row(
+              children: <Widget>[
+                Image.asset(
+                  GeneratedArtPaths.action('visitor'),
+                  width: 28,
+                  height: 28,
+                  filterQuality: FilterQuality.none,
+                ),
+                const SizedBox(width: 8),
+                Text('새 방문자', style: Theme.of(context).textTheme.bodyMedium),
+              ],
+            ),
             const SizedBox(height: 4),
             Text(
               visitor.nameKo,
@@ -449,10 +483,36 @@ class _VisitorArrivalDialog extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             Text(visitor.descriptionKo),
+            if (rewardRecipe != null) ...<Widget>[
+              const SizedBox(height: 10),
+              PixelCard(
+                color: PixelPalette.scene,
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  children: <Widget>[
+                    Image.asset(
+                      GeneratedArtPaths.action('codex'),
+                      width: 30,
+                      height: 30,
+                      filterQuality: FilterQuality.none,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        '새 만드는 법 · ${rewardRecipe.nameKo}',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
-            FilledButton(
+            PixelButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('계속 꾸미기'),
+              actionAsset: 'place',
+              expand: true,
+              label: '계속 꾸미기',
             ),
           ],
         ),

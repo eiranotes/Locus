@@ -354,6 +354,71 @@ extension AppControllerActions on AppController {
     return unseen.firstOrNull ?? snapshot.visitorEvaluations.firstOrNull;
   }
 
+  VisitorEvaluation? previewTargetVisitor({
+    required String craftedObjectId,
+    required int column,
+    required int row,
+    required int rotation,
+  }) {
+    final target = targetVisitor;
+    if (target == null) return null;
+    final object = _craftedObjects
+        .where((CraftedObject item) => item.id == craftedObjectId)
+        .firstOrNull;
+    if (object == null) return target;
+    final existing = _placements
+        .where((Placement item) => item.craftedObjectId == craftedObjectId)
+        .firstOrNull;
+    if (existing == null &&
+        _placements.length >= catalog.balance.activeObjectLimit) {
+      return target;
+    }
+    final candidate = Placement(
+      id: existing?.id ?? 'preview-$craftedObjectId',
+      craftedObjectId: craftedObjectId,
+      column: column,
+      row: row,
+      rotation: normalizeQuarterTurns(rotation),
+    );
+    final placements =
+        _placements
+            .where((Placement item) => item.craftedObjectId != craftedObjectId)
+            .toList(growable: true)
+          ..add(candidate);
+    final objectsById = <String, CraftedObject>{
+      for (final item in _craftedObjects) item.id: item,
+    };
+    final recipesById = <String, RecipeDefinition>{
+      for (final recipe in catalog.recipes) recipe.id: recipe,
+    };
+    final grid =
+        EnvironmentGridBuilder(
+          columns: catalog.balance.gridColumns,
+          rows: catalog.balance.gridRows,
+          atmosphericTraits: catalog.atmosphericTraits,
+        ).build(
+          placements: placements,
+          objectsById: objectsById,
+          recipesById: recipesById,
+        );
+    final graph = ConnectionGraphBuilder(
+      atmosphericTraits: catalog.atmosphericTraits,
+    ).build(placements: placements, objectsById: objectsById);
+    return const VisitorEngine().evaluate(
+      target.visitor,
+      VisitorContext(
+        grid: grid,
+        graph: graph,
+        placements: placements,
+        objectsById: objectsById,
+        recipesById: recipesById,
+        timeBand: sceneTimeBand,
+        weatherKind: currentWeatherKind,
+        atmosphericTraits: catalog.atmosphericTraits,
+      ),
+    );
+  }
+
   DioramaSnapshot get dioramaSnapshot {
     final objectsById = <String, CraftedObject>{
       for (final object in _craftedObjects) object.id: object,

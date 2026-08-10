@@ -4,6 +4,8 @@ import 'package:integration_test/integration_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:reality_diorama/main.dart' as app;
 import 'package:reality_diorama/src/data/database.dart';
+import 'package:reality_diorama/src/diorama/diorama_geometry.dart';
+import 'package:reality_diorama/src/diorama/diorama_view.dart';
 import 'package:sqflite/sqflite.dart';
 
 void main() {
@@ -69,6 +71,27 @@ void main() {
     await tester.tap(find.text('배치 편집'));
     await _waitForUi(tester);
     expect(find.text('배치 편집'), findsOneWidget);
+    final board = find.byType(DioramaView);
+    final boardSize = tester.getSize(board);
+    final boardTopLeft = tester.getTopLeft(board);
+    final from =
+        boardTopLeft +
+        DioramaGeometry.logicalToLocal(
+          DioramaGeometry.tileTop(0, 0),
+          boardSize,
+        );
+    final to =
+        boardTopLeft +
+        DioramaGeometry.logicalToLocal(
+          DioramaGeometry.tileTop(1, 0),
+          boardSize,
+        );
+    await tester.dragFrom(from, to - from);
+    await _waitForUi(tester, seconds: 2);
+    expect(
+      tester.widget<DioramaView>(board).snapshot.placements.single.column,
+      1,
+    );
     await binding.takeScreenshot('07-placement');
     await tester.tap(find.text('완료'));
     await _waitForUi(tester);

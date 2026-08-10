@@ -6,14 +6,36 @@ Last updated: 2026-08-10
 
 `main` contains the iOS simulator fixes, deterministic demo isolation, shared
 renderer, cataloged pixel-art packages, and a catalog-driven directional
-editor. The current working slice makes the home surface scene-first, keeps the
-latest persisted visitor visible after its one-time arrival dialog, adds a
-semantic scene summary, and establishes a repeatable iOS screenshot tour for
-the complete deterministic demo loop. The active UI migration now uses the
-Night Cabinet semantic palette and removes the global outlined-card treatment;
-collection is a scene action rather than an oversized navigation item.
+editor. The current working slice replaces generic rounded controls with
+cut-corner pixel-game surfaces without adding design tokens, adds direct
+drag-to-cell placement and target-visitor deltas, and installs 50 new generated
+scene/UI assets. The home surface remains scene-first, the latest persisted
+visitor remains visible after its one-time arrival dialog, and collection stays
+a scene action rather than an oversized navigation item.
 
 ## Completed in the current slice
+
+- Added direct manipulation for placed objects with grab-offset preservation,
+  live valid/invalid cell previews, commit-on-release persistence, and cancel
+  behavior that leaves the saved placement unchanged.
+- Added long-press drag from the crafted-object catalog onto the board while
+  keeping the explicit first-empty-cell action and 48 dp direction pad as
+  accessible alternatives.
+- Added live target-visitor condition counts during valid placement previews;
+  all preview calculations reuse the production environment, connection, and
+  visitor engines.
+- Generated, keyed, cropped, and installed 50 distinct RGBA assets: 20 terrain
+  details, 10 weather/time details, 10 editor markers, and 10 action emblems.
+  The runtime now contains 330 PNG files with 312 distinct payload hashes.
+- Replaced high-frequency generic Material buttons and smooth card/dialog
+  corners with pressed cut-corner pixel controls using the existing palette;
+  no color, spacing, or radius token was added.
+- Localized visitor requirement targets so raw ids such as `fountain`, `stay`,
+  `night`, and `clear` no longer leak into Korean UI.
+- Precached capture-result material art and kept a meaningful glyph visible
+  until the first asset frame arrives.
+- Collapsed repeated locked recipe rows into one per-collection undiscovered
+  summary and made the visitor arrival dialog name its unlocked recipe.
 
 - Expanded the collectible catalog from 10 to 28 placeable objects and from 6
   to 18 visitors across `골목 생활`, `정원 생태`, and `밤의 장터` sets.
@@ -206,20 +228,31 @@ Screen-by-screen inspection found no clipped content, overflow, hidden ink, or
 remaining floating-center action at the tested size. The Android demo debug APK
 also built successfully from that revision with Flutter 3.44.1.
 
+The pixel-control and direct-manipulation slice was verified on the existing
+`LocusPlacementQA` simulator. The final deterministic tour completed in 42
+seconds with all tests passed and exported 17 full-resolution screenshots plus
+a contact sheet under
+`artifacts/ui-screenshots/2026-08-10-pixel-drag/`. The tour dragged the first
+placed object from cell (0, 0) to (1, 0) and asserted the persisted snapshot,
+while the screenshot pass confirmed visible capture-result art, readable Korean
+visitor requirements, aggregate locked-recipe summaries, and no overflow on the
+inspected surfaces. `./tool/validate.sh` passed repository/content/Swift checks,
+analyzer, and all 66 tests. The required demo Android debug APK also built
+successfully after correcting the launch background's invalid direct hex
+drawable reference.
+
 ## Known risks and gates
 
 - The first production-bound atlas pass is installed, but it still needs final
   composition tuning against a range of populated neighborhoods and text sizes.
 - Place plaques and a share-output renderer remain outside this first shared
   renderer slice.
-- Direct drag placement and visitor-condition deltas remain future editor
-  enhancements; the current catalog-driven button editor validates each move,
-  rotation, removal, and replacement commit.
+- Direct drag is implemented and unit-tested at the projection/validation
+  boundary; touch feel, cancellation, and large-text behavior still require a
+  physical-device accessibility pass.
 - Atmospheric thresholds are initial balance values and need product telemetry
   or structured playtest evidence before expanding providers or adding more
   traits.
-- The scene-first home, persisted visitor presence, and a semantic diorama
-  summary are the next P1 UI slice from the Pro review.
 - Directional art is authoring-complete for the current ten recipes, but a later
   populated-neighborhood visual pass may still tune individual scale/occlusion.
 - The AppIcon candidate requires owner review at actual icon sizes before use.

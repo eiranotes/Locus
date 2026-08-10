@@ -245,4 +245,59 @@ void main() {
       expect(result.progress.single.current, '확인할 수 없음');
     },
   );
+
+  test('visitor requirements expose Korean labels instead of internal ids', () {
+    final recipe = testRecipe(
+      id: 'fountain',
+      kind: ObjectKind.fountain,
+      tags: const <String>{'stay'},
+    );
+    final object = testObject(
+      id: 'fountain-object',
+      recipeId: recipe.id,
+      kind: ObjectKind.fountain,
+    );
+    const placement = Placement(
+      id: 'fountain-placement',
+      craftedObjectId: 'fountain-object',
+      column: 1,
+      row: 1,
+      rotation: 0,
+    );
+    final visitor = VisitorDefinition(
+      id: 'localized-visitor',
+      nameKo: '표시 테스트',
+      descriptionKo: '테스트',
+      hintsKo: const <String>[],
+      requirements: const <VisitorRequirement>[
+        VisitorRequirement(kind: 'objectKind', anyOf: <String>['fountain']),
+        VisitorRequirement(kind: 'objectTag', anyOf: <String>['stay']),
+        VisitorRequirement(kind: 'timeBand', anyOf: <String>['night']),
+        VisitorRequirement(kind: 'weatherKind', anyOf: <String>['clear']),
+      ],
+      reward: const VisitorReward(
+        kind: VisitorRewardKind.effect,
+        value: 'test',
+      ),
+    );
+    final result = const VisitorEngine().evaluate(
+      visitor,
+      VisitorContext(
+        grid: EnvironmentGrid(columns: 5, rows: 5),
+        graph: const ConnectionGraph(edges: <ConnectionEdge>[]),
+        placements: const <Placement>[placement],
+        objectsById: <String, CraftedObject>{object.id: object},
+        recipesById: <String, RecipeDefinition>{recipe.id: recipe},
+        timeBand: TimeBand.afternoon,
+        weatherKind: WeatherMaterialKind.rain,
+      ),
+    );
+
+    expect(result.progress.map((item) => item.target), <String>[
+      '작은 분수',
+      '머무름',
+      '밤',
+      '맑음',
+    ]);
+  });
 }

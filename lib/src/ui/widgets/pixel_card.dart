@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reality_diorama/src/app/theme.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_surface.dart';
 
 class PixelCard extends StatelessWidget {
   const PixelCard({
@@ -25,19 +26,17 @@ class PixelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = BorderRadius.circular(radius);
-    final shape = RoundedRectangleBorder(
-      borderRadius: borderRadius,
-      side: highlighted
-          ? const BorderSide(color: PixelPalette.action, width: 1.5)
-          : BorderSide.none,
+    final shape = PixelCutBorder(
+      color: highlighted ? PixelPalette.action : PixelPalette.divider,
+      width: highlighted ? 2 : 1,
+      cut: radius == 0 ? 0 : 6,
     );
     if (onTap == null) {
       return Material(
         color:
             color ?? (highlighted ? PixelPalette.raised : PixelPalette.panel),
         shape: shape,
-        clipBehavior: Clip.antiAlias,
+        clipBehavior: Clip.hardEdge,
         child: Padding(padding: padding, child: child),
       );
     }
@@ -49,10 +48,10 @@ class PixelCard extends StatelessWidget {
         color:
             color ?? (highlighted ? PixelPalette.raised : PixelPalette.panel),
         shape: shape,
-        clipBehavior: Clip.antiAlias,
+        clipBehavior: Clip.hardEdge,
         child: InkWell(
           onTap: onTap,
-          borderRadius: borderRadius,
+          customBorder: shape,
           splashColor: PixelPalette.action.withValues(alpha: 0.12),
           highlightColor: PixelPalette.action.withValues(alpha: 0.07),
           child: Padding(padding: padding, child: child),

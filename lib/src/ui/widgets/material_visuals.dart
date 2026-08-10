@@ -93,6 +93,8 @@ class MaterialOrb extends StatelessWidget {
           assetPath,
           fit: BoxFit.contain,
           filterQuality: FilterQuality.none,
+          frameBuilder: (BuildContext context, Widget child, int? frame, _) =>
+              frame == null ? Icon(icon, color: color, size: 27) : child,
           errorBuilder: (_, __, ___) => Icon(icon, color: color, size: 27),
         ),
       ),

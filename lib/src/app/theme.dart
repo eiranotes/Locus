@@ -113,8 +113,8 @@ ThemeData buildAppTheme() {
     cardTheme: CardThemeData(
       color: PixelPalette.panel,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(PixelRadii.card),
+      shape: BeveledRectangleBorder(
+        borderRadius: BorderRadius.circular(PixelRadii.chip),
       ),
     ),
     appBarTheme: const AppBarTheme(
@@ -122,6 +122,13 @@ ThemeData buildAppTheme() {
       foregroundColor: PixelPalette.textStrong,
       elevation: 0,
       centerTitle: false,
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: PixelPalette.canvas,
+      shape: BeveledRectangleBorder(
+        borderRadius: BorderRadius.circular(PixelRadii.chip),
+        side: const BorderSide(color: PixelPalette.divider),
+      ),
     ),
     navigationBarTheme: NavigationBarThemeData(
       height: 74,
@@ -144,8 +151,8 @@ ThemeData buildAppTheme() {
         backgroundColor: PixelPalette.action,
         foregroundColor: PixelPalette.actionInk,
         minimumSize: const Size(44, 48),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(PixelRadii.control),
+        shape: BeveledRectangleBorder(
+          borderRadius: BorderRadius.circular(PixelRadii.chip),
         ),
         textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
       ),
@@ -155,14 +162,18 @@ ThemeData buildAppTheme() {
         foregroundColor: PixelPalette.textStrong,
         minimumSize: const Size(44, 48),
         side: const BorderSide(color: PixelPalette.divider),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(PixelRadii.control),
+        shape: BeveledRectangleBorder(
+          borderRadius: BorderRadius.circular(PixelRadii.chip),
         ),
       ),
     ),
-    snackBarTheme: const SnackBarThemeData(
+    snackBarTheme: SnackBarThemeData(
       backgroundColor: PixelPalette.raised,
-      contentTextStyle: TextStyle(color: PixelPalette.textStrong),
+      contentTextStyle: const TextStyle(color: PixelPalette.textStrong),
+      shape: BeveledRectangleBorder(
+        borderRadius: BorderRadius.circular(PixelRadii.chip),
+        side: const BorderSide(color: PixelPalette.divider),
+      ),
     ),
     dividerTheme: const DividerThemeData(
       color: PixelPalette.divider,
