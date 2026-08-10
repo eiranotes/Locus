@@ -351,7 +351,7 @@ class _VisitorGoal extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     missing == null
-                        ? '조건을 모두 완성했습니다.'
+                        ? '조건 완성'
                         : _visitorRequirementSummary(missing),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -362,11 +362,11 @@ class _VisitorGoal extends StatelessWidget {
                     repeatWait != null && repeatWait! > Duration.zero
                         ? _repeatWaitLabel(repeatWait!)
                         : clue != null
-                        ? '패턴 단서 · ${compactPatternLabel(clue.pattern)}에서 다시 확인'
+                        ? '패턴 단서 · ${compactPatternLabel(clue.pattern)}'
                         : discovered
-                        ? '조건이 맞으면 장면 기록이 하나 더 남습니다.'
+                        ? '조건을 유지하면 다시 옵니다.'
                         : rewardRecipeName == null
-                        ? '조건을 맞추면 새 기록이 열립니다.'
+                        ? '조건을 맞추면 찾아옵니다.'
                         : '첫 만남 보상 · $rewardRecipeName',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -468,14 +468,12 @@ class _CraftPrompt extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  canCraft ? '지금 만들 수 있는 물건 보기' : '먼저 날씨를 수집해 주세요',
+                  canCraft ? '물건 만들기' : '날씨 수집 필요',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  canCraft
-                      ? '수집한 재료와 걸음으로 물건을 만들면 내 공간에 놓입니다.'
-                      : '날씨를 모아 걸음으로 물건을 만듭니다. 주변 흔적은 선택입니다.',
+                  canCraft ? '재료와 걸음 준비됨' : '주변 수집은 선택',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],

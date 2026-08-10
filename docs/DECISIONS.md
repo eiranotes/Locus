@@ -2,6 +2,22 @@
 
 ## 2026-08-10
 
+### Capture history is a visual ledger, not a generic status list
+
+Each capture card composes a stable mini-scene from its record ID, time band,
+season, optional weather material, and optional surroundings material. The
+composition reuses the shipping scenery, terrain, time, weather, atmosphere,
+and material assets through `GeneratedArtPaths`; it does not create a second
+renderer contract or add tokens and bitmap files. The stored record remains
+the source of truth, so reopening a page produces the same postcard.
+
+Visible product copy follows a state-first rule: show the current state, the
+next action, or a required boundary once, rather than narrating the interface.
+Regional weather-model limits, sensor non-identification, provider/legal
+attribution, recoverable errors, and screen-reader semantics are not removed by
+this rule. They may be shortened only when the remaining text keeps the same
+meaning.
+
 ### Recipe progression is layered and only actionable visitors become goals
 
 The 28-recipe library now unfolds as 10 initial recipes followed by three

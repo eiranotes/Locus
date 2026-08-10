@@ -34,7 +34,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final controller = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('설정과 정보')),
+      appBar: AppBar(title: const Text('설정')),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: <Widget>[
@@ -56,15 +56,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: <Widget>[
                 const _InfoLine(
                   icon: Icons.phone_iphone,
-                  text: '기록과 게임 상태는 기기에 저장됩니다.',
+                  text: '기록은 이 기기에 저장됩니다.',
                 ),
                 const _InfoLine(
                   icon: Icons.bluetooth,
-                  text: '주변 스캔은 8초 동안 명시적으로 실행되며 기기 식별자를 저장하지 않습니다.',
+                  text: '주변 읽기 8초 · 기기 식별 정보 저장 안 함',
                 ),
                 const _InfoLine(
                   icon: Icons.location_on_outlined,
-                  text: '공유 화면에는 정확한 좌표를 기본 표시하지 않습니다.',
+                  text: '공유 화면은 정확한 좌표를 숨깁니다.',
                 ),
               ],
             ),
@@ -109,8 +109,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         const SizedBox(height: 6),
                         Text(
-                          attribution?.notice ??
-                              '날씨 데이터를 게임용 재료로 변환한 값이며 정확한 지점의 직접 측정이라고 표현하지 않습니다.',
+                          attribution?.notice ?? '지역 날씨 모델을 게임 재료로 사용합니다.',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         if (legalUri != null) ...<Widget>[
@@ -118,7 +117,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           TextButton.icon(
                             onPressed: () => _openExternal(legalUri),
                             icon: const Icon(Icons.open_in_new, size: 18),
-                            label: const Text('날씨 데이터 출처와 법적 고지'),
+                            label: const Text('날씨 출처 및 법적 고지'),
                           ),
                         ],
                       ],
@@ -147,7 +146,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      widget.demoMode ? '오프라인 데모 데이터 사용 중' : '기기 센서 모드',
+                      widget.demoMode ? '오프라인 데모' : '기기 센서 사용',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -187,9 +186,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       } else if (status.isPermanentlyDenied) {
         await openAppSettings();
       } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('권한을 허용하지 않아 현재 걸음 설정을 유지합니다.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('걸음 권한이 없어 설정을 유지합니다.')));
       }
     } finally {
       if (mounted) {
@@ -240,18 +239,18 @@ class _StepSourceCard extends StatelessWidget {
     final mode = controller.stepTrackingMode;
     final (title, description, icon) = switch (mode) {
       StepTrackingMode.real => (
-        '기기 걸음 사용 중',
-        '최근 걸음을 물건 제작에 사용합니다. 현재 ${formatNumber(controller.availableSteps)}걸음을 쓸 수 있습니다.',
+        '기기 걸음',
+        '사용 가능 ${formatNumber(controller.availableSteps)}걸음',
         Icons.directions_walk,
       ),
       StepTrackingMode.fallback => (
-        '기본 작업량 사용 중',
-        '걸음 권한 없이 하루 ${formatNumber(controller.fallbackDailySteps)}의 작업량을 사용합니다.',
+        '기본 작업량',
+        '하루 ${formatNumber(controller.fallbackDailySteps)}걸음',
         Icons.construction_outlined,
       ),
       StepTrackingMode.undecided => (
-        '제작 걸음 선택 전',
-        '첫 제작 전에 실제 걸음 또는 기본 작업량을 선택합니다.',
+        '걸음 설정 필요',
+        '실제 걸음 또는 기본 작업량을 선택하세요.',
         Icons.directions_walk_outlined,
       ),
     };

@@ -101,6 +101,12 @@ when timestamps match. Weather materials, surroundings materials, and collected
 patterns keep their existing complete domain queries because they are active
 crafting/collection state rather than the visual history ledger.
 
+`RecordScenePreview` turns each loaded ledger row into a stable visual summary.
+Its selector hashes the capture ID and combines that stable variation with the
+persisted time band and season plus any referenced weather and surroundings
+materials. It resolves only paths already owned by `GeneratedArtPaths`; the
+composition is presentation-only and adds no persisted visual state.
+
 ## Diorama renderer
 
 The renderer uses a fixed logical 360×360 scene and 5×5 2:1 isometric tiles.

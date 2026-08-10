@@ -160,9 +160,7 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
               ),
               const SizedBox(height: 10),
               if (editorObjects.isEmpty)
-                const PixelCard(
-                  child: Text('배치할 물건이 없습니다. 물건을 만들면 이 카탈로그에 추가됩니다.'),
-                )
+                const PixelCard(child: Text('만든 물건이 없습니다.'))
               else ...<Widget>[
                 _PlacementObjectCatalog(
                   controller: controller,
@@ -973,7 +971,7 @@ class _PlacementFeedback extends StatelessWidget {
     if (!dragging) {
       return const _SceneInstruction(
         icon: 'grab_hand',
-        label: '놓인 물건은 직접 끌기 · 보관함 물건은 길게 눌러 배치',
+        label: '놓인 물건은 끌기 · 보관 물건은 길게 눌러 배치',
         color: PixelPalette.textBody,
       );
     }
@@ -1000,7 +998,7 @@ class _PlacementFeedback extends StatelessWidget {
     final label = completedLabels.isNotEmpty
         ? '${preview!.visitor.nameKo} · ${completedLabels.join(' · ')} 완성'
         : before == null || after == null || total == null
-        ? '놓으면 바로 저장됩니다'
+        ? '놓으면 저장'
         : '${preview!.visitor.nameKo} 조건 $before/$total → $after/$total';
     return _SceneInstruction(
       icon: 'place_chevron',

@@ -49,6 +49,14 @@
 
 ### Changed
 
+- Capture-history cards now show deterministic pixel postcards assembled from
+  their time, season, weather, surroundings, and stable record identity instead
+  of repeating a generic stamp.
+- Home, capture, crafting, inventory, codex, placement, and settings copy is
+  shorter and avoids repeating visible state or the same next action. Privacy,
+  regional-weather-model, provider, recovery, and accessibility wording stays
+  explicit.
+
 - The 28-recipe collection now unfolds through deterministic 10/7/7/4 layers
   instead of placing nearly every visitor reward directly after the initial
   catalog. Later codex entries name their missing prerequisite recipe.

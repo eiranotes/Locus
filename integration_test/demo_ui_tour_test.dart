@@ -271,7 +271,7 @@ void main() {
     await _waitForUi(tester);
     await tester.tap(find.byTooltip('설정'));
     await _waitForUi(tester);
-    expect(find.text('설정과 정보'), findsOneWidget);
+    expect(find.text('설정'), findsOneWidget);
     await binding.takeScreenshot('14-settings');
   });
 }

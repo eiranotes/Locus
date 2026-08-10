@@ -82,7 +82,7 @@ class _VisitorsTab extends StatelessWidget {
             label: '만난 방문자',
             completed: seenIds.length,
             total: controller.catalog.visitors.length,
-            supportingText: '시간·날씨 패턴을 단서로 삼아 방문자 기록을 채워보세요.',
+            supportingText: '패턴에서 방문자 단서를 찾을 수 있습니다.',
           ),
         ),
         for (final group in groups) ...<Widget>[
@@ -266,7 +266,7 @@ class _ObjectKindsTab extends StatelessWidget {
                 label: '만들어 본 물건',
                 completed: madeRecipeIds.length,
                 total: controller.catalog.recipes.length,
-                supportingText: '한 번 만든 물건은 보관함에서 꺼내 다른 골목 조합에 다시 쓸 수 있어요.',
+                supportingText: '보관한 물건은 다시 배치할 수 있습니다.',
               ),
             ),
             for (final group in groups) ...<Widget>[
@@ -372,7 +372,7 @@ class _ObjectKindsTab extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            made ? '$count개 제작' : '만드는 법을 찾아보세요.',
+                            made ? '$count개 제작' : '만드는 법 미발견',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: Theme.of(context).textTheme.bodyMedium,
@@ -411,7 +411,7 @@ class _RecipesTab extends StatelessWidget {
             label: '찾은 만드는 법',
             completed: controller.unlockedRecipeIds.length,
             total: controller.catalog.recipes.length,
-            supportingText: '배치 조건을 맞춰 방문자를 만나면 새로운 만드는 법이 열립니다.',
+            supportingText: '방문자를 만나 새 만드는 법을 찾습니다.',
           ),
         ),
         for (final group in groups) ...<Widget>[
@@ -472,12 +472,12 @@ class _RecipesTab extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Text(
-                                '아직 만나지 못한 만드는 법 $lockedCount개',
+                                '잠긴 만드는 법 $lockedCount개',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '이 모음의 방문자 조건을 맞추면 차례로 열립니다.',
+                                '방문자를 만나면 열립니다.',
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             ],

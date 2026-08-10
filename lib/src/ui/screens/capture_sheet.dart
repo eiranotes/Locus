@@ -271,7 +271,7 @@ class _PreparationView extends StatelessWidget {
               ],
               const SizedBox(height: 8),
               Text(
-                '지역 날씨 모델값을 게임 흔적으로 바꿉니다. 현장 측정값을 뜻하지 않습니다.',
+                '지역 날씨 모델 · 현장 측정 아님',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -287,7 +287,7 @@ class _PreparationView extends StatelessWidget {
                 icon: Icons.radar,
                 iconColor: PixelPalette.violet,
                 title: '주변',
-                value: '8초 동안 전파 패턴 읽기',
+                value: '8초 읽기',
                 readiness: value.surroundingReadiness,
               ),
               if (value.surroundingReadiness.isReady) ...<Widget>[
@@ -297,7 +297,7 @@ class _PreparationView extends StatelessWidget {
                   value: includeSurroundings,
                   onChanged: onSurroundingsChanged,
                   title: const Text('주변까지 함께 수집'),
-                  subtitle: const Text('사람 수나 특정 기기를 기록하지 않습니다.'),
+                  subtitle: const Text('기기 식별 정보는 저장하지 않음'),
                 ),
               ],
             ],
@@ -315,7 +315,7 @@ class _PreparationView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      '제작에 쓸 수 있는 걸음',
+                      '사용 가능한 걸음',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 3),
@@ -338,7 +338,7 @@ class _PreparationView extends StatelessWidget {
         ),
         const SizedBox(height: 18),
         Text(
-          '준비된 재료는 수집할 때까지 유지됩니다. 지금 만들지 않아도 자동으로 보관됩니다.',
+          '준비된 재료는 자동 보관됩니다.',
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.center,
         ),
@@ -445,12 +445,12 @@ class _CaptureProgress extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            scansSurroundings ? '주변을 읽는 중' : '날씨를 기록하는 중',
+            scansSurroundings ? '주변 읽는 중' : '날씨 저장 중',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 8),
           Text(
-            scansSurroundings ? '화면을 켠 상태로 잠시 기다려 주세요.' : '준비된 날씨 재료를 저장합니다.',
+            scansSurroundings ? '화면을 켠 채 기다려 주세요.' : '잠시만 기다려 주세요.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ],
@@ -559,7 +559,7 @@ class _ResultView extends StatelessWidget {
           ),
         if (bundle.weatherMaterial == null &&
             bundle.surroundingMaterial == null)
-          const PixelCard(child: Text('새로 준비된 재료가 없어 기록만 확인했습니다.')),
+          const PixelCard(child: Text('새 재료 없음 · 기록만 저장')),
         if (bundle.patterns.isNotEmpty) ...<Widget>[
           const SizedBox(height: 14),
           _CollectedPatternsSection(
@@ -648,12 +648,12 @@ class _CollectedPatternsSection extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '이번에 수집한 패턴',
+                  '수집 패턴',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
               Text(
-                '신규 $newCount · 다시 만남 $repeatedCount',
+                '신규 $newCount · 반복 $repeatedCount',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
@@ -673,7 +673,7 @@ class _CollectedPatternsSection extends StatelessWidget {
             _PatternResultSummary(
               title: '동시 조합',
               count: combinations.length,
-              summary: '같은 순간의 정보 조합도 별도 수집물로 저장',
+              summary: '같은 순간에 모인 정보',
             ),
             const SizedBox(height: 11),
             for (
@@ -696,7 +696,7 @@ class _CollectedPatternsSection extends StatelessWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  '외 ${combinations.length - representatives.length}개 · 보관함 패턴에서 확인',
+                  '나머지 ${combinations.length - representatives.length}개 · 보관함에서 확인',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ),
@@ -711,7 +711,7 @@ class _CollectedPatternsSection extends StatelessWidget {
               title: '${targetVisitor!.nameKo} 단서',
               count: targetEvidence.length,
               summary:
-                  '${targetEvidence.map((VisitorPatternEvidence item) => compactPatternLabel(item.pattern)).join(' · ')} · 소모되지 않음',
+                  '${targetEvidence.map((VisitorPatternEvidence item) => compactPatternLabel(item.pattern)).join(' · ')} · 비소모 단서',
             ),
           ],
         ],

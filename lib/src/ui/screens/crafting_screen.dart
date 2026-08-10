@@ -343,7 +343,7 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
           Text('날씨 재료', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           if (controller.availableWeatherMaterials.isEmpty)
-            const PixelCard(child: Text('사용 가능한 날씨 재료가 없습니다. 먼저 수집해 주세요.'))
+            const PixelCard(child: Text('날씨를 먼저 수집해 주세요.'))
           else
             _WeatherPicker(
               materials: controller.availableWeatherMaterials,
@@ -357,13 +357,8 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
           if (weather != null) ...<Widget>[
             const SizedBox(height: 18),
             Text(
-              '이번 물건에서 살릴 흔적',
+              '남길 흔적 · 하나 선택',
               style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '재료의 흔적 중 하나만 골라 형태와 배치 효과를 또렷하게 남깁니다.',
-              style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 8),
             _TraitFocusPicker(
@@ -396,7 +391,7 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
           ),
           const SizedBox(height: 8),
           if (controller.availableSurroundingMaterials.isEmpty)
-            const PixelCard(child: Text('주변 재료 없이 기본 인접 기능으로 만들 수 있습니다.'))
+            const PixelCard(child: Text('선택 없이도 만들 수 있습니다.'))
           else
             _SurroundingPicker(
               materials: controller.availableSurroundingMaterials,
@@ -547,7 +542,7 @@ class _CraftingActionPanel extends StatelessWidget {
           if (constructionInProgress) ...<Widget>[
             const SizedBox(height: 8),
             const Text(
-              '진행 중인 공사가 있어 새 물건을 시작할 수 없습니다.',
+              '진행 중인 공사를 먼저 마쳐 주세요.',
               style: TextStyle(color: PixelPalette.amber),
             ),
           ],
@@ -561,9 +556,7 @@ class _CraftingActionPanel extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            canComplete
-                ? '완성되면 빈 칸에 놓이며 언제든 직접 옮길 수 있습니다.'
-                : '현재 걸음을 먼저 쓰고, 남은 걸음은 이후 동기화할 때 채웁니다.',
+            canComplete ? '완성 후 빈 칸에 자동 배치' : '남은 걸음은 다음 동기화 때 반영',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium,
           ),

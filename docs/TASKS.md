@@ -45,6 +45,11 @@
       and keep prerequisite-gated visitors out of active home goals.
 - [x] Replace the latest-100 capture-record ceiling with stable 24-row pages,
       an exact total, and a pixel-style explicit load-more action.
+- [x] Turn capture-history cards into deterministic pixel postcards using the
+      record's stored context and the existing authored art catalog.
+- [x] Audit primary UI copy for repeated state/next-action explanations and
+      distill it without removing privacy, provider, recovery, or accessibility
+      requirements.
 
 ## Next
 

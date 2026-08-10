@@ -15,6 +15,7 @@ import 'package:reality_diorama/src/ui/widgets/atmospheric_trait_chips.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_button.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_pattern_mark.dart';
+import 'package:reality_diorama/src/ui/widgets/record_scene_preview.dart';
 
 class InventoryScreen extends StatelessWidget {
   const InventoryScreen({super.key});
@@ -87,7 +88,7 @@ class _RecordsTab extends StatelessWidget {
       return const _EmptyState(
         icon: Icons.photo_library_outlined,
         title: '아직 수집 기록이 없습니다',
-        body: '준비된 날씨를 수집하면 이곳에 출처가 남습니다.',
+        body: '날씨를 수집하면 기록이 남습니다.',
       );
     }
     final weatherById = <String, WeatherMaterial>{
@@ -177,8 +178,9 @@ class _RecordCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final kind = weather?.kind ?? WeatherMaterialKind.cloudy;
-    final accent = weatherColor(kind);
+    final accent = weather == null
+        ? PixelPalette.textMuted
+        : weatherColor(weather!.kind);
     return PixelCard(
       radius: PixelRadii.tile,
       color: PixelPalette.scene,
@@ -187,36 +189,12 @@ class _RecordCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Expanded(
-            child: Container(
+            child: SizedBox(
               width: double.infinity,
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(PixelRadii.tile),
-              ),
-              child: Stack(
-                children: <Widget>[
-                  Positioned.fill(
-                    child: CustomPaint(
-                      painter: _RecordStampPainter(
-                        accent: accent,
-                        seed: record.capturedAt.millisecondsSinceEpoch,
-                      ),
-                    ),
-                  ),
-                  Center(
-                    child: Icon(weatherIcon(kind), color: accent, size: 42),
-                  ),
-                  if (surroundings != null)
-                    Positioned(
-                      right: 8,
-                      bottom: 8,
-                      child: Icon(
-                        surroundingIcon(surroundings!.kind),
-                        color: PixelPalette.violet,
-                        size: 20,
-                      ),
-                    ),
-                ],
+              child: RecordScenePreview(
+                record: record,
+                weather: weather,
+                surroundings: surroundings,
               ),
             ),
           ),
@@ -234,7 +212,7 @@ class _RecordCard extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           Text(
-            weather == null ? '기록만 저장됨' : weather!.kind.labelKo,
+            weather?.kind.labelKo ?? '날씨 없음',
             style: TextStyle(color: accent, fontWeight: FontWeight.w700),
           ),
         ],
@@ -256,7 +234,7 @@ class _MaterialsTab extends StatelessWidget {
       return const _EmptyState(
         icon: Icons.blur_circular,
         title: '보관된 재료가 없습니다',
-        body: '수집한 재료는 사용하기 전까지 이곳에 남습니다.',
+        body: '수집한 재료가 여기에 쌓입니다.',
       );
     }
     return ListView(
@@ -272,7 +250,7 @@ class _MaterialsTab extends StatelessWidget {
         Text('주변', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
         if (surroundings.isEmpty)
-          const PixelCard(child: Text('주변 재료는 선택 수집입니다.'))
+          const PixelCard(child: Text('주변 재료는 선택입니다.'))
         else
           for (final material in surroundings) ...<Widget>[
             _SurroundingMaterialRow(material: material),
@@ -389,7 +367,7 @@ class _PatternsTab extends StatelessWidget {
       return const _EmptyState(
         visual: PixelPatternStamp(size: 52, color: PixelPalette.muted),
         title: '아직 수집한 패턴이 없습니다',
-        body: '날씨와 주변 정보를 수집하면 각 정보와 동시 조합이 여기에 남습니다.',
+        body: '수집하면 시간·날씨·주변 패턴이 남습니다.',
       );
     }
     final grouped = <String, List<CollectedPattern>>{};
@@ -454,7 +432,7 @@ class _PatternsTab extends StatelessWidget {
         _PatternSectionHeading(
           title: '개별 패턴',
           count: individualCount,
-          body: '시간·날씨 기록은 방문자 조건을 읽는 비소모 단서',
+          body: '방문자 단서 · 소모되지 않음',
         ),
         const SizedBox(height: 10),
         PixelCard(
@@ -495,7 +473,7 @@ class _PatternsTab extends StatelessWidget {
         _PatternSectionHeading(
           title: '동시 조합',
           count: combinations.length,
-          body: '같은 순간에 모인 정보가 만든 별도 수집물',
+          body: '같은 수집에서 함께 나타난 정보',
         ),
         const SizedBox(height: 10),
         PixelCard(
@@ -742,7 +720,7 @@ class _ObjectsTab extends StatelessWidget {
       return const _EmptyState(
         icon: Icons.handyman_outlined,
         title: '아직 만든 물건이 없습니다',
-        body: '날씨 재료와 걸음을 사용해 첫 물건을 만들어 보세요.',
+        body: '첫 물건을 만들어 보세요.',
       );
     }
     final weatherById = <String, WeatherMaterial>{
@@ -859,46 +837,6 @@ class _ObjectsTab extends StatelessWidget {
       },
     );
   }
-}
-
-class _RecordStampPainter extends CustomPainter {
-  const _RecordStampPainter({required this.accent, required this.seed});
-
-  final Color accent;
-  final int seed;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..isAntiAlias = false
-      ..color = accent.withValues(alpha: 0.14);
-    for (var index = 0; index < 18; index += 1) {
-      final x = ((seed ~/ (index + 3) + index * 31) % 100) / 100 * size.width;
-      final y = ((seed ~/ (index + 7) + index * 47) % 100) / 100 * size.height;
-      final unit = index.isEven ? 3.0 : 2.0;
-      canvas.drawRect(Rect.fromLTWH(x, y, unit, unit), paint);
-    }
-    final line = Paint()
-      ..isAntiAlias = false
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1
-      ..color = accent.withValues(alpha: 0.25);
-    canvas.drawArc(
-      Rect.fromCenter(
-        center: Offset(size.width / 2, size.height / 2),
-        width: size.width * 0.75,
-        height: size.height * 0.55,
-      ),
-      0.3,
-      4.3,
-      false,
-      line,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_RecordStampPainter oldDelegate) =>
-      oldDelegate.accent != accent || oldDelegate.seed != seed;
 }
 
 class _EmptyState extends StatelessWidget {
