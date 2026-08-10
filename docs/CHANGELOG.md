@@ -49,9 +49,9 @@
 
 ### Changed
 
-- Capture-history cards now show deterministic pixel postcards assembled from
-  their time, season, weather, surroundings, and stable record identity instead
-  of repeating a generic stamp.
+- Capture-history cards now show one deterministic authored scenery element on
+  a quiet two-tone pixel backdrop instead of either a generic stamp or stacked
+  pink time/weather/atmosphere effects.
 - Home, capture, crafting, inventory, codex, placement, and settings copy is
   shorter and avoids repeating visible state or the same next action. Privacy,
   regional-weather-model, provider, recovery, and accessibility wording stays

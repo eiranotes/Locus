@@ -28,16 +28,18 @@ repeat visits as coarse scene memories rather than overwriting the only record.
 The follow-up retention slice now unfolds the 28-recipe library across three
 post-initial progression layers and pages the permanent capture ledger instead
 of silently hiding everything older than the latest 100 records. Capture
-history now presents each row as a deterministic pixel postcard assembled from
-the record's time, season, weather, surroundings, and stable ID. Visible copy
+history now presents each row as a deterministic pixel postcard with one
+authored scenery element selected from the stable record ID over a restrained
+time/season backdrop. Visible copy
 across home, capture, crafting, inventory, codex, placement, and settings has
 also been distilled so state and next action are not explained twice.
 
 ## Completed in the current slice
 
 - Replaced the repeated generic record stamp with a deterministic scene preview
-  that composes existing scenery, terrain, time, weather, atmosphere, and
-  optional-surroundings art. No new token or bitmap asset was added.
+  containing one existing scenery element over a two-tone pixel backdrop. Time,
+  weather, atmosphere, terrain overlays, decorative markers, and surroundings
+  badges are deliberately excluded. No new token or bitmap asset was added.
 - Removed repeated instructional prose from primary loop surfaces while keeping
   provider attribution, regional-model limits, sensor non-identification,
   recoverable error copy, and accessibility semantics explicit.
@@ -395,17 +397,19 @@ load-more states and deeper visitor cards found no clipped text or overflow.
 The temporary wrapper copy was deleted after export; tracked wrapper policy was
 unchanged.
 
-The record-postcard and copy-distillation slice was verified on 2026-08-10 with
-Flutter 3.44.1. `./tool/validate.sh` passed repository/content/manifest checks,
-Swift parse, formatting, analyzer, and all 92 unit/widget tests. The required
-Android demo debug APK built successfully. A temporary iOS wrapper-recovery copy
-passed the schema-v2-to-v4 migration and complete deterministic tour twice on
-`LocusPlacementQA`, exporting 23 full-resolution screenshots under
-`artifacts/ui-screenshots/2026-08-10-record-postcards/`. Visual inspection
-confirmed distinct scenery across paged historical records, weather and
-surroundings treatment on the current record, concise copy without clipping on
-the edited screens, and no overflow. The temporary wrapper copy was deleted;
-the repository's intentionally omitted iOS project remained unchanged.
+The first record-postcard pass passed automated gates but its stacked time,
+weather, terrain, and atmosphere layers were rejected in visual review because
+the pink effects obscured the authored element at card size. The follow-up
+single-element pass was verified on 2026-08-10 with Flutter 3.44.1:
+`./tool/validate.sh` passed repository/content/manifest checks, Swift parse,
+formatting, analyzer, and all 92 unit/widget tests, and the required Android
+demo debug APK built successfully. A temporary iOS wrapper-recovery copy passed
+the schema-v2-to-v4 migration and complete deterministic tour, exporting 23
+full-resolution screenshots plus an inspected contact sheet under
+`artifacts/ui-screenshots/2026-08-10-clean-record-images/`. Every record preview
+contains exactly one authored image, paged history remains visually varied, and
+the full tour shows no clipped text or overflow. The temporary wrapper copy was
+deleted; the repository's intentionally omitted iOS project remained unchanged.
 
 ## Known risks and gates
 

@@ -47,6 +47,8 @@
       an exact total, and a pixel-style explicit load-more action.
 - [x] Turn capture-history cards into deterministic pixel postcards using the
       record's stored context and the existing authored art catalog.
+- [x] Remove stacked time/weather/atmosphere/terrain effects and material badges
+      from record thumbnails so each card contains one clean authored element.
 - [x] Audit primary UI copy for repeated state/next-action explanations and
       distill it without removing privacy, provider, recovery, or accessibility
       requirements.

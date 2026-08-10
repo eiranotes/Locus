@@ -26,26 +26,22 @@ void main() {
     providerName: 'Test',
   );
 
-  test('record scene selection is stable and context-sensitive', () {
-    final first = recordSceneVisualFor(record, rain);
-    final second = recordSceneVisualFor(record, rain);
-    final winter = recordSceneVisualFor(
+  test('record scene selection is stable and varies by record', () {
+    final first = recordSceneVisualFor(record);
+    final second = recordSceneVisualFor(record);
+    final other = recordSceneVisualFor(
       CaptureRecord(
-        id: record.id,
+        id: 'record-scene-2',
         capturedAt: capturedAt,
         timeBand: TimeBand.night,
         season: Season.winter,
         weatherBasis: WeatherBasis.providerCurrentModel,
         sourceVersion: 'test-v1',
       ),
-      null,
     );
 
     expect(second.sceneryName, first.sceneryName);
-    expect(second.seasonalDetailName, first.seasonalDetailName);
-    expect(second.atmosphereDetailName, first.atmosphereDetailName);
-    expect(winter.seasonalDetailName, isNot(first.seasonalDetailName));
-    expect(winter.atmosphereDetailName, isNot(first.atmosphereDetailName));
+    expect(other.sceneryName, isNot(first.sceneryName));
   });
 
   test('paged history records produce varied scenery', () {
@@ -60,7 +56,6 @@ void main() {
             weatherBasis: WeatherBasis.demo,
             sourceVersion: 'test-v1',
           ),
-          null,
         ).sceneryName,
     };
 
@@ -76,18 +71,14 @@ void main() {
           body: SizedBox(
             width: 180,
             height: 140,
-            child: RecordScenePreview(
-              record: record,
-              weather: rain,
-              surroundings: null,
-            ),
+            child: RecordScenePreview(record: record, weather: rain),
           ),
         ),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.byType(Image), findsAtLeastNWidgets(4));
+    expect(find.byType(Image), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

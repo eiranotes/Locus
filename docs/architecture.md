@@ -102,10 +102,12 @@ patterns keep their existing complete domain queries because they are active
 crafting/collection state rather than the visual history ledger.
 
 `RecordScenePreview` turns each loaded ledger row into a stable visual summary.
-Its selector hashes the capture ID and combines that stable variation with the
-persisted time band and season plus any referenced weather and surroundings
-materials. It resolves only paths already owned by `GeneratedArtPaths`; the
-composition is presentation-only and adds no persisted visual state.
+Its selector hashes the capture ID to choose exactly one existing scenery asset
+from `GeneratedArtPaths`. A non-antialiased painter uses the persisted time band
+and season for a quiet two-tone backdrop. Weather, atmosphere, terrain, time,
+and surroundings artwork is intentionally not composed into the thumbnail;
+those states remain in record text and semantics. The preview is
+presentation-only and adds no persisted visual state.
 
 ## Diorama renderer
 

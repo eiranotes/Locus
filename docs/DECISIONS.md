@@ -4,12 +4,14 @@
 
 ### Capture history is a visual ledger, not a generic status list
 
-Each capture card composes a stable mini-scene from its record ID, time band,
-season, optional weather material, and optional surroundings material. The
-composition reuses the shipping scenery, terrain, time, weather, atmosphere,
-and material assets through `GeneratedArtPaths`; it does not create a second
-renderer contract or add tokens and bitmap files. The stored record remains
-the source of truth, so reopening a page produces the same postcard.
+Each capture card selects exactly one shipping scenery element from its stable
+record ID and places it over a restrained two-tone backdrop derived from time
+and season. The thumbnail does not layer time, weather, atmosphere, terrain, or
+material artwork and does not show a surroundings badge. Those layers compete
+with the main element and produce noisy color at compact card size. The record
+row still carries its textual weather state and accessible semantic summary.
+This presentation adds no renderer contract, token, or bitmap file, and the
+same record always resolves to the same scenery element.
 
 Visible product copy follows a state-first rule: show the current state, the
 next action, or a required boundary once, rather than narrating the interface.

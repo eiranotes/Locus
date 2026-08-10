@@ -94,10 +94,6 @@ class _RecordsTab extends StatelessWidget {
     final weatherById = <String, WeatherMaterial>{
       for (final material in controller.weatherMaterials) material.id: material,
     };
-    final surroundingById = <String, SurroundingMaterial>{
-      for (final material in controller.surroundingMaterials)
-        material.id: material,
-    };
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final largeText = MediaQuery.textScalerOf(context).scale(14) > 18;
@@ -121,9 +117,6 @@ class _RecordsTab extends StatelessWidget {
                     weather: record.weatherMaterialId == null
                         ? null
                         : weatherById[record.weatherMaterialId],
-                    surroundings: record.surroundingMaterialId == null
-                        ? null
-                        : surroundingById[record.surroundingMaterialId],
                   );
                 },
               ),
@@ -166,15 +159,10 @@ class _RecordsTab extends StatelessWidget {
 }
 
 class _RecordCard extends StatelessWidget {
-  const _RecordCard({
-    required this.record,
-    required this.weather,
-    required this.surroundings,
-  });
+  const _RecordCard({required this.record, required this.weather});
 
   final CaptureRecord record;
   final WeatherMaterial? weather;
-  final SurroundingMaterial? surroundings;
 
   @override
   Widget build(BuildContext context) {
@@ -191,11 +179,7 @@ class _RecordCard extends StatelessWidget {
           Expanded(
             child: SizedBox(
               width: double.infinity,
-              child: RecordScenePreview(
-                record: record,
-                weather: weather,
-                surroundings: surroundings,
-              ),
+              child: RecordScenePreview(record: record, weather: weather),
             ),
           ),
           const SizedBox(height: 9),
