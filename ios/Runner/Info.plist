@@ -36,5 +36,7 @@
     <string>최근 걸음을 디오라마 물건 제작에 사용합니다.</string>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>주변 전파 패턴을 물건의 연결 방식으로 바꿉니다. 특정 기기는 저장하지 않습니다.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>현실의 소리에서 짧은 감각 표본을 만들기 위해 4초간 마이크를 사용합니다. 원음은 저장하지 않습니다.</string>
 </dict>
 </plist>
