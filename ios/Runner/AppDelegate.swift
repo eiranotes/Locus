@@ -1,3 +1,4 @@
+import AVFoundation
 import CoreBluetooth
 import CoreLocation
 import CoreMotion
@@ -22,6 +23,7 @@ import WeatherKit
       return
     }
     PlatformSensorBridge.register(with: registrar)
+    SenseSamplerBridge.register(with: registrar)
   }
 }
 
@@ -243,4 +245,293 @@ final class PlatformSensorBridge: NSObject, FlutterPlugin, CBCentralManagerDeleg
     formatter.dateFormat = "yyyy-MM-dd"
     return formatter.string(from: date)
   }
+}
+
+final class SenseSamplerBridge: NSObject {
+  private let audioEngine = AVAudioEngine()
+  private let sampleLock = NSLock()
+  private var pendingResult: FlutterResult?
+  private var finishWorkItem: DispatchWorkItem?
+  private var tapInstalled = false
+  private var requestedDurationSeconds = 4.0
+  private var sampleRate = 16_000.0
+  private var envelope: [Double] = []
+  private var zeroCrossingCount = 0
+  private var sampleCount = 0
+  private var clippedSampleCount = 0
+  private var previousSample: Float = 0
+  private var hasPreviousSample = false
+
+  override init() {
+    super.init()
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(applicationWillResignActive),
+      name: UIApplication.willResignActiveNotification,
+      object: nil
+    )
+  }
+
+  deinit {
+    NotificationCenter.default.removeObserver(self)
+  }
+
+  static func register(with registrar: FlutterPluginRegistrar) {
+    let instance = SenseSamplerBridge()
+    let channel = FlutterMethodChannel(
+      name: "com.eiranotes.reality_diorama/sense",
+      binaryMessenger: registrar.messenger()
+    )
+    channel.setMethodCallHandler { call, result in
+      instance.handle(call, result: result)
+    }
+  }
+
+  private func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    guard call.method == "sampleAudio" else {
+      result(FlutterMethodNotImplemented)
+      return
+    }
+    guard pendingResult == nil else {
+      result(FlutterError(code: "sample_in_progress", message: "A sensory sample is already running.", details: nil))
+      return
+    }
+    let session = AVAudioSession.sharedInstance()
+    guard session.recordPermission == .granted else {
+      result(FlutterError(code: "permission_required", message: "Microphone permission is required.", details: nil))
+      return
+    }
+    let arguments = call.arguments as? [String: Any]
+    let requestedMillis = (arguments?["durationMillis"] as? NSNumber)?.intValue ?? 4_000
+    let durationMillis = min(10_000, max(1_000, requestedMillis))
+    pendingResult = result
+    requestedDurationSeconds = Double(durationMillis) / 1_000
+    resetSamples()
+
+    do {
+      try session.setCategory(.record, mode: .measurement, options: [.duckOthers])
+      try session.setActive(true)
+      let input = audioEngine.inputNode
+      let format = input.outputFormat(forBus: 0)
+      guard format.sampleRate > 0, format.channelCount > 0 else {
+        finish(errorCode: "audio_unavailable", message: "Audio input is unavailable.")
+        return
+      }
+      sampleRate = format.sampleRate
+      input.installTap(onBus: 0, bufferSize: 1_024, format: format) { [weak self] buffer, _ in
+        self?.consume(buffer)
+      }
+      tapInstalled = true
+      audioEngine.prepare()
+      try audioEngine.start()
+      let workItem = DispatchWorkItem { [weak self] in
+        self?.finish()
+      }
+      finishWorkItem = workItem
+      DispatchQueue.main.asyncAfter(
+        deadline: .now() + requestedDurationSeconds,
+        execute: workItem
+      )
+    } catch {
+      finish(
+        errorCode: "audio_unavailable",
+        message: "Audio sampling could not start.",
+        details: String(describing: error)
+      )
+    }
+  }
+
+  private func consume(_ buffer: AVAudioPCMBuffer) {
+    guard
+      let channel = buffer.floatChannelData?.pointee,
+      buffer.frameLength > 0
+    else { return }
+    let count = Int(buffer.frameLength)
+    var squareSum = 0.0
+    var localZeroCrossings = 0
+    var localClipped = 0
+    var localPrevious = previousSample
+    var localHasPrevious = hasPreviousSample
+    for index in 0..<count {
+      let sample = channel[index]
+      squareSum += Double(sample * sample)
+      if abs(sample) >= 0.98 { localClipped += 1 }
+      if localHasPrevious,
+        (sample >= 0 && localPrevious < 0) || (sample < 0 && localPrevious >= 0)
+      {
+        localZeroCrossings += 1
+      }
+      localPrevious = sample
+      localHasPrevious = true
+    }
+    let rms = sqrt(squareSum / Double(count))
+    sampleLock.lock()
+    envelope.append(rms)
+    zeroCrossingCount += localZeroCrossings
+    clippedSampleCount += localClipped
+    sampleCount += count
+    previousSample = localPrevious
+    hasPreviousSample = localHasPrevious
+    sampleLock.unlock()
+  }
+
+  @objc private func applicationWillResignActive() {
+    finish(errorCode: "interrupted", message: "Audio sampling was interrupted.")
+  }
+
+  private func finish(
+    errorCode: String? = nil,
+    message: String? = nil,
+    details: String? = nil
+  ) {
+    if !Thread.isMainThread {
+      DispatchQueue.main.async { [weak self] in
+        self?.finish(errorCode: errorCode, message: message, details: details)
+      }
+      return
+    }
+    guard let result = pendingResult else { return }
+    pendingResult = nil
+    finishWorkItem?.cancel()
+    finishWorkItem = nil
+    if tapInstalled {
+      audioEngine.inputNode.removeTap(onBus: 0)
+      tapInstalled = false
+    }
+    audioEngine.stop()
+    try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+
+    if let errorCode {
+      resetSamples()
+      result(FlutterError(code: errorCode, message: message, details: details))
+      return
+    }
+
+    let snapshot = sampleSnapshot()
+    guard snapshot.envelope.count >= 4, snapshot.sampleCount > 0 else {
+      resetSamples()
+      result(FlutterError(code: "insufficient_audio", message: "Not enough audio was observed.", details: nil))
+      return
+    }
+    let features = deriveFeatures(snapshot)
+    resetSamples()
+    result([
+      "schemaVersion": "audio-features-v1",
+      "loudness": features.loudness,
+      "intermittency": features.intermittency,
+      "rhythmicity": features.rhythmicity,
+      "dynamicRange": features.dynamicRange,
+      "spectralBrightness": features.spectralBrightness,
+      "confidence": features.confidence,
+    ])
+  }
+
+  private func sampleSnapshot() -> AudioSampleSnapshot {
+    sampleLock.lock()
+    defer { sampleLock.unlock() }
+    return AudioSampleSnapshot(
+      envelope: envelope,
+      zeroCrossingCount: zeroCrossingCount,
+      sampleCount: sampleCount,
+      clippedSampleCount: clippedSampleCount,
+      sampleRate: sampleRate,
+      durationSeconds: requestedDurationSeconds
+    )
+  }
+
+  private func resetSamples() {
+    sampleLock.lock()
+    envelope.removeAll(keepingCapacity: true)
+    zeroCrossingCount = 0
+    sampleCount = 0
+    clippedSampleCount = 0
+    previousSample = 0
+    hasPreviousSample = false
+    sampleLock.unlock()
+  }
+
+  private func deriveFeatures(_ snapshot: AudioSampleSnapshot) -> AudioFeatures {
+    let sorted = snapshot.envelope.sorted()
+    let meanRms = snapshot.envelope.reduce(0, +) / Double(snapshot.envelope.count)
+    let decibels = 20 * log10(max(meanRms, 0.000_001))
+    let loudness = clamp((decibels + 60) / 50)
+    let median = percentile(sorted, fraction: 0.50)
+    let inactiveThreshold = max(0.002, median * 0.45)
+    let inactive = snapshot.envelope.filter { $0 < inactiveThreshold }.count
+    var transitions = 0
+    for index in 1..<snapshot.envelope.count {
+      let previousActive = snapshot.envelope[index - 1] >= inactiveThreshold
+      let currentActive = snapshot.envelope[index] >= inactiveThreshold
+      if previousActive != currentActive { transitions += 1 }
+    }
+    let inactiveRatio = Double(inactive) / Double(snapshot.envelope.count)
+    let transitionRatio = Double(transitions) / Double(max(1, snapshot.envelope.count - 1))
+    let intermittency = clamp(inactiveRatio * 0.65 + min(1, transitionRatio * 2) * 0.35)
+    let p10 = percentile(sorted, fraction: 0.10)
+    let p90 = percentile(sorted, fraction: 0.90)
+    let dynamicRange = clamp((p90 - p10) / max(p90, 0.01))
+    let rhythmicity = envelopeRhythmicity(snapshot.envelope)
+    let zeroCrossingRate = Double(snapshot.zeroCrossingCount) / Double(snapshot.sampleCount)
+    let spectralBrightness = clamp(zeroCrossingRate / 0.18)
+    let expectedSamples = max(1, snapshot.sampleRate * snapshot.durationSeconds)
+    let coverage = min(1, Double(snapshot.sampleCount) / expectedSamples)
+    let clippedRatio = Double(snapshot.clippedSampleCount) / Double(snapshot.sampleCount)
+    let confidence = clamp(coverage * (1 - min(0.55, clippedRatio * 5)))
+    return AudioFeatures(
+      loudness: loudness,
+      intermittency: intermittency,
+      rhythmicity: rhythmicity,
+      dynamicRange: dynamicRange,
+      spectralBrightness: spectralBrightness,
+      confidence: confidence
+    )
+  }
+
+  private func envelopeRhythmicity(_ values: [Double]) -> Double {
+    guard values.count >= 8 else { return 0 }
+    let mean = values.reduce(0, +) / Double(values.count)
+    let centered = values.map { $0 - mean }
+    let energy = centered.reduce(0) { $0 + $1 * $1 }
+    guard energy > 0.000_000_1 else { return 0 }
+    let maximumLag = min(20, values.count / 2)
+    var best = 0.0
+    if maximumLag >= 2 {
+      for lag in 2...maximumLag {
+        var correlation = 0.0
+        for index in lag..<centered.count {
+          correlation += centered[index] * centered[index - lag]
+        }
+        best = max(best, correlation / energy)
+      }
+    }
+    return clamp(best * 1.6)
+  }
+
+  private func percentile(_ sorted: [Double], fraction: Double) -> Double {
+    guard !sorted.isEmpty else { return 0 }
+    let position = min(sorted.count - 1, max(0, Int((Double(sorted.count - 1) * fraction).rounded())))
+    return sorted[position]
+  }
+
+  private func clamp(_ value: Double) -> Double {
+    min(1, max(0, value))
+  }
+}
+
+private struct AudioSampleSnapshot {
+  let envelope: [Double]
+  let zeroCrossingCount: Int
+  let sampleCount: Int
+  let clippedSampleCount: Int
+  let sampleRate: Double
+  let durationSeconds: Double
+}
+
+private struct AudioFeatures {
+  let loudness: Double
+  let intermittency: Double
+  let rhythmicity: Double
+  let dynamicRange: Double
+  let spectralBrightness: Double
+  let confidence: Double
 }
