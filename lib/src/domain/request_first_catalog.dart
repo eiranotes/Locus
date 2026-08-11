@@ -85,10 +85,10 @@ class SenseAxisDefinition {
 class RequestTemplateDefinition {
   RequestTemplateDefinition({
     required this.id,
-    required this.visitorIds,
+    required List<String> visitorIds,
     required this.promptKo,
-    required this.constraints,
-    required this.overlapTags,
+    required List<RequestConstraint> constraints,
+    required Set<String> overlapTags,
     required this.accessTier,
     required this.difficulty,
     required this.minimumRelationshipStage,
@@ -167,7 +167,7 @@ class RelationshipMilestoneDefinition {
 class RelationshipTrackDefinition {
   RelationshipTrackDefinition({
     required this.visitorId,
-    required this.milestones,
+    required List<RelationshipMilestoneDefinition> milestones,
   }) : milestones = List<RelationshipMilestoneDefinition>.unmodifiable(
          milestones.toList()..sort(
            (
@@ -212,10 +212,10 @@ class SceneObjectDefinition {
 class RequestFirstCatalog {
   RequestFirstCatalog({
     required this.balance,
-    required this.axes,
-    required this.templates,
-    required this.relationshipTracks,
-    required this.sceneObjects,
+    required List<SenseAxisDefinition> axes,
+    required List<RequestTemplateDefinition> templates,
+    required List<RelationshipTrackDefinition> relationshipTracks,
+    required List<SceneObjectDefinition> sceneObjects,
   }) : axes = List<SenseAxisDefinition>.unmodifiable(axes),
        templates = List<RequestTemplateDefinition>.unmodifiable(templates),
        relationshipTracks = List<RelationshipTrackDefinition>.unmodifiable(
