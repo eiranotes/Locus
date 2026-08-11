@@ -51,12 +51,16 @@ jobs:
         run: flutter analyze
       - name: Test
         run: flutter test
-      - name: Build Android debug APK
-        run: flutter build apk --debug --dart-define=DEMO_MODE=true --no-pub
+      - name: Build request-first Android debug APK
+        run: >-
+          flutter build apk --debug
+          --dart-define=DEMO_MODE=true
+          --dart-define=REQUEST_FIRST_MODE=true
+          --no-pub
       - name: Upload Android debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: locus-android-debug-apk
+          name: locus-request-first-android-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
           retention-days: 7
@@ -83,8 +87,12 @@ jobs:
       - name: Install CocoaPods dependencies
         working-directory: ios
         run: pod install --repo-update
-      - name: Build iOS simulator
-        run: flutter build ios --simulator --debug --dart-define=DEMO_MODE=true --no-pub
+      - name: Build request-first iOS simulator
+        run: >-
+          flutter build ios --simulator --debug
+          --dart-define=DEMO_MODE=true
+          --dart-define=REQUEST_FIRST_MODE=true
+          --no-pub
 
   import-contract:
     name: Import contract
