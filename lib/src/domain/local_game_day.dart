@@ -7,9 +7,9 @@ class LocalGameDay {
     final local = value.toLocal();
     final calendarDay = DateTime(local.year, local.month, local.day);
     if (local.hour < boundaryHour) {
-      return calendarDay.subtract(const Duration(days: 1)).add(
-        Duration(hours: boundaryHour),
-      );
+      return calendarDay
+          .subtract(const Duration(days: 1))
+          .add(Duration(hours: boundaryHour));
     }
     return calendarDay.add(Duration(hours: boundaryHour));
   }

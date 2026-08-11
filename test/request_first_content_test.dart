@@ -73,8 +73,7 @@ void main() {
       SenseAxis.timeBand,
     });
     for (final template in templates.where(
-      (RequestTemplateDefinition value) =>
-          value.minimumRelationshipStage == 0,
+      (RequestTemplateDefinition value) => value.minimumRelationshipStage == 0,
     )) {
       expect(initiallyUnlocked.containsAll(template.requiredAxes), isTrue);
     }
@@ -86,7 +85,9 @@ void main() {
       hasLength(templates.length),
     );
     expect(
-      tracks.map((RelationshipTrackDefinition value) => value.visitorId).toSet(),
+      tracks
+          .map((RelationshipTrackDefinition value) => value.visitorId)
+          .toSet(),
       hasLength(tracks.length),
     );
     expect(

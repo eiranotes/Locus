@@ -4,8 +4,10 @@ class SenseVector {
   SenseVector(Map<SenseAxis, double> values)
     : values = Map<SenseAxis, double>.unmodifiable(
         values.map(
-          (SenseAxis key, double value) =>
-              MapEntry<SenseAxis, double>(key, value.clamp(0.0, 1.0).toDouble()),
+          (SenseAxis key, double value) => MapEntry<SenseAxis, double>(
+            key,
+            value.clamp(0.0, 1.0).toDouble(),
+          ),
         ),
       );
 
@@ -298,9 +300,7 @@ Map<String, Object?>? _requestFirstDecodeJsonOrNull(Object? raw) {
   final decoded = _requestFirstDecodeJson(raw);
   if (decoded is! Map<Object?, Object?>) return null;
   return decoded.map(
-    (Object? key, Object? value) => MapEntry<String, Object?>(
-      key.toString(),
-      value,
-    ),
+    (Object? key, Object? value) =>
+        MapEntry<String, Object?>(key.toString(), value),
   );
 }

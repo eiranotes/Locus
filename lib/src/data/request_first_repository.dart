@@ -19,10 +19,7 @@ class RequestFirstRepository {
     return (rows.single['specimen_count']! as num).toInt();
   }
 
-  Future<List<Specimen>> loadSpecimens({
-    int limit = 24,
-    int offset = 0,
-  }) async {
+  Future<List<Specimen>> loadSpecimens({int limit = 24, int offset = 0}) async {
     final rows = await _db.query(
       'specimens',
       orderBy: 'captured_at DESC, id DESC',
@@ -35,8 +32,9 @@ class RequestFirstRepository {
   Future<List<VisitorRequest>> loadRequests({
     Set<VisitorRequestStatus>? statuses,
   }) async {
-    final names = statuses?.map((VisitorRequestStatus value) => value.name).toList()
-      ?..sort();
+    final names =
+        statuses?.map((VisitorRequestStatus value) => value.name).toList()
+          ?..sort();
     final rows = await _db.query(
       'visitor_requests',
       where: names == null || names.isEmpty
@@ -122,7 +120,9 @@ class RequestFirstRepository {
     required List<SpecimenMatch> matches,
   }) async {
     if (record.id != specimen.captureRecordId) {
-      throw ArgumentError('Specimen must reference the supplied capture record.');
+      throw ArgumentError(
+        'Specimen must reference the supplied capture record.',
+      );
     }
     if (matches.any((SpecimenMatch value) => value.specimenId != specimen.id)) {
       throw ArgumentError('Every match must reference the supplied specimen.');
@@ -166,17 +166,13 @@ class RequestFirstRepository {
   Future<void> seedUnlockedAxes(Set<SenseAxis> axes) async {
     await _db.transaction((Transaction transaction) async {
       for (final axis in axes) {
-        await transaction.insert(
-          'sense_profile',
-          <String, Object?>{
-            'axis_key': axis.name,
-            'unlocked': 1,
-            'calibration_json': '{}',
-            'unlocked_at': null,
-            'source_visitor_id': null,
-          },
-          conflictAlgorithm: ConflictAlgorithm.ignore,
-        );
+        await transaction.insert('sense_profile', <String, Object?>{
+          'axis_key': axis.name,
+          'unlocked': 1,
+          'calibration_json': '{}',
+          'unlocked_at': null,
+          'source_visitor_id': null,
+        }, conflictAlgorithm: ConflictAlgorithm.ignore);
       }
     });
   }
@@ -195,7 +191,9 @@ class RequestFirstRepository {
       throw ArgumentError('Fulfilled request and assignment are inconsistent.');
     }
     if (relationship.visitorId != assignment.visitorId) {
-      throw ArgumentError('Relationship and assignment visitor are inconsistent.');
+      throw ArgumentError(
+        'Relationship and assignment visitor are inconsistent.',
+      );
     }
 
     await _db.transaction((Transaction transaction) async {
@@ -264,17 +262,13 @@ class RequestFirstRepository {
         );
       }
       for (final axis in unlockedAxes) {
-        await transaction.insert(
-          'sense_profile',
-          <String, Object?>{
-            'axis_key': axis.name,
-            'unlocked': 1,
-            'calibration_json': jsonEncode(<String, Object?>{}),
-            'unlocked_at': assignment.assignedAt.millisecondsSinceEpoch,
-            'source_visitor_id': assignment.visitorId,
-          },
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
+        await transaction.insert('sense_profile', <String, Object?>{
+          'axis_key': axis.name,
+          'unlocked': 1,
+          'calibration_json': jsonEncode(<String, Object?>{}),
+          'unlocked_at': assignment.assignedAt.millisecondsSinceEpoch,
+          'source_visitor_id': assignment.visitorId,
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
       }
       for (final object in grantedSceneObjects) {
         await transaction.insert(

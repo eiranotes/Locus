@@ -36,7 +36,8 @@ class RelationshipEngine {
         'must match visitorId',
       );
     }
-    final previous = current ??
+    final previous =
+        current ??
         VisitorRelationship(
           visitorId: visitorId,
           stage: 0,
@@ -44,11 +45,13 @@ class RelationshipEngine {
           unlockedRewardKeys: const <String>{},
         );
     final nextCount = previous.fulfilledCount + 1;
-    final crossed = track.milestones.where(
-      (RelationshipMilestoneDefinition milestone) =>
-          milestone.fulfilledCount > previous.fulfilledCount &&
-          milestone.fulfilledCount <= nextCount,
-    ).toList(growable: false);
+    final crossed = track.milestones
+        .where(
+          (RelationshipMilestoneDefinition milestone) =>
+              milestone.fulfilledCount > previous.fulfilledCount &&
+              milestone.fulfilledCount <= nextCount,
+        )
+        .toList(growable: false);
     var nextStage = previous.stage;
     final rewardKeys = Set<String>.from(previous.unlockedRewardKeys);
     final unlockedAxes = <SenseAxis>{};

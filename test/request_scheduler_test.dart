@@ -41,10 +41,7 @@ void main() {
       promptKo: '밤의 조용한 것',
       constraints: const <RequestConstraint>[
         RequestConstraint(axis: SenseAxis.loudness, maximum: 0.30),
-        RequestConstraint(
-          axis: SenseAxis.timeBand,
-          anyOf: <String>['night'],
-        ),
+        RequestConstraint(axis: SenseAxis.timeBand, anyOf: <String>['night']),
       ],
       overlapTags: const <String>{'quiet', 'night'},
       accessTier: RequestAccessTier.everyday,
@@ -74,10 +71,7 @@ void main() {
       requests: const <VisitorRequest>[],
       templates: templates,
       relationships: const <String, VisitorRelationship>{},
-      unlockedAxes: const <SenseAxis>{
-        SenseAxis.loudness,
-        SenseAxis.timeBand,
-      },
+      unlockedAxes: const <SenseAxis>{SenseAxis.loudness, SenseAxis.timeBand},
       slotCount: 2,
       historySpecimenIds: const <String>[],
       idFactory: () => 'request-${id++}',
@@ -145,10 +139,7 @@ void main() {
       requests: <VisitorRequest>[stale],
       templates: templates,
       relationships: const <String, VisitorRelationship>{},
-      unlockedAxes: const <SenseAxis>{
-        SenseAxis.loudness,
-        SenseAxis.timeBand,
-      },
+      unlockedAxes: const <SenseAxis>{SenseAxis.loudness, SenseAxis.timeBand},
       slotCount: 1,
       historySpecimenIds: const <String>[],
       idFactory: () => 'replacement-${id++}',
@@ -167,10 +158,7 @@ void main() {
         requests: const <VisitorRequest>[],
         templates: templates,
         relationships: const <String, VisitorRelationship>{},
-        unlockedAxes: const <SenseAxis>{
-          SenseAxis.loudness,
-          SenseAxis.timeBand,
-        },
+        unlockedAxes: const <SenseAxis>{SenseAxis.loudness, SenseAxis.timeBand},
         slotCount: 2,
         historySpecimenIds: const <String>[],
         idFactory: () => 'id-${id++}',
@@ -235,15 +223,12 @@ void main() {
 
     expect(result.activeRequests, hasLength(1));
     expect(result.activeRequests.single.historySpecimenId, isNotNull);
-    expect(
-      const <String>{
-        'specimen-1',
-        'specimen-2',
-        'specimen-3',
-        'specimen-4',
-        'specimen-5',
-      },
-      contains(result.activeRequests.single.historySpecimenId),
-    );
+    expect(const <String>{
+      'specimen-1',
+      'specimen-2',
+      'specimen-3',
+      'specimen-4',
+      'specimen-5',
+    }, contains(result.activeRequests.single.historySpecimenId));
   });
 }

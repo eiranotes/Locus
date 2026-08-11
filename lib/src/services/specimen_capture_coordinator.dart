@@ -79,15 +79,17 @@ class SpecimenCaptureCoordinator {
       ]),
       featureSchemaVersion: sample.schemaVersion,
     );
-    final matches = activeRequests.map((VisitorRequest request) {
-      return matcher.match(
-        specimen: specimen,
-        request: request,
-        referenceSpecimen: request.historySpecimenId == null
-            ? null
-            : referenceSpecimensById[request.historySpecimenId],
-      );
-    }).toList(growable: false);
+    final matches = activeRequests
+        .map((VisitorRequest request) {
+          return matcher.match(
+            specimen: specimen,
+            request: request,
+            referenceSpecimen: request.historySpecimenId == null
+                ? null
+                : referenceSpecimensById[request.historySpecimenId],
+          );
+        })
+        .toList(growable: false);
     return SpecimenCaptureBundle(
       record: record,
       specimen: specimen,

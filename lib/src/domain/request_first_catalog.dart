@@ -46,16 +46,14 @@ class RequestFirstBalance {
         requestReplacementCooldownHours:
             json['requestReplacementCooldownHours']! as int,
         specimenCaptureSeconds: json['specimenCaptureSeconds']! as int,
-        minimumCaptureConfidence:
-            (json['minimumCaptureConfidence']! as num).toDouble(),
-        everydayRequestRatio:
-            (json['everydayRequestRatio']! as num).toDouble(),
+        minimumCaptureConfidence: (json['minimumCaptureConfidence']! as num)
+            .toDouble(),
+        everydayRequestRatio: (json['everydayRequestRatio']! as num).toDouble(),
         overlapPairRate: (json['overlapPairRate']! as num).toDouble(),
         historyRequestMinimumSpecimens:
             json['historyRequestMinimumSpecimens']! as int,
         relationshipStageThresholds:
-            (json['relationshipStageThresholds']! as List<Object?>)
-                .cast<int>(),
+            (json['relationshipStageThresholds']! as List<Object?>).cast<int>(),
         gridColumns: json['gridColumns']! as int,
         gridRows: json['gridRows']! as int,
         activeObjectLimit: json['activeObjectLimit']! as int,
@@ -130,8 +128,7 @@ class RequestTemplateDefinition {
           RequestAccessTier.everyday,
         ),
         difficulty: json['difficulty']! as int,
-        minimumRelationshipStage:
-            json['minimumRelationshipStage'] as int? ?? 0,
+        minimumRelationshipStage: json['minimumRelationshipStage'] as int? ?? 0,
         historyComparison: enumByName(
           HistoryComparison.values,
           json['historyComparison'] as String? ?? '',
@@ -155,17 +152,16 @@ class RelationshipMilestoneDefinition {
   final String? sceneObjectId;
   final bool becomesResident;
 
-  factory RelationshipMilestoneDefinition.fromJson(
-    Map<String, Object?> json,
-  ) => RelationshipMilestoneDefinition(
-    stage: json['stage']! as int,
-    fulfilledCount: json['fulfilledCount']! as int,
-    unlockAxis: json['unlockAxis'] == null
-        ? null
-        : SenseAxis.values.byName(json['unlockAxis']! as String),
-    sceneObjectId: json['sceneObjectId'] as String?,
-    becomesResident: json['becomesResident'] as bool? ?? false,
-  );
+  factory RelationshipMilestoneDefinition.fromJson(Map<String, Object?> json) =>
+      RelationshipMilestoneDefinition(
+        stage: json['stage']! as int,
+        fulfilledCount: json['fulfilledCount']! as int,
+        unlockAxis: json['unlockAxis'] == null
+            ? null
+            : SenseAxis.values.byName(json['unlockAxis']! as String),
+        sceneObjectId: json['sceneObjectId'] as String?,
+        becomesResident: json['becomesResident'] as bool? ?? false,
+      );
 }
 
 class RelationshipTrackDefinition {
@@ -173,13 +169,12 @@ class RelationshipTrackDefinition {
     required this.visitorId,
     required this.milestones,
   }) : milestones = List<RelationshipMilestoneDefinition>.unmodifiable(
-         milestones.toList()
-           ..sort(
-             (
-               RelationshipMilestoneDefinition a,
-               RelationshipMilestoneDefinition b,
-             ) => a.fulfilledCount.compareTo(b.fulfilledCount),
-           ),
+         milestones.toList()..sort(
+           (
+             RelationshipMilestoneDefinition a,
+             RelationshipMilestoneDefinition b,
+           ) => a.fulfilledCount.compareTo(b.fulfilledCount),
+         ),
        );
 
   final String visitorId;
@@ -244,9 +239,8 @@ class RequestFirstCatalog {
         (RelationshipTrackDefinition value) => value.visitorId == visitorId,
       );
 
-  SceneObjectDefinition sceneObjectById(String id) => sceneObjects.firstWhere(
-    (SceneObjectDefinition value) => value.id == id,
-  );
+  SceneObjectDefinition sceneObjectById(String id) =>
+      sceneObjects.firstWhere((SceneObjectDefinition value) => value.id == id);
 
   static Future<RequestFirstCatalog> load(AssetBundle bundle) async {
     Map<String, Object?> document(String raw) =>
@@ -278,11 +272,10 @@ class RequestFirstCatalog {
           .cast<Map<String, Object?>>()
           .map(RequestTemplateDefinition.fromJson)
           .toList(growable: false),
-      relationshipTracks:
-          (relationships['tracks']! as List<Object?>)
-              .cast<Map<String, Object?>>()
-              .map(RelationshipTrackDefinition.fromJson)
-              .toList(growable: false),
+      relationshipTracks: (relationships['tracks']! as List<Object?>)
+          .cast<Map<String, Object?>>()
+          .map(RelationshipTrackDefinition.fromJson)
+          .toList(growable: false),
       sceneObjects: (sceneObjects['objects']! as List<Object?>)
           .cast<Map<String, Object?>>()
           .map(SceneObjectDefinition.fromJson)

@@ -54,10 +54,9 @@ class VisitorRelationship {
             : DateTime.fromMillisecondsSinceEpoch(
                 map['last_fulfilled_at']! as int,
               ),
-        unlockedRewardKeys: _decodeStringSet(
-          map['unlocked_reward_keys_json'],
-        ),
-        state: _requestFirstDecodeJsonOrNull(map['state_json']) ??
+        unlockedRewardKeys: _decodeStringSet(map['unlocked_reward_keys_json']),
+        state:
+            _requestFirstDecodeJsonOrNull(map['state_json']) ??
             const <String, Object?>{},
       );
 }
@@ -109,7 +108,8 @@ class RelationshipEvent {
           map['occurred_at']! as int,
         ),
         matchScore: (map['match_score'] as num?)?.toDouble(),
-        snapshot: _requestFirstDecodeJsonOrNull(map['snapshot_json']) ??
+        snapshot:
+            _requestFirstDecodeJsonOrNull(map['snapshot_json']) ??
             const <String, Object?>{},
       );
 }

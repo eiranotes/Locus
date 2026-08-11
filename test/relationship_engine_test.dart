@@ -27,10 +27,7 @@ void main() {
     ],
   );
 
-  RelationshipResolution fulfill({
-    VisitorRelationship? current,
-    int seed = 0,
-  }) {
+  RelationshipResolution fulfill({VisitorRelationship? current, int seed = 0}) {
     var id = seed;
     return const RelationshipEngine().fulfill(
       visitorId: 'night_moth',
@@ -117,9 +114,6 @@ void main() {
     final result = fulfill(current: current);
 
     expect(result.relationship.stage, 3);
-    expect(
-      result.grantedSceneObjectIds,
-      <String>['keepsake_lantern_string'],
-    );
+    expect(result.grantedSceneObjectIds, <String>['keepsake_lantern_string']);
   });
 }

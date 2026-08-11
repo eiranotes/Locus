@@ -102,10 +102,10 @@ class RequestScheduler {
       final historySpecimenId =
           selection.historyComparison == HistoryComparison.none
           ? null
-          : stableHistorySpecimenIds[
-              _stableHash('$dayKey:history:$slot:${selection.id}') %
-                  stableHistorySpecimenIds.length
-            ];
+          : stableHistorySpecimenIds[_stableHash(
+                  '$dayKey:history:$slot:${selection.id}',
+                ) %
+                stableHistorySpecimenIds.length];
       final request = VisitorRequest(
         id: idFactory(),
         visitorId: visitorId,
@@ -150,35 +150,38 @@ class RequestScheduler {
     required int historySpecimenCount,
     required RequestTemplateDefinition? anchorTemplate,
   }) {
-    final candidates = templates.where((RequestTemplateDefinition template) {
-      if (!unlockedAxes.containsAll(template.requiredAxes)) return false;
-      if (template.historyComparison != HistoryComparison.none &&
-          historySpecimenCount < balance.historyRequestMinimumSpecimens) {
-        return false;
-      }
-      if (template.visitorIds.every(activeVisitors.contains)) return false;
-      return template.visitorIds.any((String visitorId) {
-        final stage = relationships[visitorId]?.stage ?? 0;
-        return stage >= template.minimumRelationshipStage;
-      });
-    }).toList(growable: false);
+    final candidates = templates
+        .where((RequestTemplateDefinition template) {
+          if (!unlockedAxes.containsAll(template.requiredAxes)) return false;
+          if (template.historyComparison != HistoryComparison.none &&
+              historySpecimenCount < balance.historyRequestMinimumSpecimens) {
+            return false;
+          }
+          if (template.visitorIds.every(activeVisitors.contains)) return false;
+          return template.visitorIds.any((String visitorId) {
+            final stage = relationships[visitorId]?.stage ?? 0;
+            return stage >= template.minimumRelationshipStage;
+          });
+        })
+        .toList(growable: false);
     if (candidates.isEmpty) return null;
 
     var preferred = candidates
         .where(
-          (RequestTemplateDefinition value) =>
-              !usedRecently.contains(value.id),
+          (RequestTemplateDefinition value) => !usedRecently.contains(value.id),
         )
         .toList(growable: false);
     if (preferred.isEmpty) preferred = candidates;
 
     if (anchorTemplate != null &&
         _fraction('$dayKey:overlap:$slot') < balance.overlapPairRate) {
-      final overlapping = preferred.where((RequestTemplateDefinition value) {
-        return value.overlapTags
-            .intersection(anchorTemplate.overlapTags)
-            .isNotEmpty;
-      }).toList(growable: false);
+      final overlapping = preferred
+          .where((RequestTemplateDefinition value) {
+            return value.overlapTags
+                .intersection(anchorTemplate.overlapTags)
+                .isNotEmpty;
+          })
+          .toList(growable: false);
       if (overlapping.isNotEmpty) preferred = overlapping;
     }
 
@@ -187,7 +190,9 @@ class RequestScheduler {
         ? RequestAccessTier.everyday
         : RequestAccessTier.outing;
     final tierMatches = preferred
-        .where((RequestTemplateDefinition value) => value.accessTier == desiredTier)
+        .where(
+          (RequestTemplateDefinition value) => value.accessTier == desiredTier,
+        )
         .toList(growable: false);
     if (tierMatches.isNotEmpty) preferred = tierMatches;
 
@@ -205,16 +210,18 @@ class RequestScheduler {
     required Map<String, VisitorRelationship> relationships,
     required Set<String> activeVisitors,
   }) {
-    final candidates = template.visitorIds.where((String visitorId) {
-      if (activeVisitors.contains(visitorId)) return false;
-      final stage = relationships[visitorId]?.stage ?? 0;
-      return stage >= template.minimumRelationshipStage;
-    }).toList(growable: false)
-      ..sort();
+    final candidates =
+        template.visitorIds
+            .where((String visitorId) {
+              if (activeVisitors.contains(visitorId)) return false;
+              final stage = relationships[visitorId]?.stage ?? 0;
+              return stage >= template.minimumRelationshipStage;
+            })
+            .toList(growable: false)
+          ..sort();
     if (candidates.isEmpty) return null;
-    return candidates[
-      _stableHash('$dayKey:visitor:$slot:${template.id}') % candidates.length
-    ];
+    return candidates[_stableHash('$dayKey:visitor:$slot:${template.id}') %
+        candidates.length];
   }
 
   double _fraction(String input) => (_stableHash(input) % 10000) / 10000;

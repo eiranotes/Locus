@@ -88,10 +88,7 @@ void main() {
             maximum: 0.30,
             tolerance: 0.30,
           ),
-          RequestConstraint(
-            axis: SenseAxis.intermittency,
-            maximum: 0.30,
-          ),
+          RequestConstraint(axis: SenseAxis.intermittency, maximum: 0.30),
         ],
       ),
     );
@@ -99,9 +96,11 @@ void main() {
     expect(result.passed, isFalse);
     expect(result.verdict, MatchVerdict.partial);
     expect(
-      result.breakdown.singleWhere(
-        (ConstraintMatch value) => value.axis == SenseAxis.loudness,
-      ).satisfied,
+      result.breakdown
+          .singleWhere(
+            (ConstraintMatch value) => value.axis == SenseAxis.loudness,
+          )
+          .satisfied,
       isFalse,
     );
   });
@@ -147,34 +146,37 @@ void main() {
     expect(second.passed, isTrue);
   });
 
-  test('history comparison distinguishes similar and contrasting specimens', () {
-    final matcher = const SpecimenMatcher();
-    final reference = specimen(id: 'reference', loudness: 0.20);
-    final similar = matcher.match(
-      specimen: specimen(id: 'similar', loudness: 0.24),
-      request: request(
-        id: 'similar-request',
-        historyComparison: HistoryComparison.similar,
-        historySpecimenId: reference.id,
-      ),
-      referenceSpecimen: reference,
-    );
-    final contrast = matcher.match(
-      specimen: specimen(
-        id: 'contrast',
-        loudness: 0.95,
-        intermittency: 0.95,
-        rhythmicity: 0.05,
-      ),
-      request: request(
-        id: 'contrast-request',
-        historyComparison: HistoryComparison.contrast,
-        historySpecimenId: reference.id,
-      ),
-      referenceSpecimen: reference,
-    );
+  test(
+    'history comparison distinguishes similar and contrasting specimens',
+    () {
+      final matcher = const SpecimenMatcher();
+      final reference = specimen(id: 'reference', loudness: 0.20);
+      final similar = matcher.match(
+        specimen: specimen(id: 'similar', loudness: 0.24),
+        request: request(
+          id: 'similar-request',
+          historyComparison: HistoryComparison.similar,
+          historySpecimenId: reference.id,
+        ),
+        referenceSpecimen: reference,
+      );
+      final contrast = matcher.match(
+        specimen: specimen(
+          id: 'contrast',
+          loudness: 0.95,
+          intermittency: 0.95,
+          rhythmicity: 0.05,
+        ),
+        request: request(
+          id: 'contrast-request',
+          historyComparison: HistoryComparison.contrast,
+          historySpecimenId: reference.id,
+        ),
+        referenceSpecimen: reference,
+      );
 
-    expect(similar.passed, isTrue);
-    expect(contrast.passed, isTrue);
-  });
+      expect(similar.passed, isTrue);
+      expect(contrast.passed, isTrue);
+    },
+  );
 }
