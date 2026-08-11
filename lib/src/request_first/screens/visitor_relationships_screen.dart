@@ -66,7 +66,8 @@ class _RelationshipCard extends StatelessWidget {
               value.fulfilledCount > fulfilled,
         )
         .firstOrNull;
-    final denominator = nextMilestone?.fulfilledCount ?? fulfilled.clamp(1, 1 << 20);
+    final denominator =
+        nextMilestone?.fulfilledCount ?? fulfilled.clamp(1, 1 << 20);
     final previousThreshold = track.milestones
         .where(
           (RelationshipMilestoneDefinition value) =>
@@ -191,9 +192,9 @@ class _RelationshipCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               _milestoneLabel(nextMilestone),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: PixelPalette.reward,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: PixelPalette.reward),
             ),
           ],
         ],

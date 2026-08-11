@@ -67,8 +67,7 @@ class RequestFirstController extends ChangeNotifier {
   Map<String, VisitorRelationship> _relationships =
       const <String, VisitorRelationship>{};
   Set<SenseAxis> _unlockedAxes = const <SenseAxis>{};
-  List<RelationshipEvent> _relationshipEvents =
-      const <RelationshipEvent>[];
+  List<RelationshipEvent> _relationshipEvents = const <RelationshipEvent>[];
   List<SceneObject> _sceneObjects = const <SceneObject>[];
   List<ScenePlacement> _scenePlacements = const <ScenePlacement>[];
   String? _focusedRequestId;
@@ -101,13 +100,14 @@ class RequestFirstController extends ChangeNotifier {
   RequestFulfillmentOutcome? get lastFulfillment => _lastFulfillment;
 
   List<VisitorRequest> get activeRequests {
-    final values = _requests
-        .where((VisitorRequest value) => value.isActive)
-        .toList(growable: false)
-      ..sort(
-        (VisitorRequest a, VisitorRequest b) =>
-            a.slotIndex.compareTo(b.slotIndex),
-      );
+    final values =
+        _requests
+            .where((VisitorRequest value) => value.isActive)
+            .toList(growable: false)
+          ..sort(
+            (VisitorRequest a, VisitorRequest b) =>
+                a.slotIndex.compareTo(b.slotIndex),
+          );
     return values;
   }
 
@@ -410,7 +410,10 @@ class RequestFirstController extends ChangeNotifier {
   ({List<SceneObject> objects, List<ScenePlacement> placements})
   _autoPlaceRewards(List<SceneObject> rewards) {
     if (rewards.isEmpty) {
-      return (objects: const <SceneObject>[], placements: const <ScenePlacement>[]);
+      return (
+        objects: const <SceneObject>[],
+        placements: const <ScenePlacement>[],
+      );
     }
     final objects = <SceneObject>[];
     final placements = <ScenePlacement>[];
@@ -444,7 +447,9 @@ class RequestFirstController extends ChangeNotifier {
             final definition = _tryRecipe(_legacyRecipeId(object));
             if (definition != null) recipesByObjectId[object.id] = definition;
           }
-          final placementEntry = legacyCatalog.placement.entryForRecipe(recipe.id);
+          final placementEntry = legacyCatalog.placement.entryForRecipe(
+            recipe.id,
+          );
           final anchor = engine.firstValidAnchor(
             candidate: Placement(
               id: candidateId,

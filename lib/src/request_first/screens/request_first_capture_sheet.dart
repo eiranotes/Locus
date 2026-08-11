@@ -143,10 +143,9 @@ class _RequestFirstCaptureSheetState extends State<RequestFirstCaptureSheet> {
   Future<void> _assign(SpecimenMatch match) async {
     if (_assigning) return;
     setState(() => _assigning = true);
-    final outcome = await RequestFirstScope.read(context).assignSpecimen(
-      specimenId: match.specimenId,
-      requestId: match.requestId,
-    );
+    final outcome = await RequestFirstScope.read(
+      context,
+    ).assignSpecimen(specimenId: match.specimenId, requestId: match.requestId);
     if (!mounted) return;
     setState(() {
       _assigning = false;
@@ -195,9 +194,9 @@ class _ReadyView extends StatelessWidget {
                     const SizedBox(height: 7),
                     Text(
                       request!.promptKo,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        height: 1.45,
-                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyLarge?.copyWith(height: 1.45),
                     ),
                   ],
                 ),
@@ -422,7 +421,10 @@ class _MatchCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(visitor.nameKo, style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      visitor.nameKo,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 3),
                     Text(
                       _verdictLabel(match),
@@ -438,7 +440,9 @@ class _MatchCard extends StatelessWidget {
               Text(
                 '${(match.score * 100).round()}%',
                 style: TextStyle(
-                  color: match.passed ? PixelPalette.mint : PixelPalette.textMuted,
+                  color: match.passed
+                      ? PixelPalette.mint
+                      : PixelPalette.textMuted,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -530,8 +534,7 @@ class _FulfilledView extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
-        if (outcome.unlockedAxes.isEmpty &&
-            outcome.grantedSceneObjects.isEmpty)
+        if (outcome.unlockedAxes.isEmpty && outcome.grantedSceneObjects.isEmpty)
           const PixelCard(
             color: PixelPalette.scene,
             child: Text('손님이 내 공간에 머물며 다음 부탁을 준비합니다.'),

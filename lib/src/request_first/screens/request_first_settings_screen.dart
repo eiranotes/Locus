@@ -97,9 +97,7 @@ class RequestFirstSettingsScreen extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      controller.demoMode
-                          ? '결정론 감각 데모 사용 중'
-                          : '기기 감각 샘플러 사용',
+                      controller.demoMode ? '결정론 감각 데모 사용 중' : '기기 감각 샘플러 사용',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -172,7 +170,9 @@ class _AxisTag extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: unlocked ? PixelPalette.textStrong : PixelPalette.textMuted,
+              color: unlocked
+                  ? PixelPalette.textStrong
+                  : PixelPalette.textMuted,
               fontWeight: FontWeight.w700,
             ),
           ),

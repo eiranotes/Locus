@@ -27,10 +27,7 @@ class SpecimenMark extends StatelessWidget {
           height: height,
           width: double.infinity,
           child: CustomPaint(
-            painter: _SpecimenMarkPainter(
-              specimen: specimen,
-              compact: compact,
-            ),
+            painter: _SpecimenMarkPainter(specimen: specimen, compact: compact),
           ),
         ),
       ),
@@ -66,10 +63,7 @@ String specimenDescription(Specimen specimen) {
 }
 
 class _SpecimenMarkPainter extends CustomPainter {
-  const _SpecimenMarkPainter({
-    required this.specimen,
-    required this.compact,
-  });
+  const _SpecimenMarkPainter({required this.specimen, required this.compact});
 
   final Specimen specimen;
   final bool compact;
@@ -96,8 +90,7 @@ class _SpecimenMarkPainter extends CustomPainter {
     }
 
     final loudness = specimen.features[SenseAxis.loudness] ?? 0.25;
-    final intermittency =
-        specimen.features[SenseAxis.intermittency] ?? 0.35;
+    final intermittency = specimen.features[SenseAxis.intermittency] ?? 0.35;
     final rhythmicity = specimen.features[SenseAxis.rhythmicity] ?? 0.45;
     final dynamicRange = specimen.features[SenseAxis.dynamicRange] ?? 0.40;
     final brightness = specimen.features[SenseAxis.spectralBrightness] ?? 0.45;
@@ -161,7 +154,9 @@ class _SpecimenMarkPainter extends CustomPainter {
     for (var index = 1; index < points.length; index += 1) {
       canvas.drawLine(points[index - 1], points[index], paint);
     }
-    for (final point in points.where((Offset value) => value.dx.round() % 3 == 0)) {
+    for (final point in points.where(
+      (Offset value) => value.dx.round() % 3 == 0,
+    )) {
       canvas.drawRect(
         Rect.fromCenter(center: point, width: 3, height: 3),
         paint,

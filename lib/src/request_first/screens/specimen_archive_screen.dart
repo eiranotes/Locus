@@ -103,7 +103,8 @@ class _SpecimensTab extends StatelessWidget {
                     label: controller.loadingMoreSpecimens
                         ? '표본 불러오는 중'
                         : '이전 표본 더 보기',
-                    onPressed: controller.loadingMoreSpecimens || controller.busy
+                    onPressed:
+                        controller.loadingMoreSpecimens || controller.busy
                         ? null
                         : controller.loadMoreSpecimens,
                     fallbackIcon: Icons.expand_more,

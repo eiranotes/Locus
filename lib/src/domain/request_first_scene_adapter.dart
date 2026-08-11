@@ -77,7 +77,9 @@ class RequestFirstSceneAdapter {
         .map((CraftedObject value) => value.id)
         .toSet();
     final placements = scenePlacements
-        .where((ScenePlacement value) => objectIds.contains(value.sceneObjectId))
+        .where(
+          (ScenePlacement value) => objectIds.contains(value.sceneObjectId),
+        )
         .map(
           (ScenePlacement value) => Placement(
             id: value.id,
@@ -94,15 +96,16 @@ class RequestFirstSceneAdapter {
     final recipesById = <String, RecipeDefinition>{
       for (final recipe in legacyCatalog.recipes) recipe.id: recipe,
     };
-    final grid = EnvironmentGridBuilder(
-      columns: legacyCatalog.balance.gridColumns,
-      rows: legacyCatalog.balance.gridRows,
-      atmosphericTraits: legacyCatalog.atmosphericTraits,
-    ).build(
-      placements: placements,
-      objectsById: objectsById,
-      recipesById: recipesById,
-    );
+    final grid =
+        EnvironmentGridBuilder(
+          columns: legacyCatalog.balance.gridColumns,
+          rows: legacyCatalog.balance.gridRows,
+          atmosphericTraits: legacyCatalog.atmosphericTraits,
+        ).build(
+          placements: placements,
+          objectsById: objectsById,
+          recipesById: recipesById,
+        );
     final graph = ConnectionGraphBuilder(
       atmosphericTraits: legacyCatalog.atmosphericTraits,
     ).build(placements: placements, objectsById: objectsById);
@@ -149,16 +152,13 @@ class RequestFirstSceneAdapter {
     return null;
   }
 
-  WeatherMaterialKind _weatherKind(Map<String, Object?>? payload) =>
-      enumByName(
-        WeatherMaterialKind.values,
-        payload?['weatherKind'] as String? ?? '',
-        WeatherMaterialKind.cloudy,
-      );
+  WeatherMaterialKind _weatherKind(Map<String, Object?>? payload) => enumByName(
+    WeatherMaterialKind.values,
+    payload?['weatherKind'] as String? ?? '',
+    WeatherMaterialKind.cloudy,
+  );
 
-  SurroundingMaterialKind? _surroundingKind(
-    Map<String, Object?>? payload,
-  ) {
+  SurroundingMaterialKind? _surroundingKind(Map<String, Object?>? payload) {
     final raw = payload?['surroundingKind'];
     if (raw is! String) return null;
     return enumByName(
@@ -177,21 +177,22 @@ class RequestFirstSceneAdapter {
     return null;
   }
 
-  String? _activeVisitorId(
-    Map<String, VisitorRelationship> relationships,
-  ) {
-    final residents = relationships.values
-        .where((VisitorRelationship value) => value.stage >= 1)
-        .toList(growable: false)
-      ..sort((VisitorRelationship a, VisitorRelationship b) {
-        final byStage = b.stage.compareTo(a.stage);
-        if (byStage != 0) return byStage;
-        final aTime = a.lastFulfilledAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final bTime = b.lastFulfilledAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final byTime = bTime.compareTo(aTime);
-        if (byTime != 0) return byTime;
-        return a.visitorId.compareTo(b.visitorId);
-      });
+  String? _activeVisitorId(Map<String, VisitorRelationship> relationships) {
+    final residents =
+        relationships.values
+            .where((VisitorRelationship value) => value.stage >= 1)
+            .toList(growable: false)
+          ..sort((VisitorRelationship a, VisitorRelationship b) {
+            final byStage = b.stage.compareTo(a.stage);
+            if (byStage != 0) return byStage;
+            final aTime =
+                a.lastFulfilledAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+            final bTime =
+                b.lastFulfilledAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+            final byTime = bTime.compareTo(aTime);
+            if (byTime != 0) return byTime;
+            return a.visitorId.compareTo(b.visitorId);
+          });
     return residents.isEmpty ? null : residents.first.visitorId;
   }
 }

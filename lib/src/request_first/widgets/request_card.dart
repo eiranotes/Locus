@@ -90,9 +90,9 @@ class VisitorRequestCard extends StatelessWidget {
           const SizedBox(height: 13),
           Text(
             request.promptKo,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              height: 1.35,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(height: 1.35),
           ),
           const SizedBox(height: 8),
           Row(
@@ -112,9 +112,9 @@ class VisitorRequestCard extends StatelessWidget {
               if (request.difficulty > 1)
                 Text(
                   '감각 ${request.difficulty}단계',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: PixelPalette.reward,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: PixelPalette.reward),
                 ),
             ],
           ),

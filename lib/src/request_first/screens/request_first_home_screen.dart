@@ -97,7 +97,9 @@ class RequestFirstHomeScreen extends StatelessWidget {
                             bottom: 10,
                             child: DecoratedBox(
                               decoration: BoxDecoration(
-                                color: PixelPalette.panel.withValues(alpha: 0.92),
+                                color: PixelPalette.panel.withValues(
+                                  alpha: 0.92,
+                                ),
                                 border: Border.all(color: PixelPalette.divider),
                                 borderRadius: BorderRadius.circular(
                                   PixelRadii.control,
@@ -161,11 +163,16 @@ class RequestFirstHomeScreen extends StatelessWidget {
                     ),
                   )
                 else
-                  for (var index = 0; index < activeRequests.length; index += 1) ...<Widget>[
+                  for (
+                    var index = 0;
+                    index < activeRequests.length;
+                    index += 1
+                  ) ...<Widget>[
                     _RequestCardHost(
                       request: activeRequests[index],
                       selected:
-                          controller.focusedRequest?.id == activeRequests[index].id,
+                          controller.focusedRequest?.id ==
+                          activeRequests[index].id,
                       onCapture: onCapture,
                     ),
                     if (index != activeRequests.length - 1)

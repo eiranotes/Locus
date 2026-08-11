@@ -54,10 +54,7 @@ Future<void> main() async {
     );
     await controller.initialize();
     runApp(
-      RequestFirstScope(
-        controller: controller,
-        child: const RequestFirstApp(),
-      ),
+      RequestFirstScope(controller: controller, child: const RequestFirstApp()),
     );
     return;
   }

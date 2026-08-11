@@ -127,7 +127,9 @@ class RequestFirstRepository {
     if (matches.any((SpecimenMatch value) => value.specimenId != specimen.id)) {
       throw ArgumentError('Every match must reference the supplied specimen.');
     }
-    final requestIds = matches.map((SpecimenMatch value) => value.requestId).toSet();
+    final requestIds = matches
+        .map((SpecimenMatch value) => value.requestId)
+        .toSet();
     if (requestIds.length != matches.length) {
       throw ArgumentError('A specimen may store only one match per request.');
     }
@@ -160,8 +162,7 @@ class RequestFirstRepository {
       throw ArgumentError('Issued requests must be active.');
     }
     if (expired.any(
-      (VisitorRequest value) =>
-          value.status != VisitorRequestStatus.expired,
+      (VisitorRequest value) => value.status != VisitorRequestStatus.expired,
     )) {
       throw ArgumentError('Expired requests must use the expired status.');
     }
@@ -224,7 +225,9 @@ class RequestFirstRepository {
               value.requestId != assignment.requestId ||
               value.specimenId != assignment.specimenId,
         )) {
-      throw ArgumentError('Relationship events do not describe this assignment.');
+      throw ArgumentError(
+        'Relationship events do not describe this assignment.',
+      );
     }
     if (grantedSceneObjects.any(
       (SceneObject value) =>
@@ -232,7 +235,9 @@ class RequestFirstRepository {
           (value.sourceVisitorId != assignment.visitorId ||
               value.sourceRequestId != assignment.requestId),
     )) {
-      throw ArgumentError('Granted scene objects have inconsistent provenance.');
+      throw ArgumentError(
+        'Granted scene objects have inconsistent provenance.',
+      );
     }
     final grantedObjectIds = grantedSceneObjects
         .map((SceneObject value) => value.id)

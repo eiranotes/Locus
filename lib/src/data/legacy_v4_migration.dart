@@ -112,11 +112,10 @@ class LegacyV4MigrationService {
         );
       }
 
-      await transaction.insert(
-        'metadata',
-        const <String, Object?>{'key': markerKey, 'value': markerValue},
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      await transaction.insert('metadata', const <String, Object?>{
+        'key': markerKey,
+        'value': markerValue,
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
       return LegacyV4MigrationReport(
         alreadyCompleted: false,
         specimensCreated: specimensCreated,
