@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
@@ -6,9 +7,9 @@ import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/request_first/request_first_controller.dart';
 import 'package:reality_diorama/src/request_first/request_first_scope.dart';
 import 'package:reality_diorama/src/request_first/widgets/specimen_mark.dart';
+import 'package:reality_diorama/src/services/specimen_capture_coordinator.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_button.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
-import 'package:reality_diorama/src/services/specimen_capture_coordinator.dart';
 
 class RequestFirstCaptureSheet extends StatefulWidget {
   const RequestFirstCaptureSheet({super.key});
@@ -131,8 +132,27 @@ class _RequestFirstCaptureSheetState extends State<RequestFirstCaptureSheet> {
 
   Future<void> _capture() async {
     if (_capturing) return;
+    final controller = RequestFirstScope.read(context);
+    if (!controller.demoMode) {
+      var status = await Permission.microphone.status;
+      if (!status.isGranted) {
+        status = await Permission.microphone.request();
+      }
+      if (!mounted) return;
+      if (!status.isGranted) {
+        if (status.isPermanentlyDenied) {
+          await openAppSettings();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('표본을 수집하려면 마이크 권한이 필요합니다.')),
+          );
+        }
+        return;
+      }
+    }
+    if (!mounted) return;
     setState(() => _capturing = true);
-    final bundle = await RequestFirstScope.read(context).captureSpecimen();
+    final bundle = await controller.captureSpecimen();
     if (!mounted) return;
     setState(() {
       _capturing = false;
@@ -530,7 +550,9 @@ class _FulfilledView extends StatelessWidget {
           PixelCard(
             color: PixelPalette.raised,
             child: Text(
-              '관계 기념물 ${outcome.grantedSceneObjects.length}개가 보관되었습니다.',
+              outcome.grantedScenePlacements.isNotEmpty
+                  ? '관계 기념물 ${outcome.grantedSceneObjects.length}개가 내 공간에 바로 놓였습니다.'
+                  : '관계 기념물 ${outcome.grantedSceneObjects.length}개가 보관되었습니다.',
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
