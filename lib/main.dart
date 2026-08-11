@@ -34,7 +34,7 @@ Future<void> main() async {
     final requestCatalog = await RequestFirstCatalog.load(rootBundle);
     final SenseSampler sampler = demoMode
         ? const DemoSenseSampler()
-        : const UnavailableSenseSampler();
+        : const MethodChannelSenseSampler();
     final controller = RequestFirstController(
       repository: RequestFirstRepository(database),
       catalog: requestCatalog,
