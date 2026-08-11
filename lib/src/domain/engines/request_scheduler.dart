@@ -32,9 +32,19 @@ class RequestScheduler {
     required List<String> historySpecimenIds,
     required String Function() idFactory,
   }) {
+    final gameDay = LocalGameDay(boundaryHour: balance.gameDayBoundaryHour);
+    final dayKey = gameDay.keyFor(now);
+    final requestHistory = requests.toList(growable: false);
+    final slotsIssuedToday = requestHistory
+        .where(
+          (VisitorRequest request) =>
+              gameDay.keyFor(request.issuedAt) == dayKey,
+        )
+        .map((VisitorRequest request) => request.slotIndex)
+        .toSet();
     final expired = <VisitorRequest>[];
     final active = <VisitorRequest>[];
-    for (final request in requests) {
+    for (final request in requestHistory) {
       final shouldExpire =
           request.isActive &&
           request.expiresAt != null &&
@@ -59,7 +69,7 @@ class RequestScheduler {
     final templateById = <String, RequestTemplateDefinition>{
       for (final template in templates) template.id: template,
     };
-    final usedRecently = requests
+    final usedRecently = requestHistory
         .where(
           (VisitorRequest request) =>
               now.difference(request.issuedAt) < const Duration(days: 7),
@@ -69,12 +79,11 @@ class RequestScheduler {
     final issued = <VisitorRequest>[];
     final stableHistorySpecimenIds = historySpecimenIds.toSet().toList()
       ..sort();
-    final dayKey = LocalGameDay(
-      boundaryHour: balance.gameDayBoundaryHour,
-    ).keyFor(now);
 
     for (var slot = 0; slot < slotCount; slot += 1) {
-      if (occupiedSlots.contains(slot)) continue;
+      if (occupiedSlots.contains(slot) || slotsIssuedToday.contains(slot)) {
+        continue;
+      }
       final anchor = active.isEmpty ? null : active.first;
       final anchorTemplate = anchor == null
           ? null
@@ -124,6 +133,7 @@ class RequestScheduler {
       issued.add(request);
       active.add(request);
       occupiedSlots.add(slot);
+      slotsIssuedToday.add(slot);
       activeVisitors.add(visitorId);
       usedRecently.add(selection.id);
     }
