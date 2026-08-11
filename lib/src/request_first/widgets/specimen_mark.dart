@@ -27,11 +27,7 @@ class SpecimenMark extends StatelessWidget {
       label: specimenDescription(specimen),
       child: ExcludeSemantics(
         child: height.isFinite
-            ? SizedBox(
-                height: height,
-                width: double.infinity,
-                child: painted,
-              )
+            ? SizedBox(height: height, width: double.infinity, child: painted)
             : SizedBox.expand(child: painted),
       ),
     );
