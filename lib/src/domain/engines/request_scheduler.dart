@@ -29,7 +29,7 @@ class RequestScheduler {
     required Map<String, VisitorRelationship> relationships,
     required Set<SenseAxis> unlockedAxes,
     required int slotCount,
-    required int historySpecimenCount,
+    required List<String> historySpecimenIds,
     required String Function() idFactory,
   }) {
     final expired = <VisitorRequest>[];
@@ -67,6 +67,8 @@ class RequestScheduler {
         .map((VisitorRequest request) => request.templateId)
         .toSet();
     final issued = <VisitorRequest>[];
+    final stableHistorySpecimenIds = historySpecimenIds.toSet().toList()
+      ..sort();
     final dayKey = LocalGameDay(
       boundaryHour: balance.gameDayBoundaryHour,
     ).keyFor(now);
@@ -85,7 +87,7 @@ class RequestScheduler {
         unlockedAxes: unlockedAxes,
         activeVisitors: activeVisitors,
         usedRecently: usedRecently,
-        historySpecimenCount: historySpecimenCount,
+        historySpecimenCount: stableHistorySpecimenIds.length,
         anchorTemplate: anchorTemplate,
       );
       if (selection == null) continue;
@@ -97,6 +99,13 @@ class RequestScheduler {
         activeVisitors: activeVisitors,
       );
       if (visitorId == null) continue;
+      final historySpecimenId =
+          selection.historyComparison == HistoryComparison.none
+          ? null
+          : stableHistorySpecimenIds[
+              _stableHash('$dayKey:history:$slot:${selection.id}') %
+                  stableHistorySpecimenIds.length
+            ];
       final request = VisitorRequest(
         id: idFactory(),
         visitorId: visitorId,
@@ -109,6 +118,7 @@ class RequestScheduler {
         constraints: selection.constraints,
         difficulty: selection.difficulty,
         historyComparison: selection.historyComparison,
+        historySpecimenId: historySpecimenId,
         requestSchemaVersion: schemaVersion,
       );
       issued.add(request);
@@ -155,14 +165,19 @@ class RequestScheduler {
     if (candidates.isEmpty) return null;
 
     var preferred = candidates
-        .where((RequestTemplateDefinition value) => !usedRecently.contains(value.id))
+        .where(
+          (RequestTemplateDefinition value) =>
+              !usedRecently.contains(value.id),
+        )
         .toList(growable: false);
     if (preferred.isEmpty) preferred = candidates;
 
     if (anchorTemplate != null &&
         _fraction('$dayKey:overlap:$slot') < balance.overlapPairRate) {
       final overlapping = preferred.where((RequestTemplateDefinition value) {
-        return value.overlapTags.intersection(anchorTemplate.overlapTags).isNotEmpty;
+        return value.overlapTags
+            .intersection(anchorTemplate.overlapTags)
+            .isNotEmpty;
       }).toList(growable: false);
       if (overlapping.isNotEmpty) preferred = overlapping;
     }
@@ -197,7 +212,9 @@ class RequestScheduler {
     }).toList(growable: false)
       ..sort();
     if (candidates.isEmpty) return null;
-    return candidates[_stableHash('$dayKey:visitor:$slot:${template.id}') % candidates.length];
+    return candidates[
+      _stableHash('$dayKey:visitor:$slot:${template.id}') % candidates.length
+    ];
   }
 
   double _fraction(String input) => (_stableHash(input) % 10000) / 10000;
