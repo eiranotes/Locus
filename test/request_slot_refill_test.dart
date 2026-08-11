@@ -93,9 +93,7 @@ void main() {
     var id = 0;
     final result = const RequestScheduler(balance: balance).ensureSlots(
       now: DateTime(2026, 8, 12, 5),
-      requests: <VisitorRequest>[
-        completedRequest(DateTime(2026, 8, 11, 8)),
-      ],
+      requests: <VisitorRequest>[completedRequest(DateTime(2026, 8, 11, 8))],
       templates: templates,
       relationships: const <String, VisitorRelationship>{},
       unlockedAxes: const <SenseAxis>{

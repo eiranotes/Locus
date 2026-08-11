@@ -11,9 +11,7 @@ void main() {
     captureRecordId: 'record-$id',
     capturedAt: now,
     channels: const <SenseChannel>{SenseChannel.audio},
-    features: SenseVector(<SenseAxis, double>{
-      SenseAxis.loudness: loudness,
-    }),
+    features: SenseVector(<SenseAxis, double>{SenseAxis.loudness: loudness}),
     context: const SpecimenContext(
       timeBand: TimeBand.afternoon,
       season: Season.summer,
