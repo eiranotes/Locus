@@ -5,9 +5,9 @@ class VisitorRelationship {
     required this.visitorId,
     required this.stage,
     required this.fulfilledCount,
-    required this.unlockedRewardKeys,
+    required Set<String> unlockedRewardKeys,
     this.lastFulfilledAt,
-    this.state = const <String, Object?>{},
+    Map<String, Object?> state = const <String, Object?>{},
   }) : unlockedRewardKeys = Set<String>.unmodifiable(unlockedRewardKeys),
        state = Map<String, Object?>.unmodifiable(state);
 
@@ -70,7 +70,7 @@ class RelationshipEvent {
     this.requestId,
     this.specimenId,
     this.matchScore,
-    this.snapshot = const <String, Object?>{},
+    Map<String, Object?> snapshot = const <String, Object?>{},
   }) : snapshot = Map<String, Object?>.unmodifiable(snapshot);
 
   final String id;
