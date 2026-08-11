@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "tracks": [
+    {
+      "visitorId": "night_moth",
+      "milestones": [
+        {"stage": 1, "fulfilledCount": 1, "becomesResident": true},
+        {"stage": 2, "fulfilledCount": 3, "unlockAxis": "rhythmicity"},
+        {"stage": 3, "fulfilledCount": 6, "sceneObjectId": "keepsake_lantern_string"},
+        {"stage": 4, "fulfilledCount": 10}
+      ]
+    },
+    {
+      "visitorId": "fog_cat",
+      "milestones": [
+        {"stage": 1, "fulfilledCount": 1, "becomesResident": true},
+        {"stage": 2, "fulfilledCount": 3, "unlockAxis": "dynamicRange"},
+        {"stage": 3, "fulfilledCount": 6, "sceneObjectId": "keepsake_bench"},
+        {"stage": 4, "fulfilledCount": 10}
+      ]
+    },
+    {
+      "visitorId": "tea_mouse",
+      "milestones": [
+        {"stage": 1, "fulfilledCount": 1, "becomesResident": true},
+        {"stage": 2, "fulfilledCount": 3, "unlockAxis": "spectralBrightness"},
+        {"stage": 3, "fulfilledCount": 6, "sceneObjectId": "keepsake_tea_table"},
+        {"stage": 4, "fulfilledCount": 10}
+      ]
+    }
+  ]
+}
