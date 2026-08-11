@@ -39,9 +39,12 @@ class MethodChannelSenseSampler implements SenseSampler {
       throw ArgumentError('The first request-first sampler requires audio.');
     }
     try {
-      final raw = await _channel.invokeMethod<Object?>('sampleAudio', <String, Object?>{
-        'durationMillis': duration.inMilliseconds.clamp(1000, 10000),
-      });
+      final raw = await _channel.invokeMethod<Object?>(
+        'sampleAudio',
+        <String, Object?>{
+          'durationMillis': duration.inMilliseconds.clamp(1000, 10000),
+        },
+      );
       if (raw is! Map<Object?, Object?>) {
         throw StateError('The native sense sampler returned no feature map.');
       }
