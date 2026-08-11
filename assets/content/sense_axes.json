@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "axes": [
+    {"id": "loudness", "nameKo": "소리 크기", "initiallyUnlocked": true, "channel": "audio"},
+    {"id": "intermittency", "nameKo": "끊김", "initiallyUnlocked": true, "channel": "audio"},
+    {"id": "timeBand", "nameKo": "시간대", "initiallyUnlocked": true, "channel": "clock"},
+    {"id": "rhythmicity", "nameKo": "반복성", "initiallyUnlocked": false, "channel": "audio"},
+    {"id": "dynamicRange", "nameKo": "변화폭", "initiallyUnlocked": false, "channel": "audio"},
+    {"id": "spectralBrightness", "nameKo": "소리 밝기", "initiallyUnlocked": false, "channel": "audio"}
+  ]
+}
