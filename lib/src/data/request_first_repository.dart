@@ -127,6 +127,10 @@ class RequestFirstRepository {
     if (matches.any((SpecimenMatch value) => value.specimenId != specimen.id)) {
       throw ArgumentError('Every match must reference the supplied specimen.');
     }
+    final requestIds = matches.map((SpecimenMatch value) => value.requestId).toSet();
+    if (requestIds.length != matches.length) {
+      throw ArgumentError('A specimen may store only one match per request.');
+    }
     await _db.transaction((Transaction transaction) async {
       await transaction.insert(
         'capture_records',
@@ -152,6 +156,15 @@ class RequestFirstRepository {
     required List<VisitorRequest> issued,
     required List<VisitorRequest> expired,
   }) async {
+    if (issued.any((VisitorRequest value) => !value.isActive)) {
+      throw ArgumentError('Issued requests must be active.');
+    }
+    if (expired.any(
+      (VisitorRequest value) =>
+          value.status != VisitorRequestStatus.expired,
+    )) {
+      throw ArgumentError('Expired requests must use the expired status.');
+    }
     await _db.transaction((Transaction transaction) async {
       for (final request in <VisitorRequest>[...expired, ...issued]) {
         await transaction.insert(
@@ -184,16 +197,50 @@ class RequestFirstRepository {
     required List<RelationshipEvent> events,
     Set<SenseAxis> unlockedAxes = const <SenseAxis>{},
     List<SceneObject> grantedSceneObjects = const <SceneObject>[],
+    List<ScenePlacement> grantedScenePlacements = const <ScenePlacement>[],
   }) async {
     if (fulfilledRequest.id != assignment.requestId ||
         fulfilledRequest.visitorId != assignment.visitorId ||
-        fulfilledRequest.status != VisitorRequestStatus.fulfilled) {
+        fulfilledRequest.status != VisitorRequestStatus.fulfilled ||
+        fulfilledRequest.completedAt == null) {
       throw ArgumentError('Fulfilled request and assignment are inconsistent.');
     }
     if (relationship.visitorId != assignment.visitorId) {
       throw ArgumentError(
         'Relationship and assignment visitor are inconsistent.',
       );
+    }
+    if (events.isEmpty ||
+        events
+                .where(
+                  (RelationshipEvent value) =>
+                      value.kind == RelationshipEventKind.requestFulfilled,
+                )
+                .length !=
+            1 ||
+        events.any(
+          (RelationshipEvent value) =>
+              value.visitorId != assignment.visitorId ||
+              value.requestId != assignment.requestId ||
+              value.specimenId != assignment.specimenId,
+        )) {
+      throw ArgumentError('Relationship events do not describe this assignment.');
+    }
+    if (grantedSceneObjects.any(
+      (SceneObject value) =>
+          value.origin == SceneObjectOrigin.relationshipReward &&
+          (value.sourceVisitorId != assignment.visitorId ||
+              value.sourceRequestId != assignment.requestId),
+    )) {
+      throw ArgumentError('Granted scene objects have inconsistent provenance.');
+    }
+    final grantedObjectIds = grantedSceneObjects
+        .map((SceneObject value) => value.id)
+        .toSet();
+    if (grantedScenePlacements.any(
+      (ScenePlacement value) => !grantedObjectIds.contains(value.sceneObjectId),
+    )) {
+      throw ArgumentError('Granted placements must reference granted objects.');
     }
 
     await _db.transaction((Transaction transaction) async {
@@ -237,18 +284,39 @@ class RequestFirstRepository {
         throw StateError('Assignment score differs from the stored match.');
       }
 
+      final currentRelationship = await transaction.query(
+        'visitor_relationships',
+        columns: const <String>['stage', 'fulfilled_count'],
+        where: 'visitor_id = ?',
+        whereArgs: <Object?>[assignment.visitorId],
+        limit: 1,
+      );
+      final currentCount = currentRelationship.isEmpty
+          ? 0
+          : (currentRelationship.single['fulfilled_count']! as num).toInt();
+      final currentStage = currentRelationship.isEmpty
+          ? 0
+          : (currentRelationship.single['stage']! as num).toInt();
+      if (relationship.fulfilledCount != currentCount + 1 ||
+          relationship.stage < currentStage) {
+        throw StateError('Relationship progression is stale or non-monotonic.');
+      }
+
       await transaction.insert(
         'specimen_assignments',
         assignment.toMap(),
         conflictAlgorithm: ConflictAlgorithm.abort,
       );
-      await transaction.update(
+      final updatedRequests = await transaction.update(
         'visitor_requests',
         fulfilledRequest.toMap(),
         where: 'id = ?',
         whereArgs: <Object?>[fulfilledRequest.id],
         conflictAlgorithm: ConflictAlgorithm.abort,
       );
+      if (updatedRequests != 1) {
+        throw StateError('Request fulfillment did not update exactly one row.');
+      }
       await transaction.insert(
         'visitor_relationships',
         relationship.toMap(),
@@ -274,6 +342,13 @@ class RequestFirstRepository {
         await transaction.insert(
           'scene_objects',
           object.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.abort,
+        );
+      }
+      for (final placement in grantedScenePlacements) {
+        await transaction.insert(
+          'scene_placements',
+          placement.toMap(),
           conflictAlgorithm: ConflictAlgorithm.abort,
         );
       }
