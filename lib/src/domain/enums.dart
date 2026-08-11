@@ -75,6 +75,43 @@ enum StepTrackingMode { undecided, real, fallback }
 
 enum VisitorRewardKind { recipe, variant, effect }
 
+/// Request-first v7 domain types. They are additive while the v6 loop remains
+/// the shipping path, allowing the new loop to be developed and migrated
+/// without weakening the current build.
+enum SenseChannel { audio, clock, color, motion, barometer }
+
+enum SenseAxis {
+  loudness,
+  intermittency,
+  rhythmicity,
+  dynamicRange,
+  spectralBrightness,
+  timeBand,
+}
+
+enum SpecimenEligibility { assignable, lowConfidence, legacyArchive }
+
+enum VisitorRequestStatus { active, fulfilled, replaced, expired }
+
+enum HistoryComparison { none, similar, contrast }
+
+enum MatchVerdict { match, partial, mismatch, lowConfidence }
+
+enum RequestAccessTier { everyday, outing }
+
+enum RelationshipEventKind {
+  requestFulfilled,
+  stageAdvanced,
+  senseUnlocked,
+  keepsakeGranted,
+  becameResident,
+  legacyArrival,
+}
+
+enum SceneObjectOrigin { relationshipReward, legacyCrafted, starter }
+
+enum SceneObjectLifecycle { stored, placed }
+
 T enumByName<T extends Enum>(Iterable<T> values, String raw, T fallback) {
   for (final value in values) {
     if (value.name == raw) {
@@ -127,6 +164,17 @@ extension TimeBandLabel on TimeBand {
     TimeBand.afternoon => '낮',
     TimeBand.evening => '저녁',
     TimeBand.night => '밤',
+  };
+}
+
+extension SenseAxisLabel on SenseAxis {
+  String get labelKo => switch (this) {
+    SenseAxis.loudness => '소리 크기',
+    SenseAxis.intermittency => '끊김',
+    SenseAxis.rhythmicity => '반복성',
+    SenseAxis.dynamicRange => '변화폭',
+    SenseAxis.spectralBrightness => '소리 밝기',
+    SenseAxis.timeBand => '시간대',
   };
 }
 
