@@ -6,7 +6,7 @@ class AppDatabase {
 
   final Database database;
 
-  static const int schemaVersion = 4;
+  static const int schemaVersion = 5;
   static const String productionDatabaseName = 'reality_diorama.sqlite3';
   static const String demoDatabaseName = 'reality_diorama_demo.sqlite3';
 
@@ -124,6 +124,7 @@ class AppDatabase {
         value TEXT NOT NULL
       )
     ''');
+    await _createRequestFirstTables(db);
     await db.execute(
       'CREATE INDEX idx_capture_time ON capture_records(captured_at DESC)',
     );
@@ -163,6 +164,9 @@ class AppDatabase {
           'legacy-' || id, visitor_id, last_seen_at, variant_key, snapshot_json
         FROM visitor_sightings
       ''');
+    }
+    if (oldVersion < 5) {
+      await _createRequestFirstTables(db);
     }
   }
 
@@ -205,6 +209,145 @@ class AppDatabase {
     );
     await db.execute(
       'CREATE INDEX idx_pattern_key ON collected_patterns(pattern_key, captured_at DESC)',
+    );
+  }
+
+  static Future<void> _createRequestFirstTables(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS specimens (
+        id TEXT PRIMARY KEY,
+        capture_record_id TEXT NOT NULL UNIQUE,
+        captured_at INTEGER NOT NULL,
+        channel_keys_json TEXT NOT NULL,
+        feature_vector_json TEXT NOT NULL,
+        context_json TEXT NOT NULL,
+        confidence REAL NOT NULL,
+        eligibility TEXT NOT NULL,
+        preview_seed INTEGER NOT NULL,
+        feature_schema_version TEXT NOT NULL,
+        legacy_payload_json TEXT,
+        FOREIGN KEY(capture_record_id) REFERENCES capture_records(id) ON DELETE CASCADE
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS visitor_requests (
+        id TEXT PRIMARY KEY,
+        visitor_id TEXT NOT NULL,
+        template_id TEXT NOT NULL,
+        prompt_ko TEXT NOT NULL,
+        issued_at INTEGER NOT NULL,
+        expires_at INTEGER,
+        slot_index INTEGER NOT NULL,
+        status TEXT NOT NULL,
+        target_json TEXT NOT NULL,
+        difficulty INTEGER NOT NULL,
+        history_comparison TEXT NOT NULL,
+        history_specimen_id TEXT,
+        request_schema_version TEXT NOT NULL,
+        completed_at INTEGER,
+        FOREIGN KEY(history_specimen_id) REFERENCES specimens(id)
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS specimen_matches (
+        specimen_id TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        score REAL NOT NULL,
+        passed INTEGER NOT NULL,
+        verdict TEXT NOT NULL,
+        breakdown_json TEXT NOT NULL,
+        matcher_version TEXT NOT NULL,
+        PRIMARY KEY(specimen_id, request_id),
+        FOREIGN KEY(specimen_id) REFERENCES specimens(id) ON DELETE CASCADE,
+        FOREIGN KEY(request_id) REFERENCES visitor_requests(id) ON DELETE CASCADE
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS specimen_assignments (
+        id TEXT PRIMARY KEY,
+        specimen_id TEXT NOT NULL UNIQUE,
+        request_id TEXT NOT NULL UNIQUE,
+        visitor_id TEXT NOT NULL,
+        assigned_at INTEGER NOT NULL,
+        accepted_score REAL NOT NULL,
+        FOREIGN KEY(specimen_id) REFERENCES specimens(id),
+        FOREIGN KEY(request_id) REFERENCES visitor_requests(id)
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS visitor_relationships (
+        visitor_id TEXT PRIMARY KEY,
+        stage INTEGER NOT NULL,
+        fulfilled_count INTEGER NOT NULL,
+        last_fulfilled_at INTEGER,
+        unlocked_reward_keys_json TEXT NOT NULL,
+        state_json TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS relationship_events (
+        id TEXT PRIMARY KEY,
+        visitor_id TEXT NOT NULL,
+        request_id TEXT,
+        specimen_id TEXT,
+        event_kind TEXT NOT NULL,
+        occurred_at INTEGER NOT NULL,
+        match_score REAL,
+        snapshot_json TEXT NOT NULL,
+        FOREIGN KEY(request_id) REFERENCES visitor_requests(id),
+        FOREIGN KEY(specimen_id) REFERENCES specimens(id)
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS scene_objects (
+        id TEXT PRIMARY KEY,
+        definition_id TEXT NOT NULL,
+        origin_kind TEXT NOT NULL,
+        source_visitor_id TEXT,
+        source_request_id TEXT,
+        visual_seed INTEGER NOT NULL,
+        generator_version TEXT NOT NULL,
+        variant_key TEXT NOT NULL,
+        lifecycle TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        legacy_payload_json TEXT,
+        FOREIGN KEY(source_request_id) REFERENCES visitor_requests(id)
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS scene_placements (
+        id TEXT PRIMARY KEY,
+        scene_object_id TEXT NOT NULL UNIQUE,
+        column_index INTEGER NOT NULL,
+        row_index INTEGER NOT NULL,
+        rotation INTEGER NOT NULL,
+        FOREIGN KEY(scene_object_id) REFERENCES scene_objects(id) ON DELETE CASCADE
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS sense_profile (
+        axis_key TEXT PRIMARY KEY,
+        unlocked INTEGER NOT NULL,
+        calibration_json TEXT NOT NULL,
+        unlocked_at INTEGER,
+        source_visitor_id TEXT
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_specimen_time '
+      'ON specimens(captured_at DESC)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_request_status_time '
+      'ON visitor_requests(status, issued_at DESC)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_relationship_event_time '
+      'ON relationship_events(visitor_id, occurred_at DESC)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_scene_object_time '
+      'ON scene_objects(created_at DESC)',
     );
   }
 
