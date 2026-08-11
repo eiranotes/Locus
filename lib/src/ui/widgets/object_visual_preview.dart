@@ -18,6 +18,7 @@ class ObjectVisualPreview extends StatelessWidget {
     this.mirrorX,
     this.visualLayerCatalog = VisualLayerCatalog.empty,
     this.atmosphericTraitCatalog = AtmosphericTraitCatalog.empty,
+    this.showContextEffects = true,
     super.key,
   });
 
@@ -29,6 +30,7 @@ class ObjectVisualPreview extends StatelessWidget {
   final bool? mirrorX;
   final VisualLayerCatalog visualLayerCatalog;
   final AtmosphericTraitCatalog atmosphericTraitCatalog;
+  final bool showContextEffects;
 
   static final Map<String, Future<_ObjectPreviewImages>> _layerBundles =
       <String, Future<_ObjectPreviewImages>>{};
@@ -36,17 +38,21 @@ class ObjectVisualPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget fallback() => CustomPaint(
-      painter: ObjectVisualPainter(visual: visual, rotation: rotation),
+      painter: ObjectVisualPainter(
+        visual: visual,
+        rotation: rotation,
+        showContextEffects: showContextEffects,
+      ),
       size: Size.zero,
     );
     final isConstruction = visual.completion < 1;
     final spritePath = isConstruction
         ? constructionAssetPath
         : assetPath ?? GeneratedArtPaths.object(visual.kind);
-    final layer = visual.usesLayeredWeather
+    final layer = showContextEffects && visual.usesLayeredWeather
         ? visualLayerCatalog.tryForWeather(visual.weatherKind)
         : null;
-    final traitDefinition = visual.focusTrait == null
+    final traitDefinition = !showContextEffects || visual.focusTrait == null
         ? null
         : atmosphericTraitCatalog.tryDefinitionFor(visual.focusTrait!);
     final traitLayer = traitDefinition == null
@@ -60,12 +66,8 @@ class ObjectVisualPreview extends StatelessWidget {
             future: _loadImages(
               spritePath,
               surfacePath: layer?.surfacePatternPath,
-              footprintPath: layer?.footprintEffectPath,
               traitSurfacePath: distinctTraitLayer
                   ? traitLayer.surfacePatternPath
-                  : null,
-              traitFootprintPath: distinctTraitLayer
-                  ? traitLayer.footprintEffectPath
                   : null,
             ),
             builder:
@@ -82,9 +84,7 @@ class ObjectVisualPreview extends StatelessWidget {
                       rotation: rotation,
                       sprite: images.sprite,
                       surfacePattern: images.surface,
-                      footprintEffect: images.footprint,
                       traitSurfacePattern: images.traitSurface,
-                      traitFootprintEffect: images.traitFootprint,
                       spriteMirrorX: isConstruction
                           ? false
                           : mirrorX ?? rotation.isOdd,
@@ -98,6 +98,7 @@ class ObjectVisualPreview extends StatelessWidget {
                           : 0,
                       constructionSprite:
                           isConstruction && constructionAssetPath != null,
+                      showContextEffects: showContextEffects,
                     ),
                     size: Size.zero,
                   );
@@ -117,17 +118,9 @@ class ObjectVisualPreview extends StatelessWidget {
   Future<_ObjectPreviewImages> _loadImages(
     String spritePath, {
     String? surfacePath,
-    String? footprintPath,
     String? traitSurfacePath,
-    String? traitFootprintPath,
   }) {
-    final key = <String?>[
-      spritePath,
-      surfacePath,
-      footprintPath,
-      traitSurfacePath,
-      traitFootprintPath,
-    ].join('|');
+    final key = <String?>[spritePath, surfacePath, traitSurfacePath].join('|');
     return _layerBundles.putIfAbsent(
       key,
       () async => _ObjectPreviewImages(
@@ -135,15 +128,9 @@ class ObjectVisualPreview extends StatelessWidget {
         surface: surfacePath == null
             ? null
             : await GeneratedArtImageCache.load(surfacePath),
-        footprint: footprintPath == null
-            ? null
-            : await GeneratedArtImageCache.load(footprintPath),
         traitSurface: traitSurfacePath == null
             ? null
             : await GeneratedArtImageCache.load(traitSurfacePath),
-        traitFootprint: traitFootprintPath == null
-            ? null
-            : await GeneratedArtImageCache.load(traitFootprintPath),
       ),
     );
   }
@@ -153,16 +140,12 @@ final class _ObjectPreviewImages {
   const _ObjectPreviewImages({
     required this.sprite,
     this.surface,
-    this.footprint,
     this.traitSurface,
-    this.traitFootprint,
   });
 
   final ui.Image sprite;
   final ui.Image? surface;
-  final ui.Image? footprint;
   final ui.Image? traitSurface;
-  final ui.Image? traitFootprint;
 }
 
 class ObjectVisualPainter extends CustomPainter {
@@ -171,13 +154,12 @@ class ObjectVisualPainter extends CustomPainter {
     this.rotation = 0,
     this.sprite,
     this.surfacePattern,
-    this.footprintEffect,
     this.traitSurfacePattern,
-    this.traitFootprintEffect,
     this.spriteMirrorX = false,
     this.surfaceOpacity = 0,
     this.traitSurfaceOpacity = 0,
     this.constructionSprite = false,
+    this.showContextEffects = true,
   });
 
   static const DeterministicObjectRenderer renderer =
@@ -187,13 +169,12 @@ class ObjectVisualPainter extends CustomPainter {
   final int rotation;
   final ui.Image? sprite;
   final ui.Image? surfacePattern;
-  final ui.Image? footprintEffect;
   final ui.Image? traitSurfacePattern;
-  final ui.Image? traitFootprintEffect;
   final bool spriteMirrorX;
   final double surfaceOpacity;
   final double traitSurfaceOpacity;
   final bool constructionSprite;
+  final bool showContextEffects;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -204,13 +185,12 @@ class ObjectVisualPainter extends CustomPainter {
       rotation: rotation,
       sprite: sprite,
       surfacePattern: surfacePattern,
-      footprintEffect: footprintEffect,
       traitSurfacePattern: traitSurfacePattern,
-      traitFootprintEffect: traitFootprintEffect,
       spriteMirrorX: spriteMirrorX,
       surfaceOpacity: surfaceOpacity,
       traitSurfaceOpacity: traitSurfaceOpacity,
       constructionSprite: constructionSprite,
+      showContextEffects: showContextEffects,
     );
   }
 
@@ -228,12 +208,11 @@ class ObjectVisualPainter extends CustomPainter {
         oldDelegate.visual.variantKey != visual.variantKey ||
         oldDelegate.sprite != sprite ||
         oldDelegate.surfacePattern != surfacePattern ||
-        oldDelegate.footprintEffect != footprintEffect ||
         oldDelegate.traitSurfacePattern != traitSurfacePattern ||
-        oldDelegate.traitFootprintEffect != traitFootprintEffect ||
         oldDelegate.spriteMirrorX != spriteMirrorX ||
         oldDelegate.surfaceOpacity != surfaceOpacity ||
         oldDelegate.traitSurfaceOpacity != traitSurfaceOpacity ||
-        oldDelegate.constructionSprite != constructionSprite;
+        oldDelegate.constructionSprite != constructionSprite ||
+        oldDelegate.showContextEffects != showContextEffects;
   }
 }

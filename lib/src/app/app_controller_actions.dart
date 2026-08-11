@@ -566,10 +566,12 @@ extension AppControllerActions on AppController {
     );
     if (evaluation == null) return;
     final previous = seenById[evaluation.visitor.id];
+    final observedWeather = currentWeatherKind;
+    final weatherKey = observedWeather?.name ?? 'unavailable';
     final variantKey =
-        '${sceneWeatherKind.name}_${sceneTimeBand.name}_${_captures.firstOrNull?.coarseCellId ?? 'local'}';
+        '${weatherKey}_${sceneTimeBand.name}_${_captures.firstOrNull?.coarseCellId ?? 'local'}';
     final snapshotJson = VisitorSighting.encodeSnapshot(<String, Object?>{
-      'weather': sceneWeatherKind.name,
+      'weather': observedWeather?.name,
       'timeBand': sceneTimeBand.name,
       'objects': _placements
           .map((Placement item) => item.craftedObjectId)

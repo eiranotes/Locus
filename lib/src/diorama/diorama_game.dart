@@ -90,6 +90,8 @@ class DioramaScenePainter {
   final double weatherElapsed;
   final bool reduceMotion;
 
+  bool get _isEditing => snapshot.editorOverlay != null;
+
   void paint(Canvas canvas, Size outputSize) {
     final scale = math.min(
       outputSize.width / logicalSize,
@@ -127,6 +129,8 @@ class DioramaScenePainter {
       const Rect.fromLTWH(0, 0, logicalSize, logicalSize),
       Paint()..color = background,
     );
+
+    if (_isEditing) return;
 
     final glow = Paint()
       ..shader =
@@ -213,7 +217,6 @@ class DioramaScenePainter {
         ..isAntiAlias = false
         ..color = color,
     );
-    _drawTerrainDetail(canvas, column, row, center);
     canvas.drawPath(
       path,
       Paint()
@@ -226,33 +229,26 @@ class DioramaScenePainter {
             ? PixelPalette.mint
             : const Color(0xFF17222A),
     );
-    final markerName = invalidPreview
-        ? 'invalid_target'
-        : selected
-        ? 'selected_target'
-        : validAnchor
-        ? 'valid_target'
-        : null;
-    if (markerName != null) {
-      final markerSize = validAnchor && !selected ? 20.0 : 34.0;
-      _drawArtImage(
-        canvas,
-        art?.editorMarkers[markerName],
-        anchor: center.translate(0, 14),
-        size: Size.square(markerSize),
+    if (editorOverlay != null && (selected || validAnchor)) {
+      final indicatorColor = invalidPreview
+          ? PixelPalette.danger
+          : selected
+          ? PixelPalette.mint
+          : PixelPalette.mint.withValues(alpha: 0.62);
+      final indicatorCenter = center.translate(0, selected ? 0 : 4);
+      final indicatorSize = selected ? 7.0 : 4.0;
+      canvas.drawRect(
+        Rect.fromCenter(
+          center: indicatorCenter,
+          width: indicatorSize,
+          height: indicatorSize,
+        ),
+        Paint()
+          ..isAntiAlias = false
+          ..color = indicatorColor,
       );
     }
-    if (selected && editorOverlay?.dragging == true) {
-      _drawArtImage(
-        canvas,
-        art?.editorMarkers[editorOverlay?.previewValid == false
-            ? 'grab_hand'
-            : 'place_chevron'],
-        anchor: center.translate(0, -18),
-        size: const Size(30, 30),
-      );
-    }
-    if (effects.wet > 0 && (column + row).isEven) {
+    if (!_isEditing && effects.wet > 0 && (column + row).isEven) {
       canvas.drawRect(
         Rect.fromCenter(center: center.translate(0, 2), width: 14, height: 2),
         Paint()
@@ -262,94 +258,45 @@ class DioramaScenePainter {
     }
   }
 
-  void _drawTerrainDetail(Canvas canvas, int column, int row, Offset center) {
-    final generatedArt = art;
-    if (generatedArt == null) return;
-    final occupied = _effectivePlacements().any((Placement placement) {
-      CraftedObject? object;
-      for (final candidate in snapshot.objects) {
-        if (candidate.id == placement.craftedObjectId) {
-          object = candidate;
-          break;
-        }
-      }
-      if (object == null) return false;
-      final recipe = snapshot.recipesById[object.recipeId];
-      if (recipe == null) return false;
-      return PlacementEngine(columns: 5, rows: 5)
-          .occupiedCells(placement: placement, footprint: recipe.footprint)
-          .contains(GridCell(column, row));
-    });
-    if (occupied ||
-        (column * 7 + row * 11 + snapshot.objects.length) % 3 != 0) {
-      return;
-    }
-    const names = <String>[
-      'pebbles',
-      'moss',
-      'grass_blades',
-      'clover',
-      'mushrooms',
-      'autumn_leaves',
-      'wildflowers',
-      'twig',
-      'fern',
-      'drain_grate',
-      'cracked_cobble',
-      'chalk_star',
-      'puddle_glint',
-      'wet_leaf',
-      'snow_tuft',
-      'dry_weed',
-      'acorns',
-      'flower_petals',
-      'stepping_marks',
-      'crack_grass',
-    ];
-    final stateOffset =
-        snapshot.weatherKind.index * 5 + snapshot.timeBand.index;
-    final index = (column * 5 + row * 3 + stateOffset) % names.length;
-    _drawArtImage(
-      canvas,
-      generatedArt.terrainDetails[names[index]],
-      anchor: center.translate(0, 10),
-      size: const Size(30, 30),
-    );
-  }
-
   void _drawFixedArchitecture(Canvas canvas) {
     final houseBase = _tileTop(2.6, 0.15).translate(0, -4);
     final generatedArt = art;
     if (generatedArt != null) {
+      final opacity = _isEditing ? 0.38 : 1.0;
       _drawArtImage(
         canvas,
         generatedArt.scenery['house'],
         anchor: houseBase,
         size: const Size(132, 132),
+        opacity: opacity,
       );
       _drawArtImage(
         canvas,
         generatedArt.scenery['tree'],
         anchor: _tileTop(0.25, 0.35),
         size: const Size(94, 94),
+        opacity: opacity,
       );
       _drawArtImage(
         canvas,
         generatedArt.scenery['bench'],
         anchor: _tileTop(0.45, 1.6),
         size: const Size(88, 72),
+        opacity: opacity,
       );
       _drawArtImage(
         canvas,
         generatedArt.scenery['fence'],
         anchor: _tileTop(4.25, 1.0),
         size: const Size(92, 70),
+        opacity: opacity,
       );
       _drawArtImage(
         canvas,
         generatedArt.scenery['path_junction'],
         anchor: _tileTop(2.6, 4.15).translate(0, 3),
         size: const Size(96, 66),
+        opacity: opacity,
       );
       return;
     }
@@ -463,10 +410,16 @@ class DioramaScenePainter {
     final objects = <String, CraftedObject>{
       for (final object in snapshot.objects) object.id: object,
     };
-    final placements = _effectivePlacements()
-      ..sort((Placement a, Placement b) {
-        return (a.row + a.column).compareTo(b.row + b.column);
-      });
+    final footprintsByObjectId = <String, Footprint>{
+      for (final object in snapshot.objects)
+        if (snapshot.recipesById[object.recipeId] case final recipe?)
+          object.id: recipe.footprint,
+    };
+    final placements = DioramaGeometry.orderedPlacements(
+      _effectivePlacements(),
+      footprintFor: (Placement placement) =>
+          footprintsByObjectId[placement.craftedObjectId],
+    );
 
     for (final placement in placements) {
       final object = objects[placement.craftedObjectId];
@@ -477,9 +430,13 @@ class DioramaScenePainter {
         object.recipeId,
       );
       final placementVisual = placementEntry.visualFor(placement.rotation);
-      final anchor = _tileTop(
-        placement.column.toDouble(),
-        placement.row.toDouble(),
+      final recipe = snapshot.recipesById[object.recipeId];
+      if (recipe == null) {
+        continue;
+      }
+      final anchor = DioramaGeometry.placementGroundAnchor(
+        placement,
+        recipe.footprint,
       );
       final visual = ObjectVisualDescriptor.fromCraftedObject(
         object,
@@ -510,12 +467,8 @@ class DioramaScenePainter {
         sprite: art?.objectAssets[placementVisual.assetPath],
         spriteMirrorX: placementVisual.mirrorX,
         surfacePattern: art?.weatherSurfaces[visual.weatherKind],
-        footprintEffect: art?.weatherFootprints[visual.weatherKind],
         traitSurfacePattern: distinctTraitLayer
             ? art?.weatherSurfaces[traitLayer.kind]
-            : null,
-        traitFootprintEffect: distinctTraitLayer
-            ? art?.weatherFootprints[traitLayer.kind]
             : null,
         surfaceOpacity:
             (weatherLayer?.surfaceOpacity ?? 0) +
@@ -525,12 +478,32 @@ class DioramaScenePainter {
                   .clamp(0, 0.32)
                   .toDouble()
             : 0,
+        showContextEffects: !_isEditing,
       );
+      final overlay = snapshot.editorOverlay;
+      if (overlay != null &&
+          placement.craftedObjectId == overlay.selectedObjectId) {
+        final invalid =
+            overlay.previewPlacement != null && !overlay.previewValid;
+        final color = invalid ? PixelPalette.danger : PixelPalette.mint;
+        canvas.drawRect(
+          Rect.fromCenter(center: anchor, width: 7, height: 7),
+          Paint()
+            ..isAntiAlias = false
+            ..color = PixelPalette.canvas,
+        );
+        canvas.drawRect(
+          Rect.fromCenter(center: anchor, width: 5, height: 5),
+          Paint()
+            ..isAntiAlias = false
+            ..color = color,
+        );
+      }
     }
   }
 
   void _drawVisitor(Canvas canvas) {
-    if (snapshot.activeVisitorId == null) {
+    if (_isEditing || snapshot.activeVisitorId == null) {
       return;
     }
     final anchor = _tileTop(2.2, 4.1).translate(0, -4);
@@ -575,83 +548,8 @@ class DioramaScenePainter {
   }
 
   void _drawWeather(Canvas canvas) {
-    final generatedArt = art;
-    if (generatedArt != null) {
-      if (snapshot.weatherKind == WeatherMaterialKind.rain) {
-        _drawPixelRain(canvas);
-        return;
-      }
-      _drawAtmosphereDetails(canvas, generatedArt);
-      return;
-    }
-    switch (snapshot.weatherKind) {
-      case WeatherMaterialKind.rain:
-        _drawPixelRain(canvas);
-        break;
-      case WeatherMaterialKind.cloudy:
-        canvas.drawRect(
-          const Rect.fromLTWH(0, 0, logicalSize, logicalSize),
-          Paint()..color = const Color(0xFFB8C7CB).withValues(alpha: 0.035),
-        );
-        break;
-      case WeatherMaterialKind.windy:
-        final paint = Paint()
-          ..color = PixelPalette.cream.withValues(alpha: 0.14)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1;
-        for (var index = 0; index < 6; index += 1) {
-          final y = 75.0 + index * 39;
-          canvas.drawArc(
-            Rect.fromLTWH(20 + index * 7, y, 100, 22),
-            0.1,
-            2.1,
-            false,
-            paint,
-          );
-        }
-        break;
-      case WeatherMaterialKind.cold:
-        final paint = Paint()..color = Colors.white.withValues(alpha: 0.48);
-        for (var index = 0; index < 22; index += 1) {
-          final x = ((index * 61 + 17) % 350).toDouble();
-          final y = ((index * 37 + 23) % 330).toDouble();
-          canvas.drawRect(Rect.fromLTWH(x, y, 2, 2), paint);
-        }
-        break;
-      case WeatherMaterialKind.clear:
-      case WeatherMaterialKind.warm:
-        break;
-    }
-  }
-
-  void _drawAtmosphereDetails(Canvas canvas, DioramaArtImages generatedArt) {
-    final weatherNames = switch (snapshot.weatherKind) {
-      WeatherMaterialKind.rain => const <String>[],
-      WeatherMaterialKind.cloudy => const <String>['mist_wisp'],
-      WeatherMaterialKind.windy => const <String>['wind_leaves'],
-      WeatherMaterialKind.cold => const <String>['frost_sparkles'],
-      WeatherMaterialKind.clear => const <String>['morning_rays'],
-      WeatherMaterialKind.warm => const <String>['warm_motes'],
-    };
-    final timeName = switch (snapshot.timeBand) {
-      TimeBand.dawn => 'dawn_sparkle',
-      TimeBand.morning => 'morning_rays',
-      TimeBand.afternoon => 'warm_motes',
-      TimeBand.evening => 'evening_windows',
-      TimeBand.night => 'night_moths',
-    };
-    final names = <String>{...weatherNames, timeName}.toList(growable: false);
-    for (var index = 0; index < names.length; index += 1) {
-      final anchor = index.isEven
-          ? const Offset(68, 86)
-          : const Offset(302, 220);
-      _drawArtImage(
-        canvas,
-        generatedArt.atmosphereDetails[names[index]],
-        anchor: anchor.translate(0, index * 26),
-        size: const Size(48, 48),
-      );
-    }
+    if (_isEditing || snapshot.weatherKind != WeatherMaterialKind.rain) return;
+    _drawPixelRain(canvas);
   }
 
   void _drawPixelRain(Canvas canvas) {
@@ -698,6 +596,7 @@ class DioramaScenePainter {
     Image? image, {
     required Offset anchor,
     required Size size,
+    double opacity = 1,
   }) {
     if (image == null) {
       return;
@@ -711,7 +610,9 @@ class DioramaScenePainter {
         size.width,
         size.height,
       ),
-      Paint()..filterQuality = FilterQuality.none,
+      Paint()
+        ..filterQuality = FilterQuality.none
+        ..color = Color.fromRGBO(255, 255, 255, opacity.clamp(0, 1).toDouble()),
     );
   }
 

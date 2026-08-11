@@ -24,25 +24,12 @@ final class DeterministicObjectRenderer {
     Image? sprite,
     bool spriteMirrorX = false,
     Image? surfacePattern,
-    Image? footprintEffect,
     Image? traitSurfacePattern,
-    Image? traitFootprintEffect,
     double surfaceOpacity = 0,
     double traitSurfaceOpacity = 0,
-    double traitFootprintOpacity = 0.36,
     bool constructionSprite = false,
+    bool showContextEffects = true,
   }) {
-    if (visual.usesLayeredWeather && footprintEffect != null) {
-      _drawFootprintEffect(canvas, anchor, footprintEffect);
-    }
-    if (visual.usesLayeredWeather && traitFootprintEffect != null) {
-      _drawFootprintEffect(
-        canvas,
-        anchor,
-        traitFootprintEffect,
-        opacity: traitFootprintOpacity,
-      );
-    }
     if (visual.completion < 1) {
       if (constructionSprite && sprite != null) {
         _drawObjectSprite(
@@ -52,7 +39,9 @@ final class DeterministicObjectRenderer {
           sprite,
           mirrorX: spriteMirrorX,
         );
-        _drawConnectorMark(canvas, anchor, visual.surroundingKind);
+        if (showContextEffects) {
+          _drawConnectorMark(canvas, anchor, visual.surroundingKind);
+        }
       } else {
         _drawConstruction(canvas, anchor, visual.completion);
       }
@@ -61,7 +50,8 @@ final class DeterministicObjectRenderer {
 
     if (sprite != null) {
       _drawObjectSprite(canvas, anchor, visual, sprite, mirrorX: spriteMirrorX);
-      if (visual.usesLayeredWeather &&
+      if (showContextEffects &&
+          visual.usesLayeredWeather &&
           surfacePattern != null &&
           surfaceOpacity > 0) {
         _drawSurfacePattern(
@@ -74,7 +64,8 @@ final class DeterministicObjectRenderer {
           opacity: surfaceOpacity,
         );
       }
-      if (visual.usesLayeredWeather &&
+      if (showContextEffects &&
+          visual.usesLayeredWeather &&
           traitSurfacePattern != null &&
           traitSurfaceOpacity > 0) {
         _drawSurfacePattern(
@@ -87,7 +78,9 @@ final class DeterministicObjectRenderer {
           opacity: traitSurfaceOpacity,
         );
       }
-      _drawConnectorMark(canvas, anchor, visual.surroundingKind);
+      if (showContextEffects) {
+        _drawConnectorMark(canvas, anchor, visual.surroundingKind);
+      }
       return;
     }
 
@@ -159,7 +152,9 @@ final class DeterministicObjectRenderer {
         _drawTowerShape(canvas, anchor, accent, visual);
         break;
     }
-    _drawConnectorMark(canvas, anchor, visual.surroundingKind);
+    if (showContextEffects) {
+      _drawConnectorMark(canvas, anchor, visual.surroundingKind);
+    }
   }
 
   Color spriteTint(ObjectVisualDescriptor visual) {
@@ -178,13 +173,11 @@ final class DeterministicObjectRenderer {
     Image? sprite,
     bool spriteMirrorX = false,
     Image? surfacePattern,
-    Image? footprintEffect,
     Image? traitSurfacePattern,
-    Image? traitFootprintEffect,
     double surfaceOpacity = 0,
     double traitSurfaceOpacity = 0,
-    double traitFootprintOpacity = 0.36,
     bool constructionSprite = false,
+    bool showContextEffects = true,
   }) {
     if (outputSize.isEmpty) {
       return;
@@ -209,13 +202,11 @@ final class DeterministicObjectRenderer {
       sprite: sprite,
       spriteMirrorX: spriteMirrorX,
       surfacePattern: surfacePattern,
-      footprintEffect: footprintEffect,
       traitSurfacePattern: traitSurfacePattern,
-      traitFootprintEffect: traitFootprintEffect,
       surfaceOpacity: surfaceOpacity,
       traitSurfaceOpacity: traitSurfaceOpacity,
-      traitFootprintOpacity: traitFootprintOpacity,
       constructionSprite: constructionSprite,
+      showContextEffects: showContextEffects,
     );
     canvas.restore();
   }
@@ -250,7 +241,7 @@ final class DeterministicObjectRenderer {
     Image sprite, {
     required bool mirrorX,
   }) {
-    final size = _spriteSize(visual.kind);
+    final size = spriteSizeFor(visual.kind);
     _drawShadow(canvas, anchor.translate(0, 2), size.width * 0.52, 9);
     canvas.save();
     canvas.translate(anchor.dx, anchor.dy);
@@ -271,7 +262,7 @@ final class DeterministicObjectRenderer {
     canvas.restore();
   }
 
-  Size _spriteSize(ObjectKind kind) => switch (kind) {
+  static Size spriteSizeFor(ObjectKind kind) => switch (kind) {
     ObjectKind.alleyLamp => const Size(76, 98),
     ObjectKind.signpost => const Size(78, 78),
     ObjectKind.planter => const Size(84, 72),
@@ -302,26 +293,27 @@ final class DeterministicObjectRenderer {
     ObjectKind.observatory => const Size(102, 106),
   };
 
-  void _drawFootprintEffect(
-    Canvas canvas,
-    Offset anchor,
-    Image image, {
-    double opacity = 1,
-  }) {
-    const size = Size(104, 104);
-    canvas.drawImageRect(
-      image,
-      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
-      Rect.fromLTWH(
-        anchor.dx - size.width / 2,
-        anchor.dy - 72,
-        size.width,
-        size.height,
-      ),
-      Paint()
-        ..filterQuality = FilterQuality.none
-        ..color = Color.fromRGBO(255, 255, 255, opacity.clamp(0, 1).toDouble()),
+  static Rect spriteBoundsAt(Offset anchor, ObjectKind kind) {
+    final size = spriteSizeFor(kind);
+    return Rect.fromLTWH(
+      anchor.dx - size.width / 2,
+      anchor.dy - size.height,
+      size.width,
+      size.height,
     );
+  }
+
+  static Offset previewAnchorIn(Size outputSize) {
+    if (outputSize.isEmpty) return Offset.zero;
+    final scale = math.min(
+      outputSize.width / previewLogicalSize.width,
+      outputSize.height / previewLogicalSize.height,
+    );
+    final offset = Offset(
+      (outputSize.width - previewLogicalSize.width * scale) / 2,
+      (outputSize.height - previewLogicalSize.height * scale) / 2,
+    );
+    return offset + previewAnchor * scale;
   }
 
   void _drawSurfacePattern(
@@ -333,7 +325,7 @@ final class DeterministicObjectRenderer {
     required bool mirrorX,
     required double opacity,
   }) {
-    final size = _spriteSize(visual.kind);
+    final size = spriteSizeFor(visual.kind);
     final destination = Rect.fromLTWH(
       -size.width / 2,
       -size.height,

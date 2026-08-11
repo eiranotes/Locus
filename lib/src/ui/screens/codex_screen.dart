@@ -228,12 +228,13 @@ String _visitorSceneLabel(VisitorSighting? sighting) {
   if (sighting == null) return '장면 기록 없음';
   final parts = sighting.variantKey.split('_');
   if (parts.length < 2) return '장면 기록';
+  final time = enumByName(TimeBand.values, parts[1], TimeBand.evening);
+  if (parts[0] == 'unavailable') return '날씨 미확인 · ${time.labelKo}';
   final weather = enumByName(
     WeatherMaterialKind.values,
     parts[0],
     WeatherMaterialKind.cloudy,
   );
-  final time = enumByName(TimeBand.values, parts[1], TimeBand.evening);
   return '${weather.labelKo} · ${time.labelKo}';
 }
 

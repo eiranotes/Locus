@@ -4,6 +4,20 @@
 
 ### Fixed
 
+- Placement sprites now snap their bottom-center ground point to the front
+  vertex of the complete rotated footprint instead of the persisted anchor
+  cell center, fixing both 1x1 half-tile drift and rotated 1x2 placement drift.
+- Selected objects no longer jump above physically nearer objects, and editor
+  selection lines no longer cross through object bases.
+
+- Completed crafting no longer says an object was placed when a full board or
+  missing anchor caused it to be stored in inventory.
+- Visitor scene memories no longer persist a rendered fallback weather kind as
+  if it were a current provider observation.
+- Dense placement scenes now hit-test in the same order they paint, use the
+  shared per-kind sprite bounds, and keep the selected object visible without
+  changing its saved cell.
+
 - Capture-history records no longer display placement scenery as if it were the
   collected result; linked surroundings effects now remain visually distinct
   from objects that can be placed in the diorama.
@@ -53,6 +67,16 @@
 - Prototype version text is now debug-only and cannot appear in a release UI.
 
 ### Changed
+
+- Removed random terrain stamps, non-rain global atmosphere emblems, and large
+  weather footprint halos from visible scene composition. Original generated
+  assets and provenance remain preserved.
+- Placement mode now subdues fixed scenery, omits visitor/weather decoration,
+  uses code-rendered cell feedback, and redraws the selected footprint above
+  object art.
+- Long-press catalog drag feedback now attaches by the rendered object's
+  bottom-center ground point; the board inversely projects that point to the
+  persisted anchor cell and complete rotated footprint.
 
 - Capture-history cards now show the record's linked surroundings material as a
   framed effect sample. Weather-only records use their weather material and
@@ -203,6 +227,10 @@
   pixels do not obscure the daytime neighborhood grid.
 
 ### Tests
+
+- Added alpha-bound verification for all 112 directional sprites, shared
+  render/hit ordering coverage, and an eight-object iOS editor scenario that
+  drags a tall sprite from its visible upper body and asserts the target cell.
 
 - Added actionable-visitor policy and exact 10/7/7/4 progression-layer tests.
   The iOS tour now seeds 30 historical captures, verifies 24-of-31 paging and

@@ -8,6 +8,7 @@ import 'package:reality_diorama/src/data/game_repository.dart';
 import 'package:reality_diorama/src/diorama/diorama_geometry.dart';
 import 'package:reality_diorama/src/diorama/diorama_view.dart';
 import 'package:reality_diorama/src/domain/engines/collection_pattern_engine.dart';
+import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_pattern_mark.dart';
@@ -274,6 +275,67 @@ void main() {
     expect(find.text('설정'), findsOneWidget);
     await binding.takeScreenshot('14-settings');
   });
+
+  testWidgets(
+    'dense editor keeps the visible sprite ground point on its cell',
+    (WidgetTester tester) async {
+      final databasePath = p.join(
+        await getDatabasesPath(),
+        AppDatabase.demoDatabaseName,
+      );
+      await deleteDatabase(databasePath);
+      await _seedDenseEditor();
+
+      await app.main();
+      await _waitForUi(tester, seconds: 4);
+      if (find.text('새 방문자').evaluate().isNotEmpty) {
+        await tester.tap(find.text('계속 꾸미기'));
+        await _waitForUi(tester);
+      }
+      await tester.tap(find.text('배치 편집'));
+      await _waitForUi(tester, seconds: 2);
+
+      final board = find.byType(DioramaView);
+      final boardSize = tester.getSize(board);
+      final boardTopLeft = tester.getTopLeft(board);
+      final towerPlacement = tester
+          .widget<DioramaView>(board)
+          .snapshot
+          .placements
+          .firstWhere(
+            (Placement value) => value.craftedObjectId == 'dense-tower',
+          );
+      expect(
+        tester.widget<DioramaView>(board).snapshot.placements,
+        hasLength(8),
+      );
+
+      final sourceAnchor = DioramaGeometry.tileTop(
+        towerPlacement.column.toDouble(),
+        towerPlacement.row.toDouble(),
+      );
+      final targetAnchor = DioramaGeometry.tileTop(3, 3);
+      final visibleTowerPoint = sourceAnchor.translate(0, -62);
+      final from =
+          boardTopLeft +
+          DioramaGeometry.logicalToLocal(visibleTowerPoint, boardSize);
+      final delta =
+          DioramaGeometry.logicalToLocal(targetAnchor, boardSize) -
+          DioramaGeometry.logicalToLocal(sourceAnchor, boardSize);
+      await tester.dragFrom(from, delta);
+      await _waitForUi(tester, seconds: 2);
+
+      final movedTower = tester
+          .widget<DioramaView>(board)
+          .snapshot
+          .placements
+          .firstWhere(
+            (Placement value) => value.craftedObjectId == 'dense-tower',
+          );
+      expect((movedTower.column, movedTower.row), (3, 3));
+      await binding.takeScreenshot('15-placement-dense');
+    },
+  );
 }
 
 Future<void> _seedCaptureHistory() async {
@@ -307,6 +369,65 @@ Future<void> _seedCaptureHistory() async {
       ),
     );
   }
+  await database.close();
+}
+
+Future<void> _seedDenseEditor() async {
+  final database = await AppDatabase.open(demoMode: true);
+  final capturedAt = DateTime.utc(2026, 8, 11, 9);
+  final weather = WeatherMaterial(
+    id: 'dense-editor-weather',
+    kind: WeatherMaterialKind.clear,
+    timeBand: TimeBand.morning,
+    season: Season.summer,
+    capturedAt: capturedAt,
+    sourceRecordId: 'dense-editor-fixture',
+    visualSeed: 811,
+    providerName: 'Dense editor fixture',
+  );
+  final entries = <(String, ObjectKind, int, int, int)>[
+    ('tower', ObjectKind.tower, 1, 1, 3),
+    ('alley_lamp', ObjectKind.alleyLamp, 0, 0, 0),
+    ('bench', ObjectKind.bench, 2, 0, 1),
+    ('tree', ObjectKind.tree, 4, 0, 2),
+    ('pond', ObjectKind.pond, 0, 2, 0),
+    ('planter', ObjectKind.planter, 4, 2, 1),
+    ('stone_gate', ObjectKind.stoneGate, 0, 4, 2),
+    ('observatory', ObjectKind.observatory, 4, 4, 3),
+  ];
+  await database.database.transaction((Transaction transaction) async {
+    await transaction.insert('weather_materials', weather.toMap());
+    for (var index = 0; index < entries.length; index += 1) {
+      final entry = entries[index];
+      final objectId = entry.$1 == 'tower'
+          ? 'dense-tower'
+          : 'dense-${entry.$1}';
+      final object = CraftedObject(
+        id: objectId,
+        recipeId: entry.$1,
+        kind: entry.$2,
+        weatherMaterialId: weather.id,
+        weatherKind: weather.kind,
+        requiredSteps: 100,
+        appliedSteps: 100,
+        lifecycle: ObjectLifecycle.placed,
+        visualSeed: 900 + index,
+        generatorVersion: currentObjectGeneratorVersion,
+        createdAt: capturedAt.add(Duration(minutes: index)),
+      );
+      await transaction.insert('crafted_objects', object.toMap());
+      await transaction.insert(
+        'placements',
+        Placement(
+          id: 'dense-placement-${entry.$1}',
+          craftedObjectId: objectId,
+          column: entry.$3,
+          row: entry.$4,
+          rotation: entry.$5,
+        ).toMap(),
+      );
+    }
+  });
   await database.close();
 }
 

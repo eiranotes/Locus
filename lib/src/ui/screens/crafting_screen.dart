@@ -436,6 +436,7 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
       if (!mounted || object == null) {
         return;
       }
+      final placed = object.lifecycle == ObjectLifecycle.placed;
       await showDialog<void>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
@@ -456,7 +457,9 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
               const SizedBox(height: 12),
               Text(
                 object.isComplete
-                    ? '${widget.recipe.nameKo}을 내 공간에 놓았습니다.'
+                    ? placed
+                          ? '${widget.recipe.nameKo}을 내 공간에 놓았습니다.'
+                          : '빈자리가 없어 ${widget.recipe.nameKo}을 보관함에 저장했습니다.'
                     : '${formatNumber(object.remainingSteps)}걸음을 더 모으면 완성됩니다.',
                 textAlign: TextAlign.center,
               ),
@@ -465,7 +468,7 @@ class _CraftingDetailScreenState extends State<CraftingDetailScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('내 공간 보기'),
+              child: Text(object.isComplete && !placed ? '확인' : '내 공간 보기'),
             ),
           ],
         ),

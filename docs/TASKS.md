@@ -52,6 +52,17 @@
 - [x] Audit primary UI copy for repeated state/next-action explanations and
       distill it without removing privacy, provider, recovery, or accessibility
       requirements.
+- [x] Remove runtime terrain/atmosphere clutter and large weather footprint
+      halos while preserving generated-source provenance and object-local
+      weather identity.
+- [x] Unify placement paint order, hit testing, sprite bounds, selected-object
+      lift, and catalog-drag ground anchors around one exact isometric contract.
+- [x] Verify all 112 directional sprite ground anchors and exercise an
+      eight-object editor drag from a visible upper sprite point to a persisted
+      target cell on the iOS simulator.
+- [x] Correct the placement projection so sprite bottoms snap to the front
+      vertex of the complete rotated footprint, remove selected-object depth
+      lifting, and verify the result in sparse and eight-object editor captures.
 
 ## Next
 

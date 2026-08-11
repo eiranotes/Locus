@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
@@ -45,6 +46,51 @@ void main() {
       expect(directionalPaths, hasLength(4), reason: recipe.id);
     }
   });
+
+  test(
+    'directional sprites keep a stable bottom-center ground anchor',
+    () async {
+      for (final entry in catalog.entries) {
+        for (final visual in entry.visuals) {
+          final codec = await ui.instantiateImageCodec(
+            await File(visual.assetPath).readAsBytes(),
+          );
+          final frame = await codec.getNextFrame();
+          codec.dispose();
+          final image = frame.image;
+          final bytes = await image.toByteData(
+            format: ui.ImageByteFormat.rawRgba,
+          );
+          expect(bytes, isNotNull, reason: visual.assetPath);
+          final rgba = bytes!.buffer.asUint8List();
+          var minX = image.width;
+          var maxX = -1;
+          var maxY = -1;
+          for (var y = 0; y < image.height; y += 1) {
+            for (var x = 0; x < image.width; x += 1) {
+              final alpha = rgba[(y * image.width + x) * 4 + 3];
+              if (alpha == 0) continue;
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
+              if (y > maxY) maxY = y;
+            }
+          }
+          image.dispose();
+
+          expect(
+            maxY,
+            255,
+            reason: '${visual.assetPath} must touch its anchor',
+          );
+          expect(
+            (minX + maxX) / 2,
+            closeTo(127.5, 6.5),
+            reason: '${visual.assetPath} must stay centered on its anchor',
+          );
+        }
+      }
+    },
+  );
 
   test('every recipe fits, rotates, and rejects every out-of-bounds edge', () {
     const engine = PlacementEngine(columns: 5, rows: 5);

@@ -102,15 +102,12 @@ void main() {
     expect(secondDirection, isNot(orderedEquals(firstDirection)));
   });
 
-  test('v3 alpha-clips weather surface and draws its footprint', () async {
+  test('v3 alpha-clips weather surface without a footprint halo', () async {
     final sprite = await _decodeSprite(
       'assets/art/generated/v1/directional/object_alley_lamp_r0.png',
     );
     final surface = await _decodeSprite(
       'assets/art/generated/v1/weather/surface_rain.png',
-    );
-    final footprint = await _decodeSprite(
-      'assets/art/generated/v1/weather/footprint_rain.png',
     );
     final visual = _visual(
       generatorVersion: currentObjectGeneratorVersion,
@@ -122,14 +119,37 @@ void main() {
       visual,
       sprite: sprite,
       surfacePattern: surface,
-      footprintEffect: footprint,
       surfaceOpacity: 0.5,
+    );
+    final cleanEditor = await _render(
+      renderer,
+      visual,
+      sprite: sprite,
+      surfacePattern: surface,
+      surfaceOpacity: 0.5,
+      showContextEffects: false,
     );
     sprite.dispose();
     surface.dispose();
-    footprint.dispose();
 
     expect(layered, isNot(orderedEquals(plain)));
+    expect(cleanEditor, isNot(orderedEquals(layered)));
+  });
+
+  test('sprite bounds and fitted preview share one bottom-center anchor', () {
+    const anchor = Offset(180, 220);
+    for (final kind in ObjectKind.values) {
+      final bounds = DeterministicObjectRenderer.spriteBoundsAt(anchor, kind);
+      expect(bounds.bottom, anchor.dy, reason: kind.name);
+      expect(bounds.center.dx, anchor.dx, reason: kind.name);
+    }
+
+    const previewSize = Size(82, 92);
+    final fittedAnchor = DeterministicObjectRenderer.previewAnchorIn(
+      previewSize,
+    );
+    expect(fittedAnchor.dx, closeTo(41, 0.01));
+    expect(fittedAnchor.dy, closeTo(79.3125, 0.001));
   });
 }
 
@@ -170,8 +190,8 @@ Future<Uint8List> _render(
   Image? sprite,
   bool spriteMirrorX = false,
   Image? surfacePattern,
-  Image? footprintEffect,
   double surfaceOpacity = 0,
+  bool showContextEffects = true,
 }) async {
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
@@ -183,8 +203,8 @@ Future<Uint8List> _render(
     sprite: sprite,
     spriteMirrorX: spriteMirrorX,
     surfacePattern: surfacePattern,
-    footprintEffect: footprintEffect,
     surfaceOpacity: surfaceOpacity,
+    showContextEffects: showContextEffects,
   );
   final image = await recorder.endRecording().toImage(96, 104);
   final data = await image.toByteData(format: ImageByteFormat.rawRgba);

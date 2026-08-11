@@ -1,5 +1,42 @@
 # Decisions
 
+## 2026-08-11
+
+### Placement mode is a planning surface with one ground-anchor contract
+
+Generated terrain stamps, non-rain global atmosphere emblems, and 104 px
+weather footprint halos no longer participate in runtime scene composition.
+They remain in their authoring packages with original prompts, sources,
+manifests, and hashes; removal from the visible product does not rewrite asset
+provenance. Rain keeps its restrained code-rendered motion, and alpha-clipped
+object surface patterns remain the bounded weather treatment outside placement
+mode.
+
+The editor suppresses scene weather and visitors, lowers fixed-scenery opacity,
+and uses code-rendered cell fills, outlines, and anchor squares instead of
+decorative target images on the board. The selected footprint remains below
+object art, while its small ground-point marker participates at the object's
+natural depth. Selection therefore cannot falsify the neighborhood's isometric
+occlusion order.
+
+`DioramaGeometry.orderedPlacements()` is shared by painting and hit testing.
+`DeterministicObjectRenderer.spriteBoundsAt()` is the visible-object fallback
+for selection, and `previewAnchorIn()` aligns long-press drag feedback by the
+same normalized sprite ground point used on the board. Direct drags still
+preserve the original pointer-to-anchor offset and commit only one validated
+cell on release. All 112 directional PNGs must touch the 256 px bottom edge and
+keep their alpha bounds centered on that point; the board then maps it to the
+front vertex of the complete rotated footprint.
+
+### Persisted outcome copy must describe the stored state
+
+A completed craft reports placement only when its returned lifecycle is
+`placed`; a complete object with no valid anchor reports that it was saved to
+inventory. Visitor encounters use the currently verified weather kind or an
+explicit `unavailable` value. The rendered scene may still use a harmless
+fallback palette, but persisted provenance must not turn that fallback into a
+claimed observation.
+
 ## 2026-08-10
 
 ### Capture history is an ambient-effect ledger, not a placement catalog
@@ -309,10 +346,9 @@ not runtime mirrors, so asymmetric openings, backs, signs, and approaches remain
 spatially truthful. Source atlases, reviewed row bounds, contact sheet, alpha
 processing, and hashes are retained as a reproducible authoring contract.
 
-Board selection fills and connection emphasis remain code-rendered while the
-new generated editor markers reinforce valid, selected, invalid, grab, drop,
-direction, and rotation states. They are interaction feedback rather than
-collectible art and must scale cleanly with layout and accessibility.
+Board selection fills and connection emphasis remain code-rendered. They are
+interaction feedback rather than collectible art and must scale cleanly with
+layout and accessibility.
 
 All editor actions query the same `PlacementEngine` validation used by commits.
 Invalid moves and rotations are disabled before mutation, selected footprints
@@ -350,6 +386,22 @@ northeast, southwest, and southeast arrows in a 2×2 pad. This matches the
 screen-space result of the two logical grid axes. Targets are 48 dp so the same
 control clears both iOS and Android minimum guidance; commit validation still
 comes exclusively from `PlacementEngine`.
+
+### Placement art is anchored to the rotated footprint's front vertex
+
+Placement rows continue to persist the top-left logical anchor cell. Rendering
+must not attach a sprite's bottom pixel directly to that cell center: doing so
+raises 1x1 art by half a tile and misplaces 1x2 art by an additional occupied
+cell after rotation. `DioramaGeometry.placementGroundAnchor` derives the
+front-most occupied cell and adds half the tile height, so the normalized PNG's
+bottom-center point lands on the footprint's front vertex.
+
+The inverse projection is used for catalog drops, and hit testing uses the same
+derived point. Paint order follows the derived front depth rather than the
+stored anchor depth. Selection remains a tile fill below the art plus a small
+ground-point marker painted at the selected object's natural depth; it never
+lifts the object above a physically nearer neighbor or draws a diamond across
+the object's body.
 
 ### External weather depth is cataloged, bounded, and provider-neutral
 

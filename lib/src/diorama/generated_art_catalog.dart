@@ -83,25 +83,13 @@ final class DioramaArtImages {
     required this.objectAssets,
     required this.visitors,
     required this.scenery,
-    required this.weatherOverlays,
-    required this.timeOverlays,
     required this.weatherSurfaces,
-    required this.weatherFootprints,
-    required this.terrainDetails,
-    required this.atmosphereDetails,
-    required this.editorMarkers,
   });
 
   final Map<String, ui.Image> objectAssets;
   final Map<String, ui.Image> visitors;
   final Map<String, ui.Image> scenery;
-  final Map<WeatherMaterialKind, ui.Image> weatherOverlays;
-  final Map<TimeBand, ui.Image> timeOverlays;
   final Map<WeatherMaterialKind, ui.Image> weatherSurfaces;
-  final Map<WeatherMaterialKind, ui.Image> weatherFootprints;
-  final Map<String, ui.Image> terrainDetails;
-  final Map<String, ui.Image> atmosphereDetails;
-  final Map<String, ui.Image> editorMarkers;
 
   static Future<DioramaArtImages> load(
     PlacementCatalog placementCatalog,
@@ -138,89 +126,16 @@ final class DioramaArtImages {
       ])
         name: GeneratedArtPaths.scenery(name),
     };
-    final weatherPaths = <WeatherMaterialKind, String>{
-      for (final kind in WeatherMaterialKind.values)
-        kind: GeneratedArtPaths.weatherOverlay(kind),
-    };
-    final timePaths = <TimeBand, String>{
-      for (final timeBand in TimeBand.values)
-        timeBand: GeneratedArtPaths.timeOverlay(timeBand),
-    };
     final surfacePaths = <WeatherMaterialKind, String>{
       for (final layer in visualLayerCatalog.weather)
         layer.kind: layer.surfacePatternPath,
-    };
-    final footprintPaths = <WeatherMaterialKind, String>{
-      for (final layer in visualLayerCatalog.weather)
-        layer.kind: layer.footprintEffectPath,
-    };
-    final terrainPaths = <String, String>{
-      for (final name in const <String>[
-        'pebbles',
-        'moss',
-        'grass_blades',
-        'clover',
-        'mushrooms',
-        'autumn_leaves',
-        'wildflowers',
-        'twig',
-        'fern',
-        'drain_grate',
-        'cracked_cobble',
-        'chalk_star',
-        'puddle_glint',
-        'wet_leaf',
-        'snow_tuft',
-        'dry_weed',
-        'acorns',
-        'flower_petals',
-        'stepping_marks',
-        'crack_grass',
-      ])
-        name: GeneratedArtPaths.terrainDetail(name),
-    };
-    final atmospherePaths = <String, String>{
-      for (final name in const <String>[
-        'rain_ripples',
-        'mist_wisp',
-        'frost_sparkles',
-        'warm_motes',
-        'wind_leaves',
-        'dawn_sparkle',
-        'morning_rays',
-        'evening_windows',
-        'night_moths',
-        'falling_raindrops',
-      ])
-        name: GeneratedArtPaths.atmosphereDetail(name),
-    };
-    final editorPaths = <String, String>{
-      for (final name in const <String>[
-        'valid_target',
-        'selected_target',
-        'invalid_target',
-        'grab_hand',
-        'place_chevron',
-        'arrow_left',
-        'arrow_up',
-        'arrow_down',
-        'arrow_right',
-        'rotate',
-      ])
-        name: GeneratedArtPaths.editorMarker(name),
     };
 
     return DioramaArtImages(
       objectAssets: await _loadMap(objectPaths),
       visitors: await _loadMap(visitorPaths),
       scenery: await _loadMap(sceneryPaths),
-      weatherOverlays: await _loadMap(weatherPaths),
-      timeOverlays: await _loadMap(timePaths),
       weatherSurfaces: await _loadMap(surfacePaths),
-      weatherFootprints: await _loadMap(footprintPaths),
-      terrainDetails: await _loadMap(terrainPaths),
-      atmosphereDetails: await _loadMap(atmospherePaths),
-      editorMarkers: await _loadMap(editorPaths),
     );
   }
 

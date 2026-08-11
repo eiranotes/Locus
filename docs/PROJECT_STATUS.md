@@ -1,6 +1,6 @@
 # Project status
 
-Last updated: 2026-08-10
+Last updated: 2026-08-11
 
 ## Current state
 
@@ -35,8 +35,33 @@ overlays are removed from the diorama; rain is a stepped pixel animation with a
 reduced-motion fallback. Visible copy
 across home, capture, crafting, inventory, codex, placement, and settings has
 also been distilled so state and next action are not explained twice.
+The clean-editor slice now removes decorative terrain stamps, non-rain global
+atmosphere emblems, and large weather footprint halos from runtime composition
+while retaining their authoring sources and manifests. Placement mode dims
+fixed scenery, suppresses scene weather and visitors, and renders selected
+footprints with code geometry below the object layer. Painting, hit testing,
+and drag feedback now derive one ground point from the front vertex of the
+rotated occupied footprint. Isometric depth also follows that front vertex;
+selection never changes the object's physical paint order or persisted cell.
 
 ## Completed in the current slice
+
+- Removed random terrain stamps, non-rain global atmosphere emblems, and large
+  weather footprint halos from runtime composition. Object-local alpha-clipped
+  weather surfaces remain available outside placement mode; original PNGs,
+  prompts, manifests, and hashes remain intact as authoring provenance.
+- Reworked placement mode as a clean planning view: fixed scenery is subdued,
+  visitors and scene weather are omitted, valid/selected/invalid cells use
+  small code-rendered marks, and the selected footprint is redrawn above dense
+  object art.
+- Unified isometric paint and hit-test order, replaced the generic selection
+  rectangle with shared per-kind sprite bounds, and aligned catalog drag
+  feedback by its rendered ground point. The sprite bottom now snaps to the
+  front vertex of its complete rotated footprint, including 1x2 objects, while
+  selected-cell fills remain below the art and never cross its body.
+- Corrected craft completion copy when a completed object cannot auto-place and
+  is stored instead. Visitor scene memories now persist `unavailable` rather
+  than a rendered fallback weather kind when current provider weather is absent.
 
 - Replaced capture-history scenery postcards with framed effect samples linked
   to the record's actual surroundings material. Weather-only records use their
@@ -415,23 +440,40 @@ contains only collected-effect samples, and the home view contains no vague
 full-screen weather texture. Wrapper recovery files used for local simulator
 evidence remain untracked and are excluded from the commit.
 
+The corrected grid-anchor slice was verified on 2026-08-11 with the host
+Flutter 3.44.1. `./tool/validate.sh` passed repository/content/manifest checks,
+Swift parse, formatting, analyzer, and all 100 unit/widget tests. The placement
+contract decodes all 112 directional sprites and now also proves 1x1 and rotated
+1x2 front-vertex projection, inverse catalog-drop projection, and footprint-
+aware depth order. The complete iOS deterministic drive passed four integration
+checks and exported the refreshed sparse and eight-object editor captures under
+`artifacts/ui-screenshots/2026-08-11-grid-anchor-fix/`. The complete 24-image
+proof set is retained with the repository under
+`docs/ui-screenshots/2026-08-11-grid-anchor-fix/`. The dense fixture grabbed the
+visible upper body of a tower, moved it from cell (1, 1) to (3, 3), and asserted
+the persisted coordinates. Visual inspection confirmed that the sparse lamp's
+base lands on the selected cell's front vertex and that dense-scene occlusion
+follows physical front depth without selection lifting.
+
 ## Known risks and gates
 
 - The first production-bound atlas pass is installed, but it still needs final
   composition tuning against a range of populated neighborhoods and text sizes.
 - Place plaques and a share-output renderer remain outside this first shared
   renderer slice.
-- Direct drag is implemented and unit-tested at the projection/validation
-  boundary; touch feel, cancellation, and large-text behavior still require a
-  physical-device accessibility pass.
+- Direct drag is implemented and verified through an eight-object simulator
+  scene with upper-sprite grabbing, stable occlusion order, and persisted-cell
+  assertions; touch feel, cancellation, and large-text behavior still require
+  a physical-device accessibility pass.
 - Atmospheric thresholds are initial balance values and need product telemetry
   or structured playtest evidence before expanding providers or adding more
   traits.
 - Visitor encounter counts, coarse contexts, and the deeper 10/7/7/4 unlock
   graph are now implemented, but D7/D30 value and layer pacing still need
   longitudinal beta or structured playtest evidence.
-- Directional art is authoring-complete for the current ten recipes, but a later
-  populated-neighborhood visual pass may still tune individual scale/occlusion.
+- Directional art is authoring-complete and all 112 current direction assets
+  satisfy the shared ground-anchor contract. The dense editor passed, but a
+  later populated home-scene pass may still tune individual scale/occlusion.
 - The AppIcon candidate requires owner review at actual icon sizes before use.
 - Wrapper bootstrap remains mutating and must use exactly Flutter 3.44.9; the
   audit machine's global SDK was 3.44.1.

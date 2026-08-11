@@ -6,6 +6,7 @@ import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/diorama/diorama_view.dart';
 import 'package:reality_diorama/src/diorama/diorama_geometry.dart';
 import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
+import 'package:reality_diorama/src/diorama/object_renderer.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/engines/placement_engine.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
@@ -17,6 +18,14 @@ import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_button.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_surface.dart';
 import 'package:reality_diorama/src/ui/widgets/placement_direction_pad.dart';
+
+const Size _catalogDragFeedbackSize = Size(82, 92);
+
+Offset _catalogDragAnchorStrategy(
+  Draggable<Object> draggable,
+  BuildContext context,
+  Offset position,
+) => DeterministicObjectRenderer.previewAnchorIn(_catalogDragFeedbackSize);
 
 class PlacementEditorScreen extends StatefulWidget {
   const PlacementEditorScreen({this.initialObjectId, super.key});
@@ -359,20 +368,25 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
   }
 
   Placement? _placementAt(AppController controller, Offset logical) {
-    final placements = controller.placements.toList(growable: false)
-      ..sort(
-        (Placement a, Placement b) =>
-            (a.column + a.row).compareTo(b.column + b.row),
-      );
+    final objectById = <String, CraftedObject>{
+      for (final object in controller.craftedObjects) object.id: object,
+    };
+    final placements = DioramaGeometry.orderedPlacements(
+      controller.placements,
+      footprintFor: (Placement placement) {
+        final object = objectById[placement.craftedObjectId];
+        return object == null
+            ? null
+            : controller.catalog.recipeById(object.recipeId).footprint;
+      },
+    );
     final cell = DioramaGeometry.nearestCell(logical);
     final engine = PlacementEngine(
       columns: controller.catalog.balance.gridColumns,
       rows: controller.catalog.balance.gridRows,
     );
     for (final placement in placements.reversed) {
-      final object = controller.craftedObjects
-          .where((CraftedObject item) => item.id == placement.craftedObjectId)
-          .firstOrNull;
+      final object = objectById[placement.craftedObjectId];
       if (object == null) continue;
       final recipe = controller.catalog.recipeById(object.recipeId);
       if (engine
@@ -382,16 +396,22 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
       }
     }
     for (final placement in placements.reversed) {
-      final anchor = DioramaGeometry.tileTop(
-        placement.column.toDouble(),
-        placement.row.toDouble(),
+      final object = objectById[placement.craftedObjectId];
+      if (object == null) continue;
+      final recipe = controller.catalog.recipeById(object.recipeId);
+      final anchor = DioramaGeometry.placementGroundAnchor(
+        placement,
+        recipe.footprint,
       );
-      if (Rect.fromLTRB(
-        anchor.dx - 52,
-        anchor.dy - 118,
-        anchor.dx + 52,
-        anchor.dy + 12,
-      ).contains(logical)) {
+      final bounds = object.isComplete
+          ? DeterministicObjectRenderer.spriteBoundsAt(anchor, object.kind)
+          : Rect.fromLTRB(
+              anchor.dx - 28,
+              anchor.dy - 48,
+              anchor.dx + 28,
+              anchor.dy + 8,
+            );
+      if (bounds.inflate(4).contains(logical)) {
         return placement;
       }
     }
@@ -420,7 +440,16 @@ class _PlacementEditorScreenState extends State<PlacementEditorScreen> {
     if (renderObject is! RenderBox) return;
     final local = renderObject.globalToLocal(details.offset);
     final logical = DioramaGeometry.localToLogical(local, renderObject.size);
-    final anchor = DioramaGeometry.nearestCell(logical);
+    final object = controller.craftedObjects
+        .where((CraftedObject item) => item.id == details.data.objectId)
+        .firstOrNull;
+    if (object == null) return;
+    final recipe = controller.catalog.recipeById(object.recipeId);
+    final anchor = DioramaGeometry.nearestPlacementAnchor(
+      logical,
+      footprint: recipe.footprint,
+      rotation: details.data.rotation,
+    );
     final alreadyPlaced = controller.placements.any(
       (Placement item) => item.craftedObjectId == details.data.objectId,
     );
@@ -597,6 +626,7 @@ class _PlacementObjectCatalog extends StatelessWidget {
                       visualLayerCatalog: controller.catalog.visualLayers,
                       atmosphericTraitCatalog:
                           controller.catalog.atmosphericTraits,
+                      showContextEffects: false,
                       semanticLabel: '${recipe.nameKo} ${direction.labelKo}',
                     ),
                   ),
@@ -630,33 +660,37 @@ class _PlacementObjectCatalog extends StatelessWidget {
           );
           return LongPressDraggable<_CatalogPlacementDrag>(
             data: drag,
-            dragAnchorStrategy: pointerDragAnchorStrategy,
+            dragAnchorStrategy: _catalogDragAnchorStrategy,
             hapticFeedbackOnStart: true,
             onDragStarted: () => onDragStarted(drag),
             onDraggableCanceled: (_, __) => onDragCancelled(),
             feedback: Material(
               color: Colors.transparent,
-              child: SizedBox(
-                width: 82,
-                height: 92,
-                child: ObjectVisualPreview(
-                  visual: ObjectVisualDescriptor.fromCraftedObject(
-                    object,
-                    timeBand: weatherById[object.weatherMaterialId]?.timeBand,
+              child: Opacity(
+                opacity: 0.72,
+                child: SizedBox.fromSize(
+                  size: _catalogDragFeedbackSize,
+                  child: ObjectVisualPreview(
+                    visual: ObjectVisualDescriptor.fromCraftedObject(
+                      object,
+                      timeBand: weatherById[object.weatherMaterialId]?.timeBand,
+                    ),
+                    rotation: rotation,
+                    assetPath: visual.assetPath,
+                    mirrorX: visual.mirrorX,
+                    constructionAssetPath: controller.catalog.craftingArt
+                        .constructionAssetFor(
+                          object.recipeId,
+                          object.requiredSteps <= 0
+                              ? 1
+                              : object.appliedSteps / object.requiredSteps,
+                        ),
+                    visualLayerCatalog: controller.catalog.visualLayers,
+                    atmosphericTraitCatalog:
+                        controller.catalog.atmosphericTraits,
+                    showContextEffects: false,
+                    semanticLabel: '${recipe.nameKo} 끌어서 배치',
                   ),
-                  rotation: rotation,
-                  assetPath: visual.assetPath,
-                  mirrorX: visual.mirrorX,
-                  constructionAssetPath: controller.catalog.craftingArt
-                      .constructionAssetFor(
-                        object.recipeId,
-                        object.requiredSteps <= 0
-                            ? 1
-                            : object.appliedSteps / object.requiredSteps,
-                      ),
-                  visualLayerCatalog: controller.catalog.visualLayers,
-                  atmosphericTraitCatalog: controller.catalog.atmosphericTraits,
-                  semanticLabel: '${recipe.nameKo} 끌어서 배치',
                 ),
               ),
             ),
