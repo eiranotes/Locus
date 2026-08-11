@@ -4,6 +4,7 @@ import 'package:reality_diorama/src/data/request_first_repository.dart';
 import 'package:reality_diorama/src/domain/content_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
+import 'package:reality_diorama/src/domain/engines/placement_engine.dart';
 import 'package:reality_diorama/src/domain/engines/relationship_engine.dart';
 import 'package:reality_diorama/src/domain/engines/request_scheduler.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
@@ -20,6 +21,7 @@ class RequestFulfillmentOutcome {
     required this.relationship,
     required this.events,
     required this.grantedSceneObjects,
+    required this.grantedScenePlacements,
     required this.unlockedAxes,
   });
 
@@ -28,6 +30,7 @@ class RequestFulfillmentOutcome {
   final VisitorRelationship relationship;
   final List<RelationshipEvent> events;
   final List<SceneObject> grantedSceneObjects;
+  final List<ScenePlacement> grantedScenePlacements;
   final Set<SenseAxis> unlockedAxes;
 }
 
@@ -116,8 +119,9 @@ class RequestFirstController extends ChangeNotifier {
     return active.isEmpty ? null : active.first;
   }
 
-  int get residentCount =>
-      _relationships.values.where((VisitorRelationship value) => value.stage >= 1).length;
+  int get residentCount => _relationships.values
+      .where((VisitorRelationship value) => value.stage >= 1)
+      .length;
 
   DioramaSnapshot get sceneSnapshot => const RequestFirstSceneAdapter().build(
     now: DateTime.now(),
@@ -242,7 +246,7 @@ class RequestFirstController extends ChangeNotifier {
         track: catalog.trackForVisitor(request.visitorId),
         idFactory: uuid.v4,
       );
-      final sceneObjects = relationshipResolution.grantedSceneObjectIds
+      final rawSceneObjects = relationshipResolution.grantedSceneObjectIds
           .map(
             (String definitionId) => SceneObject(
               id: uuid.v4(),
@@ -263,6 +267,7 @@ class RequestFirstController extends ChangeNotifier {
             ),
           )
           .toList(growable: false);
+      final rewardPlacement = _autoPlaceRewards(rawSceneObjects);
       final assignment = SpecimenAssignment(
         id: uuid.v4(),
         specimenId: specimen.id,
@@ -281,7 +286,8 @@ class RequestFirstController extends ChangeNotifier {
         relationship: relationshipResolution.relationship,
         events: relationshipResolution.events,
         unlockedAxes: relationshipResolution.unlockedAxes,
-        grantedSceneObjects: sceneObjects,
+        grantedSceneObjects: rewardPlacement.objects,
+        grantedScenePlacements: rewardPlacement.placements,
       );
 
       _assignments = <SpecimenAssignment>[assignment, ..._assignments];
@@ -302,13 +308,21 @@ class RequestFirstController extends ChangeNotifier {
         ..._unlockedAxes,
         ...relationshipResolution.unlockedAxes,
       };
-      _sceneObjects = <SceneObject>[...sceneObjects, ..._sceneObjects];
+      _sceneObjects = <SceneObject>[
+        ...rewardPlacement.objects,
+        ..._sceneObjects,
+      ];
+      _scenePlacements = <ScenePlacement>[
+        ...rewardPlacement.placements,
+        ..._scenePlacements,
+      ];
       final outcome = RequestFulfillmentOutcome(
         assignment: assignment,
         request: fulfilled,
         relationship: relationshipResolution.relationship,
         events: relationshipResolution.events,
-        grantedSceneObjects: sceneObjects,
+        grantedSceneObjects: rewardPlacement.objects,
+        grantedScenePlacements: rewardPlacement.placements,
         unlockedAxes: relationshipResolution.unlockedAxes,
       );
       _lastFulfillment = outcome;
@@ -391,6 +405,98 @@ class RequestFirstController extends ChangeNotifier {
     if (!active.any((VisitorRequest value) => value.id == _focusedRequestId)) {
       _focusedRequestId = active.isEmpty ? null : active.first.id;
     }
+  }
+
+  ({List<SceneObject> objects, List<ScenePlacement> placements})
+  _autoPlaceRewards(List<SceneObject> rewards) {
+    if (rewards.isEmpty) {
+      return (objects: const <SceneObject>[], placements: const <ScenePlacement>[]);
+    }
+    final objects = <SceneObject>[];
+    final placements = <ScenePlacement>[];
+    final workingObjects = <SceneObject>[..._sceneObjects];
+    final workingPlacements = <ScenePlacement>[..._scenePlacements];
+    final engine = PlacementEngine(
+      columns: catalog.balance.gridColumns,
+      rows: catalog.balance.gridRows,
+    );
+
+    for (final reward in rewards) {
+      var next = reward;
+      if (workingPlacements.length < catalog.balance.activeObjectLimit) {
+        final recipeId = _legacyRecipeId(reward);
+        final recipe = _tryRecipe(recipeId);
+        if (recipe != null) {
+          final candidateId = uuid.v4();
+          final existing = workingPlacements
+              .map(
+                (ScenePlacement value) => Placement(
+                  id: value.id,
+                  craftedObjectId: value.sceneObjectId,
+                  column: value.column,
+                  row: value.row,
+                  rotation: value.rotation,
+                ),
+              )
+              .toList(growable: false);
+          final recipesByObjectId = <String, RecipeDefinition>{};
+          for (final object in <SceneObject>[...workingObjects, reward]) {
+            final definition = _tryRecipe(_legacyRecipeId(object));
+            if (definition != null) recipesByObjectId[object.id] = definition;
+          }
+          final placementEntry = legacyCatalog.placement.entryForRecipe(recipe.id);
+          final anchor = engine.firstValidAnchor(
+            candidate: Placement(
+              id: candidateId,
+              craftedObjectId: reward.id,
+              column: 0,
+              row: 0,
+              rotation: 0,
+            ),
+            recipe: recipe,
+            existing: existing,
+            recipeByObjectId: recipesByObjectId,
+            allowedRotations: placementEntry.allowedRotations,
+          );
+          if (anchor != null) {
+            next = reward.copyWith(lifecycle: SceneObjectLifecycle.placed);
+            final placement = ScenePlacement(
+              id: candidateId,
+              sceneObjectId: reward.id,
+              column: anchor.column,
+              row: anchor.row,
+              rotation: 0,
+            );
+            placements.add(placement);
+            workingPlacements.add(placement);
+          }
+        }
+      }
+      objects.add(next);
+      workingObjects.add(next);
+    }
+    return (
+      objects: List<SceneObject>.unmodifiable(objects),
+      placements: List<ScenePlacement>.unmodifiable(placements),
+    );
+  }
+
+  String _legacyRecipeId(SceneObject object) {
+    if (object.origin != SceneObjectOrigin.relationshipReward) {
+      return object.definitionId;
+    }
+    try {
+      return catalog.sceneObjectById(object.definitionId).legacyRecipeId;
+    } on StateError {
+      return object.definitionId;
+    }
+  }
+
+  RecipeDefinition? _tryRecipe(String id) {
+    for (final recipe in legacyCatalog.recipes) {
+      if (recipe.id == id) return recipe;
+    }
+    return null;
   }
 
   Future<void> _reloadAll() async {
