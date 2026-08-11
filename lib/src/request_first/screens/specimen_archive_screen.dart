@@ -3,6 +3,7 @@ import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
+import 'package:reality_diorama/src/request_first/request_first_controller.dart';
 import 'package:reality_diorama/src/request_first/request_first_scope.dart';
 import 'package:reality_diorama/src/request_first/widgets/specimen_mark.dart';
 import 'package:reality_diorama/src/ui/number_format.dart';
@@ -59,7 +60,7 @@ class SpecimenArchiveScreen extends StatelessWidget {
 class _SpecimensTab extends StatelessWidget {
   const _SpecimensTab({required this.controller});
 
-  final dynamic controller;
+  final RequestFirstController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +88,7 @@ class _SpecimensTab extends StatelessWidget {
                 ),
                 itemCount: controller.specimens.length,
                 itemBuilder: (BuildContext context, int index) {
-                  final specimen = controller.specimens[index] as Specimen;
+                  final specimen = controller.specimens[index];
                   return _SpecimenCard(
                     specimen: specimen,
                     assignment: controller.assignmentForSpecimen(specimen.id),
@@ -190,7 +191,7 @@ class _SpecimenCard extends StatelessWidget {
 class _KeepsakesTab extends StatelessWidget {
   const _KeepsakesTab({required this.controller});
 
-  final dynamic controller;
+  final RequestFirstController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +207,7 @@ class _KeepsakesTab extends StatelessWidget {
       itemCount: controller.sceneObjects.length,
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (BuildContext context, int index) {
-        final object = controller.sceneObjects[index] as SceneObject;
+        final object = controller.sceneObjects[index];
         return _KeepsakeRow(object: object);
       },
     );
