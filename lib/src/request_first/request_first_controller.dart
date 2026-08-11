@@ -9,10 +9,13 @@ import 'package:reality_diorama/src/domain/engines/relationship_engine.dart';
 import 'package:reality_diorama/src/domain/engines/request_scheduler.dart';
 import 'package:reality_diorama/src/domain/engines/seeded_visuals.dart';
 import 'package:reality_diorama/src/domain/game_snapshot.dart';
+import 'package:reality_diorama/src/domain/placement_catalog.dart';
 import 'package:reality_diorama/src/domain/request_first_catalog.dart';
 import 'package:reality_diorama/src/domain/request_first_scene_adapter.dart';
 import 'package:reality_diorama/src/services/specimen_capture_coordinator.dart';
 import 'package:uuid/uuid.dart';
+
+part 'request_first_controller_actions.dart';
 
 class RequestFulfillmentOutcome {
   const RequestFulfillmentOutcome({
@@ -98,6 +101,8 @@ class RequestFirstController extends ChangeNotifier {
   String? get focusedRequestId => _focusedRequestId;
   SpecimenCaptureBundle? get lastCapture => _lastCapture;
   RequestFulfillmentOutcome? get lastFulfillment => _lastFulfillment;
+
+  void notifyChanged() => notifyListeners();
 
   List<VisitorRequest> get activeRequests {
     final values =
@@ -188,6 +193,17 @@ class RequestFirstController extends ChangeNotifier {
       final references = <String, Specimen>{
         for (final specimen in _specimens) specimen.id: specimen,
       };
+      final missingReferenceIds = historyReferenceIdsFor(
+        active,
+      ).difference(references.keys.toSet());
+      if (missingReferenceIds.isNotEmpty) {
+        final persistedReferences = await repository.loadSpecimensByIds(
+          missingReferenceIds,
+        );
+        for (final specimen in persistedReferences) {
+          references[specimen.id] = specimen;
+        }
+      }
       final bundle = await captureCoordinator.capture(
         now: DateTime.now(),
         activeRequests: active,

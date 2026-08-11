@@ -29,6 +29,18 @@ class RequestFirstRepository {
     return rows.map(Specimen.fromMap).toList(growable: false);
   }
 
+  Future<List<Specimen>> loadSpecimensByIds(Set<String> ids) async {
+    if (ids.isEmpty) return const <Specimen>[];
+    final sortedIds = ids.toList(growable: false)..sort();
+    final rows = await _db.query(
+      'specimens',
+      where: 'id IN (${List<String>.filled(sortedIds.length, '?').join(',')})',
+      whereArgs: sortedIds,
+      orderBy: 'id ASC',
+    );
+    return rows.map(Specimen.fromMap).toList(growable: false);
+  }
+
   Future<List<VisitorRequest>> loadRequests({
     Set<VisitorRequestStatus>? statuses,
   }) async {
@@ -362,6 +374,16 @@ class RequestFirstRepository {
 
   Future<void> saveScenePlacement(ScenePlacement placement) async {
     await _db.transaction((Transaction transaction) async {
+      final objectRows = await transaction.query(
+        'scene_objects',
+        columns: const <String>['id'],
+        where: 'id = ?',
+        whereArgs: <Object?>[placement.sceneObjectId],
+        limit: 1,
+      );
+      if (objectRows.isEmpty) {
+        throw StateError('Scene object does not exist.');
+      }
       await transaction.delete(
         'scene_placements',
         where: 'scene_object_id = ?',
@@ -372,12 +394,15 @@ class RequestFirstRepository {
         placement.toMap(),
         conflictAlgorithm: ConflictAlgorithm.abort,
       );
-      await transaction.update(
+      final updatedObjects = await transaction.update(
         'scene_objects',
         <String, Object?>{'lifecycle': SceneObjectLifecycle.placed.name},
         where: 'id = ?',
         whereArgs: <Object?>[placement.sceneObjectId],
       );
+      if (updatedObjects != 1) {
+        throw StateError('Scene placement did not update exactly one object.');
+      }
     });
   }
 
@@ -388,12 +413,15 @@ class RequestFirstRepository {
         where: 'scene_object_id = ?',
         whereArgs: <Object?>[sceneObjectId],
       );
-      await transaction.update(
+      final updatedObjects = await transaction.update(
         'scene_objects',
         <String, Object?>{'lifecycle': SceneObjectLifecycle.stored.name},
         where: 'id = ?',
         whereArgs: <Object?>[sceneObjectId],
       );
+      if (updatedObjects != 1) {
+        throw StateError('Stored scene object does not exist.');
+      }
     });
   }
 }

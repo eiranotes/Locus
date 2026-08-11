@@ -4,6 +4,17 @@
 
 ### Fixed
 
+- History similarity and contrast requests now fetch their exact persisted
+  reference specimens even when those records are older than the newest
+  24-item archive page.
+- Relationship keepsakes that could not auto-place are no longer trapped in
+  storage; the request-first home now opens a validated placement screen for
+  placing, moving, rotating, and storing them.
+- Scene placement transactions now reject missing objects and require exactly
+  one object lifecycle update.
+- Request-first schema validation now executes all table declarations in
+  SQLite instead of checking only for expected source strings.
+
 - Placement sprites now snap their bottom-center ground point to the front
   vertex of the complete rotated footprint instead of the persisted anchor
   cell center, fixing both 1x1 half-tile drift and rotated 1x2 placement drift.
@@ -67,6 +78,13 @@
 - Prototype version text is now debug-only and cannot appear in a release UI.
 
 ### Changed
+
+- Integrated the PR #12 request-first vertical slice locally behind
+  `REQUEST_FIRST_MODE=true`, including native audio features, schema v5,
+  lossless legacy mapping, request/assignment/relationship UI, and reuse of the
+  5×5 diorama.
+- Removed the branch-specific format workflow that committed and pushed source
+  with `contents: write`; formatting remains a read-only CI gate.
 
 - Removed random terrain stamps, non-rain global atmosphere emblems, and large
   weather footprint halos from visible scene composition. Original generated

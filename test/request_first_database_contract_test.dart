@@ -34,4 +34,19 @@ void main() {
     expect(repository, contains("'visitor_relationships'"));
     expect(repository, contains("'relationship_events'"));
   });
+
+  test('request-first keepsakes have a validated manual placement path', () {
+    final actions = File(
+      'lib/src/request_first/request_first_controller_actions.dart',
+    ).readAsStringSync();
+    final screen = File(
+      'lib/src/request_first/screens/request_first_placement_screen.dart',
+    ).readAsStringSync();
+    expect(actions, contains('validateScenePlacementCandidate'));
+    expect(actions, contains('placeOrMoveSceneObject'));
+    expect(actions, contains('storeSceneObject'));
+    expect(actions, contains('PlacementEngine'));
+    expect(screen, contains('PlacementDirectionPad'));
+    expect(screen, contains('기념물 배치'));
+  });
 }

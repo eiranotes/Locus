@@ -52,6 +52,15 @@ def main() -> None:
         if forbidden in workflow:
             fail(f"Flutter CI must remain read-only: found {forbidden!r}")
 
+    for workflow_path in sorted((ROOT / ".github/workflows").glob("*.yml")):
+        workflow_text = workflow_path.read_text(encoding="utf-8")
+        for forbidden in ("contents: write", "git push", "git commit"):
+            if forbidden in workflow_text:
+                fail(
+                    f"workflow {workflow_path.name} must not mutate source: "
+                    f"found {forbidden!r}"
+                )
+
     reporter_fragments = (
         "workflow_run:",
         'workflows: ["Flutter CI"]',

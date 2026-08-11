@@ -2,20 +2,23 @@
 
 ## Coexistence boundary
 
-The current v6 application stays wired to `AppController`, `GameRepository`, weather/BLE capture, crafting, and the existing `DioramaSnapshot`. The request-first foundation is additive:
+The current v6 application stays wired to `AppController`, `GameRepository`, weather/BLE capture, crafting, and the existing `DioramaSnapshot`. The bootstrap selects the request-first vertical slice only when `REQUEST_FIRST_MODE=true`:
 
 ```text
 RequestFirstCatalog
 RequestScheduler
 SenseSampler
+MethodChannelSenseSampler
 SpecimenCaptureCoordinator
 SpecimenMatcher
 RelationshipEngine
 RequestFirstRepository
 SQLite schema v5 tables
+LegacyV4MigrationService
+RequestFirstController and screens
 ```
 
-No request-first class is imported by the current app bootstrap. This prevents an incomplete native sensor slice from destabilizing the shipping prototype while still allowing domain, content, and migration contracts to land in the repository.
+The two controllers do not share mutable state. This keeps the default v6 path stable while the request-first device and behavior gates remain open.
 
 ## Capture boundary
 
@@ -30,7 +33,9 @@ SenseSampler.sample
 → RequestFirstRepository.saveSpecimenCapture transaction
 ```
 
-A later native implementation must preserve this exact Dart contract on iOS and Android.
+iOS `AVAudioEngine` and Android `AudioRecord` implement this boundary in the
+foreground. They return the shared `audio-features-v1` map only; physical-device
+calibration and temporary-file auditing remain release gates.
 
 ## Request scheduling
 
@@ -46,6 +51,10 @@ A later native implementation must preserve this exact Dart contract on iOS and 
 - maintains an everyday/outing split through `everydayRequestRatio`.
 
 The scheduler does not persist. Its result is committed by `RequestFirstRepository.saveRequestSchedule`.
+
+History references are independent of archive pagination. The controller keeps
+the visible archive bounded to 24 specimens, then resolves only missing IDs for
+the at-most-two active history requests before matching.
 
 ## Match stability
 
@@ -76,6 +85,14 @@ The database also enforces unique `specimen_id` and `request_id` in `specimen_as
 
 Reward keys are stored on the relationship row so replaying a state cannot grant a milestone twice.
 
-## Scene migration target
+## Scene migration and placement
 
-`SceneObject` separates placement inventory from crafting provenance. Existing `CraftedObject` rows will later migrate with identical IDs, visual seeds, generator versions, variant keys, and placements. Weather, surroundings, focus trait, and construction state will be retained in `legacy_payload_json` for renderer compatibility.
+`SceneObject` separates placement inventory from crafting provenance. Existing
+`CraftedObject` rows migrate with identical IDs, visual seeds, generator
+versions, variant keys, and placements. Weather, surroundings, focus trait, and
+construction state remain in `legacy_payload_json` for renderer compatibility.
+
+Relationship rewards auto-place only when a valid anchor is available. The
+manual placement screen uses the same `PlacementEngine`, directional catalog,
+5×5 board, and eight-object cap for first placement, movement, rotation, and
+return-to-storage. None of these actions changes request or relationship state.

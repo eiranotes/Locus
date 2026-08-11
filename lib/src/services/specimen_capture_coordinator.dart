@@ -18,6 +18,12 @@ class SpecimenCaptureBundle {
   final List<SpecimenMatch> matches;
 }
 
+Set<String> historyReferenceIdsFor(Iterable<VisitorRequest> requests) =>
+    requests
+        .map((VisitorRequest request) => request.historySpecimenId)
+        .whereType<String>()
+        .toSet();
+
 class SpecimenCaptureCoordinator {
   const SpecimenCaptureCoordinator({
     required this.sampler,

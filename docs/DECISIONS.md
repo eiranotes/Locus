@@ -2,6 +2,33 @@
 
 ## 2026-08-11
 
+### Request-first is a feature-flagged vertical slice until device evidence exists
+
+PR #12 is integrated locally as the concrete implementation of the Pro-reviewed
+request-first pivot, but `REQUEST_FIRST_MODE=true` remains required. This keeps
+the current v6 loop available while native audio feature distributions,
+interruptions, permission recovery, file-residue behavior, battery, thermal,
+accessibility, and 14-day behavior are still unverified. A Draft PR and a
+successful simulator/demo build are not evidence for those physical-device
+gates.
+
+History requests bind one persisted specimen ID when issued. Archive UI paging
+must never redefine that game rule, so capture resolves any missing active
+history references through a bounded ID query instead of loading the entire
+specimen library or accepting `기준 표본 없음`. The permanent record remains
+paginated; only the at-most-two active references are fetched on demand.
+
+Relationship keepsakes retain the same 5×5 `PlacementEngine`, authored rotation
+catalog, and eight-object limit as v6. Manual placement, directional movement,
+rotation, and return-to-storage are expression tools only: they do not satisfy
+requests or mutate relationship progress. Repository writes recheck that the
+scene object exists and update exactly one lifecycle row in the same transaction.
+
+All ordinary CI workflows remain source-read-only. Formatting is a validation
+failure, not a bot-authored branch mutation. The request-first static gate also
+executes the actual embedded table declarations in SQLite so a syntactically
+invalid schema cannot pass through string-presence assertions alone.
+
 ### Placement mode is a planning surface with one ground-anchor contract
 
 Generated terrain stamps, non-rain global atmosphere emblems, and 104 px

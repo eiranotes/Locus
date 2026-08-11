@@ -4,6 +4,23 @@ Last updated: 2026-08-11
 
 ## Current state
 
+Local `main` has been fast-forwarded to the current PR #12 head (`50fb554`) and
+now contains the feature-flagged request-first vertical slice. With
+`REQUEST_FIRST_MODE=true`, Locus runs visitor requests, four-second foreground
+audio feature sampling, permanent specimens, exclusive assignment,
+relationship milestones, schema-v5 migration, and the relationship diorama.
+The v6 weather/BLE/steps/crafting loop remains the default while physical-device
+sensor calibration and product validation are still open.
+
+The local follow-up hardens that PR in three places. History requests now load
+their exact persisted reference specimens even when those records are older
+than the 24-item archive page. Relationship keepsakes now have an actual manual
+placement route with first-valid placement, bounded directional movement,
+rotation, storage, and the shared `PlacementEngine`. Static validation executes
+all nine request-first table declarations against in-memory SQLite, and the
+temporary source-writing format workflow has been removed in favor of
+read-only CI checks.
+
 `main` contains the iOS simulator fixes, deterministic demo isolation, shared
 renderer, cataloged pixel-art packages, and a catalog-driven directional
 editor. The current working slice replaces generic rounded controls with
@@ -45,6 +62,18 @@ rotated occupied footprint. Isometric depth also follows that front vertex;
 selection never changes the object's physical paint order or persisted cell.
 
 ## Completed in the current slice
+
+- Integrated the Draft PR #12 request-first vertical slice locally without
+  changing the default v6 launch path.
+- Added targeted lookup for history-reference specimens so archive pagination
+  cannot make a valid similarity or contrast request impossible.
+- Connected stored and placed relationship keepsakes to a request-first
+  placement screen using the existing 5×5 collision, rotation, and eight-object
+  rules; placement remains expressive and never advances relationships.
+- Hardened scene-placement writes with object-existence and exact-row checks.
+- Made the request-first schema checker execute the actual Dart-embedded table
+  SQL through Python's SQLite runtime and removed the branch-specific workflow
+  that committed formatting changes with `contents: write`.
 
 - Removed random terrain stamps, non-rain global atmosphere emblems, and large
   weather footprint halos from runtime composition. Object-local alpha-clipped
@@ -455,7 +484,28 @@ the persisted coordinates. Visual inspection confirmed that the sparse lamp's
 base lands on the selected cell's front vertex and that dense-scene occlusion
 follows physical front depth without selection lifting.
 
+The request-first PR integration and local hardening were verified on
+2026-08-11 with the host Flutter 3.44.1. `./tool/validate.sh` passed repository,
+request-first SQLite execution, content, manifest, Swift parse, formatting,
+analyzer, and all 132 unit/widget tests. Both the default v6 demo APK and the
+`REQUEST_FIRST_MODE=true` demo APK built successfully, followed by a successful
+request-first iOS simulator Debug build. The built app installed and launched
+on the shared `AppAudit iPhone 16 Pro`; the request-first home rendered without
+visible overflow. A temporary stored keepsake in the isolated demo database
+made the new `기념물 · 보관 1` entry action visible beside `표본 찾기` without
+collision, then the QA row was deleted. macOS accessibility did not expose the
+Simulator window to `computer-use`, so the clicked placement-screen runtime
+state remains a focused integration-tour item rather than claimed evidence.
+
 ## Known risks and gates
+
+- The request-first placement screen compiles and its entry action was visually
+  verified, but click-through movement/rotation/relaunch proof still needs the
+  dedicated deterministic integration tour recorded in `docs/TASKS.md`.
+- Native request-first audio code builds on both platforms, but physical-device
+  calibration, interruption/route handling, permission recovery, file-residue,
+  battery, thermal, and 14-day behavior evidence remain mandatory before the
+  feature flag can become the default.
 
 - The first production-bound atlas pass is installed, but it still needs final
   composition tuning against a range of populated neighborhoods and text sizes.

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/diorama/diorama_view.dart';
 import 'package:reality_diorama/src/domain/entities.dart';
+import 'package:reality_diorama/src/request_first/screens/request_first_placement_screen.dart';
 import 'package:reality_diorama/src/request_first/request_first_scope.dart';
 import 'package:reality_diorama/src/request_first/screens/request_first_settings_screen.dart';
 import 'package:reality_diorama/src/request_first/widgets/request_card.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_button.dart';
 import 'package:reality_diorama/src/ui/widgets/pixel_card.dart';
+import 'package:reality_diorama/src/ui/widgets/pixel_surface.dart';
 
 class RequestFirstHomeScreen extends StatelessWidget {
   const RequestFirstHomeScreen({required this.onCapture, super.key});
@@ -91,30 +93,23 @@ class RequestFirstHomeScreen extends StatelessWidget {
                             actionAsset: 'capture',
                           ),
                         ),
-                        if (storedCount > 0)
+                        if (controller.sceneObjects.isNotEmpty)
                           Positioned(
                             right: 10,
                             bottom: 10,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: PixelPalette.panel.withValues(
-                                  alpha: 0.92,
-                                ),
-                                border: Border.all(color: PixelPalette.divider),
-                                borderRadius: BorderRadius.circular(
-                                  PixelRadii.control,
-                                ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 8,
-                                ),
-                                child: Text(
-                                  '보관 기념물 $storedCount',
-                                  style: Theme.of(context).textTheme.bodySmall,
+                            child: PixelButton(
+                              label: storedCount > 0
+                                  ? '기념물 · 보관 $storedCount'
+                                  : '기념물 배치',
+                              onPressed: () => Navigator.of(context).push<void>(
+                                MaterialPageRoute<void>(
+                                  builder: (BuildContext context) =>
+                                      const RequestFirstPlacementScreen(),
                                 ),
                               ),
+                              fallbackIcon: Icons.grid_view_outlined,
+                              actionAsset: 'place',
+                              tone: PixelButtonTone.quiet,
                             ),
                           ),
                       ],

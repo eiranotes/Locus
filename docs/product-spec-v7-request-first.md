@@ -1,6 +1,6 @@
 # Locus v7 — Request-first foundation
 
-Status: additive implementation foundation. The v6 loop remains the default application path until the request-first vertical slice passes device validation.
+Status: feature-flagged vertical slice. The v6 loop remains the default application path until request-first passes device and behavior validation.
 
 ## Product statement
 
@@ -21,7 +21,7 @@ visitor issues one authored request
 → the 5×5 diorama remains a place to arrange relationship rewards
 ```
 
-## Foundation scope in this branch
+## Implemented vertical-slice scope
 
 - SQLite schema v5 for specimens, requests, matches, assignments, relationships, events, scene keepsakes, placements, and sense unlocks.
 - Deterministic request scheduling with a 04:00 local-day boundary, two slots, authored templates, locked-axis filtering, recent-template avoidance, overlap preference, and explicit history-specimen references.
@@ -29,7 +29,12 @@ visitor issues one authored request
 - Atomic assignment persistence. Both `specimen_id` and `request_id` are unique in the assignment table.
 - Relationship milestones at 1, 3, 6, and 10 completed requests.
 - Reuse mapping for existing object art; no new production art is introduced.
-- A platform-neutral `SenseSampler` boundary plus deterministic demo sampler. Native microphone implementations are deliberately not claimed by this foundation slice.
+- A platform-neutral `SenseSampler`, deterministic demo sampler, iOS
+  `AVAudioEngine`, and Android `AudioRecord` feature extraction.
+- Lossless legacy mapping, request-first controller, home/capture/assignment/
+  archive/relationship/settings UI, and shared diorama scene adaptation.
+- Relationship keepsake auto-placement plus manual place, move, rotate, and
+  store actions using the existing placement rules.
 
 ## Invariants
 
@@ -55,13 +60,14 @@ visitor issues one authored request
 - Capture target: four seconds.
 - Relationship milestones: 1 / 3 / 6 / 10 fulfillments.
 
-## Not implemented in this slice
+## Remaining validation and product gates
 
-- iOS `AVAudioEngine` feature extraction.
-- Android `AudioRecord` feature extraction.
-- Request-first app shell and screens.
-- v4 user-data migration into scene keepsakes and legacy specimens.
+- Physical-device parity calibration and interruption/permission/route testing.
+- OS temporary-file residue, battery, thermal, and accessibility audits.
+- Deterministic full-flow UI screenshots and keepsake persistence tour.
+- Fourteen-day behavior validation.
 - Replacement of the current crafting, weather, BLE, and step loop.
 - Production analytics or remote configuration.
 
-These remain explicit later slices; the current application continues to build against v6 while the new domain is tested independently.
+These remain explicit gates. The current application defaults to v6 while the
+request-first slice is run with `REQUEST_FIRST_MODE=true`.

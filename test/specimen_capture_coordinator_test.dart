@@ -38,4 +38,32 @@ void main() {
       expect(bundle.matches.single.passed, isTrue);
     },
   );
+
+  test(
+    'history reference ids stay available beyond the visible archive page',
+    () {
+      final now = DateTime(2026, 8, 11, 20);
+      final request = VisitorRequest(
+        id: 'history-request',
+        visitorId: 'fog_cat',
+        templateId: 'similar-memory',
+        promptKo: '전에 준 것과 닮은 것',
+        issuedAt: now,
+        expiresAt: now.add(const Duration(hours: 72)),
+        slotIndex: 0,
+        status: VisitorRequestStatus.active,
+        constraints: const <RequestConstraint>[
+          RequestConstraint(axis: SenseAxis.loudness, maximum: 0.30),
+        ],
+        difficulty: 2,
+        historyComparison: HistoryComparison.similar,
+        historySpecimenId: 'older-than-first-page',
+        requestSchemaVersion: 'test-v1',
+      );
+
+      expect(historyReferenceIdsFor(<VisitorRequest>[request]), <String>{
+        'older-than-first-page',
+      });
+    },
+  );
 }

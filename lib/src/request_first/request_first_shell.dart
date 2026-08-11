@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:reality_diorama/src/app/theme.dart';
-import 'package:reality_diorama/src/request_first/request_first_controller.dart';
 import 'package:reality_diorama/src/request_first/request_first_scope.dart';
 import 'package:reality_diorama/src/request_first/screens/request_first_capture_sheet.dart';
 import 'package:reality_diorama/src/request_first/screens/request_first_home_screen.dart';

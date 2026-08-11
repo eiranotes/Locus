@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reality_diorama/src/app/theme.dart';
 import 'package:reality_diorama/src/diorama/generated_art_catalog.dart';
-import 'package:reality_diorama/src/domain/entities.dart';
 import 'package:reality_diorama/src/domain/enums.dart';
 import 'package:reality_diorama/src/domain/request_first_catalog.dart';
 import 'package:reality_diorama/src/request_first/request_first_scope.dart';

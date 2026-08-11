@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import re
+import sqlite3
 import sys
 from pathlib import Path
 
@@ -158,6 +160,8 @@ def check_source_contracts() -> None:
         "lib/src/platform/sense_sampler.dart",
         "lib/src/services/specimen_capture_coordinator.dart",
         "lib/src/data/request_first_repository.dart",
+        "lib/src/request_first/request_first_controller_actions.dart",
+        "lib/src/request_first/screens/request_first_placement_screen.dart",
     ]
     for relative in required:
         require_file(relative)
@@ -195,9 +199,31 @@ def check_source_contracts() -> None:
         if fragment not in database:
             fail(f"database is missing assignment exclusivity: {fragment}")
 
+    request_first_schema = database.split(
+        "static Future<void> _createRequestFirstTables", 1
+    )
+    if len(request_first_schema) != 2:
+        fail("request-first schema method is missing")
+    create_statements = re.findall(
+        r"await db\.execute\('''\s*(.*?)\s*'''\);",
+        request_first_schema[1],
+        re.DOTALL,
+    )
+    if len(create_statements) != 9:
+        fail("request-first schema must contain exactly nine table statements")
+    connection = sqlite3.connect(":memory:")
+    try:
+        for statement in create_statements:
+            connection.execute(statement)
+    except sqlite3.Error as exc:
+        fail(f"request-first schema is not executable SQLite: {exc}")
+    finally:
+        connection.close()
+
     repository = require_file("lib/src/data/request_first_repository.dart")
     for fragment in (
         "Future<void> saveSpecimenCapture",
+        "Future<List<Specimen>> loadSpecimensByIds",
         "Future<void> assignSpecimen",
         "Stored specimen match does not satisfy the request",
         "Specimen or request has already been assigned",
@@ -205,6 +231,18 @@ def check_source_contracts() -> None:
     ):
         if fragment not in repository:
             fail(f"request-first repository is missing {fragment}")
+
+    placement_actions = require_file(
+        "lib/src/request_first/request_first_controller_actions.dart"
+    )
+    for fragment in (
+        "validateScenePlacementCandidate",
+        "placeOrMoveSceneObject",
+        "storeSceneObject",
+        "PlacementEngine",
+    ):
+        if fragment not in placement_actions:
+            fail(f"request-first placement actions are missing {fragment}")
 
     scheduler = require_file("lib/src/domain/engines/request_scheduler.dart")
     for fragment in (
