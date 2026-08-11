@@ -1,0 +1,38 @@
+name: Request-first format
+
+on:
+  push:
+    branches:
+      - agent/request-first-v7-foundation
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out request-first branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/request-first-v7-foundation
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.44.9
+          cache: true
+      - name: Format Dart sources
+        run: dart format lib test
+      - name: Commit formatting
+        shell: bash
+        run: |
+          if git diff --quiet -- lib test; then
+            echo "Dart sources already formatted."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib test
+          git commit -m "chore: format request-first vertical slice"
+          git push origin HEAD:agent/request-first-v7-foundation
