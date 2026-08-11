@@ -19,17 +19,20 @@ class SpecimenMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final painted = CustomPaint(
+      painter: _SpecimenMarkPainter(specimen: specimen, compact: compact),
+    );
     return Semantics(
       image: true,
       label: specimenDescription(specimen),
       child: ExcludeSemantics(
-        child: SizedBox(
-          height: height,
-          width: double.infinity,
-          child: CustomPaint(
-            painter: _SpecimenMarkPainter(specimen: specimen, compact: compact),
-          ),
-        ),
+        child: height.isFinite
+            ? SizedBox(
+                height: height,
+                width: double.infinity,
+                child: painted,
+              )
+            : SizedBox.expand(child: painted),
       ),
     );
   }
