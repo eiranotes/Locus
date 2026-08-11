@@ -12,7 +12,7 @@ class SceneObject {
     required this.createdAt,
     this.sourceVisitorId,
     this.sourceRequestId,
-    this.legacyPayload,
+    Map<String, Object?>? legacyPayload,
   }) : legacyPayload = legacyPayload == null
            ? null
            : Map<String, Object?>.unmodifiable(legacyPayload);
