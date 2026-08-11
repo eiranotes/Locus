@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "templates": [
+    {
+      "id": "quiet_anytime",
+      "visitorIds": ["fog_cat", "night_moth"],
+      "promptKo": "조용히 이어지는 소리를 하나 가져다줘.",
+      "accessTier": "everyday",
+      "difficulty": 1,
+      "minimumRelationshipStage": 0,
+      "overlapTags": ["quiet", "steady"],
+      "constraints": [
+        {"axis": "loudness", "maximum": 0.28, "tolerance": 0.20, "weight": 1.0, "hard": true},
+        {"axis": "intermittency", "maximum": 0.45, "tolerance": 0.25, "weight": 0.7, "hard": false}
+      ]
+    },
+    {
+      "id": "loud_burst",
+      "visitorIds": ["night_moth", "tea_mouse"],
+      "promptKo": "크게 들렸다가 금방 사라지는 소리가 궁금해.",
+      "accessTier": "everyday",
+      "difficulty": 2,
+      "minimumRelationshipStage": 0,
+      "overlapTags": ["loud", "broken"],
+      "constraints": [
+        {"axis": "loudness", "minimum": 0.68, "tolerance": 0.22, "weight": 1.0, "hard": true},
+        {"axis": "intermittency", "minimum": 0.55, "tolerance": 0.25, "weight": 1.0, "hard": true}
+      ]
+    },
+    {
+      "id": "broken_quiet",
+      "visitorIds": ["fog_cat", "tea_mouse"],
+      "promptKo": "작고 드문드문 끊기는 소리를 찾아줘.",
+      "accessTier": "everyday",
+      "difficulty": 2,
+      "minimumRelationshipStage": 0,
+      "overlapTags": ["quiet", "broken"],
+      "constraints": [
+        {"axis": "loudness", "maximum": 0.36, "tolerance": 0.20, "weight": 1.0, "hard": true},
+        {"axis": "intermittency", "minimum": 0.58, "tolerance": 0.25, "weight": 1.0, "hard": true}
+      ]
+    },
+    {
+      "id": "steady_low",
+      "visitorIds": ["fog_cat", "night_moth"],
+      "promptKo": "낮게 오래 이어지는 소리를 듣고 싶어.",
+      "accessTier": "everyday",
+      "difficulty": 2,
+      "minimumRelationshipStage": 0,
+      "overlapTags": ["quiet", "steady"],
+      "constraints": [
+        {"axis": "loudness", "maximum": 0.42, "tolerance": 0.22, "weight": 0.8, "hard": false},
+        {"axis": "intermittency", "maximum": 0.28, "tolerance": 0.22, "weight": 1.0, "hard": true}
+      ]
+    },
+    {
+      "id": "evening_quiet",
+      "visitorIds": ["night_moth", "fog_cat"],
+      "promptKo": "저녁이나 밤의 조용한 소리를 가져다줘.",
+      "accessTier": "everyday",
+      "difficulty": 2,
+      "minimumRelationshipStage": 0,
+      "overlapTags": ["quiet", "evening"],
+      "constraints": [
+        {"axis": "timeBand", "anyOf": ["evening", "night"], "weight": 1.0, "hard": true},
+        {"axis": "loudness", "maximum": 0.32, "tolerance": 0.20, "weight": 1.0, "hard": true}
+      ]
+    },
+    {
+      "id": "morning_loud",
+      "visitorIds": ["tea_mouse"],
+      "promptKo": "아침에 또렷하게 들리는 큰 소리를 찾아줘.",
+      "accessTier": "outing",
+      "difficulty": 2,
+      "minimumRelationshipStage": 0,
+      "overlapTags": ["loud", "morning"],
+      "constraints": [
+        {"axis": "timeBand", "anyOf": ["morning"], "weight": 1.0, "hard": true},
+        {"axis": "loudness", "minimum": 0.62, "tolerance": 0.24, "weight": 1.0, "hard": true}
+      ]
+    },
+    {
+      "id": "night_broken",
+      "visitorIds": ["night_moth"],
+      "promptKo": "밤에 잠깐씩 나타나는 소리를 기다려줘.",
+      "accessTier": "outing",
+      "difficulty": 2,
+      "minimumRelationshipStage": 0,
+      "overlapTags": ["broken", "evening"],
+      "constraints": [
+        {"axis": "timeBand", "anyOf": ["night"], "weight": 1.0, "hard": true},
+        {"axis": "intermittency", "minimum": 0.58, "tolerance": 0.25, "weight": 1.0, "hard": true}
+      ]
+    },
+    {
+      "id": "afternoon_steady",
+      "visitorIds": ["fog_cat", "tea_mouse"],
+      "promptKo": "낮 동안 한결같이 이어지는 소리를 가져다줘.",
+      "accessTier": "everyday",
+      "difficulty": 2,
+      "minimumRelationshipStage": 0,
+      "overlapTags": ["steady", "day"],
+      "constraints": [
+        {"axis": "timeBand", "anyOf": ["afternoon"], "weight": 0.8, "hard": false},
+        {"axis": "intermittency", "maximum": 0.30, "tolerance": 0.22, "weight": 1.0, "hard": true}
+      ]
+    },
+    {
+      "id": "soft_rhythm",
+      "visitorIds": ["night_moth", "tea_mouse"],
+      "promptKo": "조용하지만 규칙적으로 되풀이되는 소리를 찾아줘.",
+      "accessTier": "everyday",
+      "difficulty": 3,
+      "minimumRelationshipStage": 2,
+      "overlapTags": ["quiet", "rhythm"],
+      "constraints": [
+        {"axis": "loudness", "maximum": 0.38, "tolerance": 0.20, "weight": 0.8, "hard": false},
+        {"axis": "rhythmicity", "minimum": 0.65, "tolerance": 0.25, "weight": 1.0, "hard": true}
+      ]
+    },
+    {
+      "id": "dynamic_surge",
+      "visitorIds": ["fog_cat", "tea_mouse"],
+      "promptKo": "크기가 크게 달라지는 소리의 순간을 가져다줘.",
+      "accessTier": "outing",
+      "difficulty": 3,
+      "minimumRelationshipStage": 2,
+      "overlapTags": ["loud", "dynamic"],
+      "constraints": [
+        {"axis": "dynamicRange", "minimum": 0.68, "tolerance": 0.24, "weight": 1.0, "hard": true},
+        {"axis": "loudness", "minimum": 0.45, "tolerance": 0.30, "weight": 0.5, "hard": false}
+      ]
+    },
+    {
+      "id": "bright_fragments",
+      "visitorIds": ["tea_mouse", "night_moth"],
+      "promptKo": "가볍고 날카롭게 튀는 소리를 찾아줘.",
+      "accessTier": "everyday",
+      "difficulty": 3,
+      "minimumRelationshipStage": 2,
+      "overlapTags": ["bright", "broken"],
+      "constraints": [
+        {"axis": "spectralBrightness", "minimum": 0.66, "tolerance": 0.25, "weight": 1.0, "hard": true},
+        {"axis": "intermittency", "minimum": 0.45, "tolerance": 0.30, "weight": 0.5, "hard": false}
+      ]
+    },
+    {
+      "id": "similar_memory",
+      "visitorIds": ["fog_cat", "night_moth", "tea_mouse"],
+      "promptKo": "전에 건넨 표본과 닮은 소리를 하나 더 찾아줘.",
+      "accessTier": "everyday",
+      "difficulty": 4,
+      "minimumRelationshipStage": 4,
+      "historyComparison": "similar",
+      "overlapTags": ["memory", "quiet"],
+      "constraints": [
+        {"axis": "loudness", "minimum": 0.0, "maximum": 1.0, "weight": 0.2, "hard": false}
+      ]
+    },
+    {
+      "id": "contrast_memory",
+      "visitorIds": ["fog_cat", "night_moth", "tea_mouse"],
+      "promptKo": "전에 건넨 표본과 정반대인 소리를 찾아줘.",
+      "accessTier": "outing",
+      "difficulty": 4,
+      "minimumRelationshipStage": 4,
+      "historyComparison": "contrast",
+      "overlapTags": ["memory", "loud"],
+      "constraints": [
+        {"axis": "loudness", "minimum": 0.0, "maximum": 1.0, "weight": 0.2, "hard": false}
+      ]
+    }
+  ]
+}
