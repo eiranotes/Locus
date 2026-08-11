@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "objects": [
+    {"id": "keepsake_alley_lamp", "nameKo": "기억의 골목등", "legacyRecipeId": "alley_lamp"},
+    {"id": "keepsake_bench", "nameKo": "고양이의 벤치", "legacyRecipeId": "bench"},
+    {"id": "keepsake_lantern_string", "nameKo": "나방의 전구 줄", "legacyRecipeId": "lantern_string"},
+    {"id": "keepsake_wind_chime", "nameKo": "기억의 풍경", "legacyRecipeId": "wind_chime"},
+    {"id": "keepsake_tea_table", "nameKo": "생쥐의 찻상", "legacyRecipeId": "tea_table"},
+    {"id": "keepsake_stone_lantern", "nameKo": "기억의 석등", "legacyRecipeId": "stone_lantern"}
+  ]
+}
