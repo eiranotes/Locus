@@ -79,17 +79,21 @@ void main() {
         SenseAxis.timeBand,
       },
       slotCount: 2,
-      historySpecimenCount: 0,
+      historySpecimenIds: const <String>[],
       idFactory: () => 'request-${id++}',
     );
 
     expect(result.activeRequests, hasLength(2));
     expect(
-      result.activeRequests.map((VisitorRequest value) => value.visitorId).toSet(),
+      result.activeRequests
+          .map((VisitorRequest value) => value.visitorId)
+          .toSet(),
       hasLength(2),
     );
     expect(
-      result.activeRequests.map((VisitorRequest value) => value.templateId).toSet(),
+      result.activeRequests
+          .map((VisitorRequest value) => value.templateId)
+          .toSet(),
       containsAll(<String>['quiet', 'quiet-night']),
     );
   });
@@ -110,7 +114,7 @@ void main() {
       },
       unlockedAxes: const <SenseAxis>{SenseAxis.loudness},
       slotCount: 1,
-      historySpecimenCount: 0,
+      historySpecimenIds: const <String>[],
       idFactory: () => 'request-${id++}',
     );
 
@@ -146,7 +150,7 @@ void main() {
         SenseAxis.timeBand,
       },
       slotCount: 1,
-      historySpecimenCount: 0,
+      historySpecimenIds: const <String>[],
       idFactory: () => 'replacement-${id++}',
     );
 
@@ -168,7 +172,7 @@ void main() {
           SenseAxis.timeBand,
         },
         slotCount: 2,
-        historySpecimenCount: 0,
+        historySpecimenIds: const <String>[],
         idFactory: () => 'id-${id++}',
       );
     }
@@ -182,6 +186,64 @@ void main() {
     expect(
       first.activeRequests.map((VisitorRequest value) => value.visitorId),
       second.activeRequests.map((VisitorRequest value) => value.visitorId),
+    );
+  });
+
+  test('history requests persist a deterministic reference specimen', () {
+    var id = 0;
+    final historyTemplate = RequestTemplateDefinition(
+      id: 'similar-memory',
+      visitorIds: const <String>['fog_cat'],
+      promptKo: '전에 준 것과 닮은 것',
+      constraints: const <RequestConstraint>[
+        RequestConstraint(
+          axis: SenseAxis.loudness,
+          minimum: 0,
+          maximum: 1,
+          hard: false,
+        ),
+      ],
+      overlapTags: const <String>{'memory'},
+      accessTier: RequestAccessTier.everyday,
+      difficulty: 4,
+      minimumRelationshipStage: 4,
+      historyComparison: HistoryComparison.similar,
+    );
+    final result = const RequestScheduler(balance: balance).ensureSlots(
+      now: DateTime(2026, 8, 11, 9),
+      requests: const <VisitorRequest>[],
+      templates: <RequestTemplateDefinition>[historyTemplate],
+      relationships: <String, VisitorRelationship>{
+        'fog_cat': VisitorRelationship(
+          visitorId: 'fog_cat',
+          stage: 4,
+          fulfilledCount: 10,
+          unlockedRewardKeys: const <String>{},
+        ),
+      },
+      unlockedAxes: const <SenseAxis>{SenseAxis.loudness},
+      slotCount: 1,
+      historySpecimenIds: const <String>[
+        'specimen-5',
+        'specimen-3',
+        'specimen-1',
+        'specimen-4',
+        'specimen-2',
+      ],
+      idFactory: () => 'history-request-${id++}',
+    );
+
+    expect(result.activeRequests, hasLength(1));
+    expect(result.activeRequests.single.historySpecimenId, isNotNull);
+    expect(
+      const <String>{
+        'specimen-1',
+        'specimen-2',
+        'specimen-3',
+        'specimen-4',
+        'specimen-5',
+      },
+      contains(result.activeRequests.single.historySpecimenId),
     );
   });
 }
