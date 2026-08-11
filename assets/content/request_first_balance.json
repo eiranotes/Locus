@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "tutorialRequestSlots": 1,
+  "requestSlots": 2,
+  "gameDayBoundaryHour": 4,
+  "requestLifetimeHours": 72,
+  "requestReplacementCooldownHours": 24,
+  "specimenCaptureSeconds": 4,
+  "minimumCaptureConfidence": 0.60,
+  "everydayRequestRatio": 0.70,
+  "overlapPairRate": 0.50,
+  "historyRequestMinimumSpecimens": 5,
+  "relationshipStageThresholds": [1, 3, 6, 10],
+  "gridColumns": 5,
+  "gridRows": 5,
+  "activeObjectLimit": 8
+}
