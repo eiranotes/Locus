@@ -2,6 +2,18 @@
 
 ## Completed
 
+- [x] Review the WebGPT Pro `Locus 설계 분석` conversation against the live
+      checkout and current Draft PR #12 instead of accepting its completion
+      claims at face value.
+- [x] Fast-forward the current PR #12 head into local `main` while preserving
+      all pre-existing untracked wrappers, logs, and screenshot artifacts.
+- [x] Keep old history-reference specimens reachable through targeted SQLite
+      lookup when the visible archive is paged to the newest 24 records.
+- [x] Connect relationship keepsakes to validated manual place, move, rotate,
+      and store actions without making placement a relationship gate.
+- [x] Execute request-first schema declarations in the static validator and
+      remove the temporary source-writing format workflow.
+
 - [x] Reproduce iOS simulator install and startup from the imported `main`.
 - [x] Fix missing `CFBundleExecutable` and sqflite WAL startup failure.
 - [x] Align runtime and iOS display identity with Locus.
@@ -65,6 +77,15 @@
       lifting, and verify the result in sparse and eight-object editor captures.
 
 ## Next
+
+- [ ] Run cross-device audio calibration fixtures on physical iPhone and
+      Android hardware, including interruption, route change, permanent denial,
+      thermal, battery, and temporary-file residue checks.
+- [ ] Add a deterministic request-first integration tour that earns a
+      keepsake, stores it, places it again, moves and rotates it, relaunches,
+      and verifies the exact persisted scene.
+- [ ] Decide whether request-first becomes the default only after the sensor
+      and 14-day behavior gates pass; do not remove v6 code before that decision.
 
 - [x] Expand the object catalog to 28 recipes and visitor codex to 18 entries
       without increasing the 5×5 board or eight-object active limit.

@@ -18,6 +18,7 @@ def patch_android_manifest() -> None:
     <uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\" />
     <uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\" />
     <uses-permission android:name=\"android.permission.ACTIVITY_RECOGNITION\" />
+    <uses-permission android:name=\"android.permission.RECORD_AUDIO\" />
     <uses-permission android:name=\"android.permission.BLUETOOTH\" android:maxSdkVersion=\"30\" />
     <uses-permission android:name=\"android.permission.BLUETOOTH_ADMIN\" android:maxSdkVersion=\"30\" />
     <uses-permission android:name=\"android.permission.BLUETOOTH_SCAN\" android:usesPermissionFlags=\"neverForLocation\" />
@@ -25,18 +26,35 @@ def patch_android_manifest() -> None:
 
     <uses-feature android:name=\"android.hardware.bluetooth_le\" android:required=\"false\" />
     <uses-feature android:name=\"android.hardware.sensor.stepcounter\" android:required=\"false\" />
+    <uses-feature android:name=\"android.hardware.microphone\" android:required=\"false\" />
 
 """
     if "android.permission.ACTIVITY_RECOGNITION" not in text:
         text = text.replace(marker, permissions + "    " + marker, 1)
-    elif "android.hardware.sensor.stepcounter" not in text:
-        text = text.replace(
-            marker,
-            "    <uses-feature android:name=\"android.hardware.bluetooth_le\" android:required=\"false\" />\n"
-            "    <uses-feature android:name=\"android.hardware.sensor.stepcounter\" android:required=\"false\" />\n\n"
-            "    " + marker,
-            1,
-        )
+    else:
+        if "android.permission.RECORD_AUDIO" not in text:
+            text = text.replace(
+                "    <uses-permission android:name=\"android.permission.ACTIVITY_RECOGNITION\" />\n",
+                "    <uses-permission android:name=\"android.permission.ACTIVITY_RECOGNITION\" />\n"
+                "    <uses-permission android:name=\"android.permission.RECORD_AUDIO\" />\n",
+                1,
+            )
+        if "android.hardware.bluetooth_le" not in text:
+            text = text.replace(
+                marker,
+                "    <uses-feature android:name=\"android.hardware.bluetooth_le\" android:required=\"false\" />\n"
+                "    <uses-feature android:name=\"android.hardware.sensor.stepcounter\" android:required=\"false\" />\n"
+                "    <uses-feature android:name=\"android.hardware.microphone\" android:required=\"false\" />\n\n"
+                "    " + marker,
+                1,
+            )
+        elif "android.hardware.microphone" not in text:
+            text = text.replace(
+                "    <uses-feature android:name=\"android.hardware.sensor.stepcounter\" android:required=\"false\" />\n",
+                "    <uses-feature android:name=\"android.hardware.sensor.stepcounter\" android:required=\"false\" />\n"
+                "    <uses-feature android:name=\"android.hardware.microphone\" android:required=\"false\" />\n",
+                1,
+            )
     text, count = re.subn(
         r'android:label="[^"]*"',
         'android:label="Locus"',
@@ -69,7 +87,7 @@ def patch_ios_plist() -> None:
     if not path.exists():
         return
     text = path.read_text(encoding="utf-8")
-    keys = """
+    legacy_keys = """
 \t<key>NSLocationWhenInUseUsageDescription</key>
 \t<string>현재 지역의 날씨 재료를 만들기 위해 위치를 사용합니다.</string>
 \t<key>NSMotionUsageDescription</key>
@@ -77,8 +95,14 @@ def patch_ios_plist() -> None:
 \t<key>NSBluetoothAlwaysUsageDescription</key>
 \t<string>주변 전파 패턴을 물건의 연결 방식으로 바꿉니다. 특정 기기는 저장하지 않습니다.</string>
 """
+    microphone_key = """
+\t<key>NSMicrophoneUsageDescription</key>
+\t<string>현실의 소리에서 짧은 감각 표본을 만들기 위해 4초간 마이크를 사용합니다. 원음은 저장하지 않습니다.</string>
+"""
     if "NSMotionUsageDescription" not in text:
-        text = text.replace("</dict>", keys + "</dict>", 1)
+        text = text.replace("</dict>", legacy_keys + "</dict>", 1)
+    if "NSMicrophoneUsageDescription" not in text:
+        text = text.replace("</dict>", microphone_key + "</dict>", 1)
     if "CFBundleExecutable" not in text:
         executable = """\t<key>CFBundleExecutable</key>
 \t<string>$(EXECUTABLE_NAME)</string>
