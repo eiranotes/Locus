@@ -5,6 +5,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 python3 tool/check_repo.py
+python3 tool/check_request_first.py
 python3 - <<'PY'
 import json
 from pathlib import Path
