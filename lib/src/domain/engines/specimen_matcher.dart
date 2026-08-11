@@ -7,6 +7,8 @@ class SpecimenMatcher {
   const SpecimenMatcher({this.minimumConfidence = 0.60});
 
   static const String matcherVersion = 'specimen-matcher-v1';
+  static const double similarDistanceThreshold = 0.20;
+  static const double contrastDistanceThreshold = 0.55;
 
   final double minimumConfidence;
 
@@ -57,7 +59,7 @@ class SpecimenMatcher {
     final score = totalWeight == 0 ? 0.0 : weightedScore / totalWeight;
     final hardSatisfied = breakdown
         .where((ConstraintMatch value) => value.hard)
-        .every((ConstraintMatch value) => value.score >= 0.65);
+        .every((ConstraintMatch value) => value.satisfied);
     final passed = hardSatisfied && score >= 0.75;
     final verdict = passed
         ? MatchVerdict.match
@@ -154,19 +156,55 @@ class SpecimenMatcher {
       squared += delta * delta;
     }
     final distance = math.sqrt(squared / commonAxes.length).clamp(0.0, 1.0);
+    final satisfied = switch (comparison) {
+      HistoryComparison.similar => distance <= similarDistanceThreshold,
+      HistoryComparison.contrast => distance >= contrastDistanceThreshold,
+      HistoryComparison.none => true,
+    };
     final score = switch (comparison) {
-      HistoryComparison.similar => (1 - distance / 0.40).clamp(0.0, 1.0),
-      HistoryComparison.contrast => ((distance - 0.20) / 0.55).clamp(0.0, 1.0),
+      HistoryComparison.similar => _thresholdScore(
+        value: distance,
+        threshold: similarDistanceThreshold,
+        lowerIsBetter: true,
+      ),
+      HistoryComparison.contrast => _thresholdScore(
+        value: distance,
+        threshold: contrastDistanceThreshold,
+        lowerIsBetter: false,
+      ),
       HistoryComparison.none => 1.0,
     };
     return ConstraintMatch(
       constraintKey: 'history.${comparison.name}',
-      score: score.toDouble(),
-      satisfied: score >= 0.65,
+      score: score,
+      satisfied: satisfied,
       hard: true,
       observed: '거리 ${distance.toStringAsFixed(2)}',
       target: comparison == HistoryComparison.similar ? '닮은 표본' : '대조 표본',
     );
+  }
+
+  double _thresholdScore({
+    required double value,
+    required double threshold,
+    required bool lowerIsBetter,
+  }) {
+    if (lowerIsBetter) {
+      if (value <= threshold) {
+        return (0.75 + 0.25 * (threshold - value) / threshold)
+            .clamp(0.75, 1.0)
+            .toDouble();
+      }
+      return (0.74 * (1 - (value - threshold) / (1 - threshold)))
+          .clamp(0.0, 0.74)
+          .toDouble();
+    }
+    if (value >= threshold) {
+      return (0.75 + 0.25 * (value - threshold) / (1 - threshold))
+          .clamp(0.75, 1.0)
+          .toDouble();
+    }
+    return (0.74 * value / threshold).clamp(0.0, 0.74).toDouble();
   }
 
   double _rangeScore(double value, RequestConstraint constraint) {
